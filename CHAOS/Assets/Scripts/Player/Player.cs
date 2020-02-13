@@ -68,8 +68,8 @@ public class Player : MonoBehaviour
         this.fireRightHook = Input.GetButton(this.axisName.fireRightHook);
         this.movementX = Input.GetAxis(this.axisName.moveLeftRight);
         this.movementY = Input.GetAxis(this.axisName.moveFrontBack);
-        this.mouseAxisX = Input.GetAxis(this.axisName.mouseX);
-        this.mouseAxisY = Input.GetAxis(this.axisName.mouseY) * (float)((PlayerPrefs.GetInt(PlayerPrefKeys.invertYAxis) != 0) ? -1 : 1);
+        //this.mouseAxisX = Input.GetAxis(this.axisName.mouseX);
+        //this.mouseAxisY = Input.GetAxis(this.axisName.mouseY) * (float)((PlayerPrefs.GetInt(PlayerPrefKeys.invertYAxis) != 0) ? -1 : 1);
         this.CheckIfGrounded();
         this.CheckIfStationary();
         this.CheckSliding();
@@ -582,7 +582,7 @@ public class Player : MonoBehaviour
         this.grabbed = true;
         this.actionScript.StartDamageEffect();
         this.actionScript.StartGrabEscapeAttempt();
-        this.camScript.StartGrabZoom();
+        //this.camScript.StartGrabZoom();
     }
 
     // Token: 0x06000148 RID: 328 RVA: 0x0000D894 File Offset: 0x0000BA94
@@ -592,7 +592,7 @@ public class Player : MonoBehaviour
         //gameObject.GetComponent<TitanMain>().ReleaseGrabbedPlayer();
         base.transform.parent = null;
         this.rigidBody.isKinematic = false;
-        this.camScript.ResetFollowDistance();
+        //this.camScript.ResetFollowDistance();
         this.EnableScripts();
         this.actionScript.StopDamageEffect();
         this.grabbed = false;
@@ -749,23 +749,23 @@ public class Player : MonoBehaviour
 
     // Token: 0x1700001C RID: 28
     // (get) Token: 0x06000154 RID: 340 RVA: 0x0000DC9D File Offset: 0x0000BE9D
-    public float MouseAxisX
-    {
-        get
-        {
-            return this.mouseAxisX;
-        }
-    }
+    //public float MouseAxisX
+    //{
+    //    get
+    //    {
+    //        return this.mouseAxisX;
+    //    }
+    //}
 
-    // Token: 0x1700001D RID: 29
-    // (get) Token: 0x06000155 RID: 341 RVA: 0x0000DCA5 File Offset: 0x0000BEA5
-    public float MouseAxisY
-    {
-        get
-        {
-            return this.mouseAxisY;
-        }
-    }
+    //// Token: 0x1700001D RID: 29
+    //// (get) Token: 0x06000155 RID: 341 RVA: 0x0000DCA5 File Offset: 0x0000BEA5
+    //public float MouseAxisY
+    //{
+    //    get
+    //    {
+    //        return this.mouseAxisY;
+    //    }
+    //}
 
     // Token: 0x1700001E RID: 30
     // (get) Token: 0x06000156 RID: 342 RVA: 0x0000DCAD File Offset: 0x0000BEAD

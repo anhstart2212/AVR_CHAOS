@@ -50,7 +50,7 @@ public class MusicController : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
         }
-        yield break;
+        //yield break;
     }
 
     // Token: 0x06000574 RID: 1396 RVA: 0x0002DD43 File Offset: 0x0002BF43

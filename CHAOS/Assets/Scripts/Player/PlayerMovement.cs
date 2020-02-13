@@ -423,7 +423,7 @@ public class PlayerMovement : MonoBehaviour
                 yield return null;
             }
         }
-        yield break;
+        //yield break;
     }
 
     // Token: 0x0600023E RID: 574 RVA: 0x00014258 File Offset: 0x00012458

@@ -8,7 +8,9 @@ public class DrawHookCable : MonoBehaviour
     private void Awake()
     {
         this.lineRenderer = base.GetComponent<LineRenderer>();
-        this.lineRenderer.SetWidth(this.lineWidth, this.lineWidth);
+        //this.lineRenderer.SetWidth(this.lineWidth, this.lineWidth);
+        this.lineRenderer.startWidth = this.lineWidth;
+        this.lineRenderer.endWidth = this.lineWidth;
     }
 
     // Token: 0x06000110 RID: 272 RVA: 0x0000B130 File Offset: 0x00009330
@@ -69,10 +71,10 @@ public class DrawHookCable : MonoBehaviour
     private void FixedUpdate()
     {
         this.lineRenderer.SetPosition(0, base.transform.position);
-        if (this.titanAnchor != null)
-        {
-            this.target = this.titanAnchor.position;
-        }
+        //if (this.titanAnchor != null)
+        //{
+        //    this.target = this.titanAnchor.position;
+        //}
         this.dist = Vector3.Distance(base.transform.position, this.target);
         this.lineRenderer.material.mainTextureScale = new Vector2(this.dist * 2f, 1f);
         if (!this.isRetracting)
@@ -181,10 +183,10 @@ public class DrawHookCable : MonoBehaviour
             }
             else
             {
-                if (this.titanAnchor != null)
-                {
-                    UnityEngine.Object.Destroy(this.titanAnchor.gameObject);
-                }
+                //if (this.titanAnchor != null)
+                //{
+                //    UnityEngine.Object.Destroy(this.titanAnchor.gameObject);
+                //}
                 UnityEngine.Object.Destroy(base.gameObject);
             }
         }
@@ -234,10 +236,10 @@ public class DrawHookCable : MonoBehaviour
     {
         UnityEngine.Object.Destroy(this.jointInstance);
         UnityEngine.Object.Destroy(this.hookJoint);
-        if (this.titanAnchor != null)
-        {
-            UnityEngine.Object.Destroy(this.titanAnchor.gameObject);
-        }
+        //if (this.titanAnchor != null)
+        //{
+        //    UnityEngine.Object.Destroy(this.titanAnchor.gameObject);
+        //}
         UnityEngine.Object.Destroy(base.gameObject);
     }
 
@@ -301,7 +303,7 @@ public class DrawHookCable : MonoBehaviour
     private Vector3 lookAtPosition;
 
     // Token: 0x0400015C RID: 348
-    private Transform titanAnchor;
+    //private Transform titanAnchor;
 
     // Token: 0x0400015D RID: 349
     [HideInInspector]

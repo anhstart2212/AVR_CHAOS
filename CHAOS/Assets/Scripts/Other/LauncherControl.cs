@@ -8,13 +8,13 @@ public class LauncherControl : MonoBehaviour
     private void Start()
     {
         this.player = base.GetComponentInParent<Player>();
-        this.cc = this.player.transforms.playerCamera.GetComponent<CameraControl>();
+        //this.cc = this.player.transforms.playerCamera.GetComponent<CameraControl>();
     }
 
     // Token: 0x06000123 RID: 291 RVA: 0x0000C27C File Offset: 0x0000A47C
     private void LateUpdate()
     {
-        Vector3 cameraTargetPosition = this.cc.CameraTargetPosition;
+        //Vector3 cameraTargetPosition = this.cc.CameraTargetPosition;
         Vector3 forward = this.player.transforms.playerCamera.forward;
         this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
         if (this.player.HookSplitKeyDown)
@@ -49,16 +49,20 @@ public class LauncherControl : MonoBehaviour
         }
         else
         {
-            Vector3 origin;
-            if (this.isLeft)
-            {
-                origin = cameraTargetPosition - this.player.transforms.playerCamera.right * 0.05f;
-            }
-            else
-            {
-                origin = cameraTargetPosition + this.player.transforms.playerCamera.right * 0.05f;
-            }
-            Ray ray2 = new Ray(origin, forward);
+            //Vector3 origin;
+            //if (this.isLeft)
+            //{
+            //    origin = cameraTargetPosition - this.player.transforms.playerCamera.right * 0.05f;
+            //}
+            //else
+            //{
+            //    origin = cameraTargetPosition + this.player.transforms.playerCamera.right * 0.05f;
+            //}
+            //Ray ray2 = new Ray(origin, forward);
+
+            Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
+            //Debug.DrawRay(player.transforms.playerCamera.transform.position, forward * 1000, Color.blue);
+
             if (!Physics.Raycast(ray2, this.player.MaxHookDistance, Common.layerNoHook))
             {
                 int layerMask2 = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
@@ -180,7 +184,7 @@ public class LauncherControl : MonoBehaviour
     private Player player;
 
     // Token: 0x04000187 RID: 391
-    private CameraControl cc;
+    //private CameraControl cc;
 
     // Token: 0x04000188 RID: 392
     private RaycastHit contact;

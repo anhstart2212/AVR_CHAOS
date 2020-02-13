@@ -23,7 +23,7 @@ public class EnvMapAnimator : MonoBehaviour
             this.m_material.SetMatrix("_EnvMatrix", matrix);
             yield return null;
         }
-        yield break;
+        //yield break;
     }
 
     // Token: 0x0400065A RID: 1626

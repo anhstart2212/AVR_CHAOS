@@ -1091,7 +1091,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1671096956949974
 GameObject:
   m_ObjectHideFlags: 1
@@ -4322,11 +4322,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82cae0a09719ef649adcb9c04733b736, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lowerBound: 80
-  upperBound: 280
-  defaultFollowDistance: 3
-  maxOffsetX: 0.55
-  maxOffsetY: 0.4
 --- !u!114 &114285654807304974
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4519,8 +4514,6 @@ MonoBehaviour:
     hookSplit: Hook Split
     jumpReel: Jump Reel
     verticalBurst: Vertical Burst
-    mouseX: Mouse X
-    mouseY: Mouse Y
     titanLock: Titan Lock
   speed:
     run: 10
@@ -4561,15 +4554,14 @@ MonoBehaviour:
     footRight: {fileID: 4610159488680986}
     hookOriginLeft: {fileID: 4673970331557140}
     hookOriginRight: {fileID: 4272805884603514}
-    playerCamera: {fileID: 4342468761857266}
+    playerCamera: {fileID: 0}
     playerUI: {fileID: 4643998026157664}
     rotator: {fileID: 4779279079945292}
   particles:
     gasCore: {fileID: 198293050759178386}
     gasFast: {fileID: 198043302649730770}
     gasBurst: {fileID: 198074957772921390}
-    deathVFX: {fileID: 198540010591126880, guid: e743e0433f5bf244383ea46d97c06812,
-      type: 2}
+    deathVFX: {fileID: 0}
 --- !u!114 &114630607990808298
 MonoBehaviour:
   m_ObjectHideFlags: 1

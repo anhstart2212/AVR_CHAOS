@@ -80,7 +80,7 @@ public class PlayerActions : MonoBehaviour
         {
             yield return null;
         }
-        Transform titan = Common.GetRootObject(base.transform);
+        //Transform titan = Common.GetRootObject(base.transform);
         //TitanMain main = titan.GetComponent<TitanMain>();
         //main.ContactScript.DisableHand(main.IsLeftEating);
         this.StartGrabbedTimer();

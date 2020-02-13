@@ -35,10 +35,10 @@ public class InputAxisNames
     public string verticalBurst;
 
     // Token: 0x0400055F RID: 1375
-    public string mouseX;
+    //public string mouseX;
 
     // Token: 0x04000560 RID: 1376
-    public string mouseY;
+    //public string mouseY;
 
     // Token: 0x04000561 RID: 1377
     public string titanLock;
