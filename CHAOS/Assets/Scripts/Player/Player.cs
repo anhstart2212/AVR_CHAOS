@@ -199,7 +199,7 @@ public class Player : MonoBehaviour
     // Token: 0x06000132 RID: 306 RVA: 0x0000CEC4 File Offset: 0x0000B0C4
     private void CheckIfJumping()
     {
-        if (Input.GetButtonDown(this.axisName.jumpReel) && this.grounded && !this.jumping && !this.IsEitherHooked)
+        if (Input.GetButtonDown(this.axisName.jump) && this.grounded && !this.jumping && !this.IsEitherHooked)
         {
             this.jumping = true;
         }

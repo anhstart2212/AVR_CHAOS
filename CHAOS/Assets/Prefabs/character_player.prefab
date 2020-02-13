@@ -4513,6 +4513,7 @@ MonoBehaviour:
     attack: Attack
     hookSplit: Hook Split
     jumpReel: Jump Reel
+    jump: Jump
     verticalBurst: Vertical Burst
     titanLock: Titan Lock
   speed:

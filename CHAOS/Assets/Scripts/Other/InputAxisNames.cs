@@ -31,6 +31,8 @@ public class InputAxisNames
     // Token: 0x0400055D RID: 1373
     public string jumpReel;
 
+    public string jump;
+
     // Token: 0x0400055E RID: 1374
     public string verticalBurst;
 
