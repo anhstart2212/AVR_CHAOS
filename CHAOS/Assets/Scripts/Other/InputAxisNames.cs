@@ -26,7 +26,7 @@ public class InputAxisNames
     public string attack;
 
     // Token: 0x0400055C RID: 1372
-    public string hookSplit;
+    public string centerHook;
 
     // Token: 0x0400055D RID: 1373
     public string jumpReel;

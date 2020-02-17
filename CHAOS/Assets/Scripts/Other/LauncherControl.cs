@@ -14,73 +14,17 @@ public class LauncherControl : MonoBehaviour
     // Token: 0x06000123 RID: 291 RVA: 0x0000C27C File Offset: 0x0000A47C
     private void LateUpdate()
     {
-        //Vector3 cameraTargetPosition = this.cc.CameraTargetPosition;
         Vector3 forward = this.player.transforms.playerCamera.forward;
         this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
-        if (this.player.HookSplitKeyDown)
+        if (this.player.CenterHookKeyDown)
         {
-            float d = 1f;
-            float num = 0.05f;
-            if (this.isLeft)
-            {
-                d = -1f;
-            }
-            for (int i = 0; i < 15; i++)
-            {
-                Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
-                Ray ray = new Ray(this.player.transform.position, direction);
-                if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
-                {
-                    int layerMask = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
-                    bool flag = Physics.Raycast(ray, out this.contact, this.player.MaxHookDistance, layerMask);
-                    if (flag)
-                    {
-                        this.AssignTargetVariables();
-                        break;
-                    }
-                    this.targetAcquired = false;
-                }
-                else
-                {
-                    this.targetAcquired = false;
-                }
-                num += 0.025f;
-            }
+            CenterHookTarget(forward);
         }
         else
         {
-            //Vector3 origin;
-            //if (this.isLeft)
-            //{
-            //    origin = cameraTargetPosition - this.player.transforms.playerCamera.right * 0.05f;
-            //}
-            //else
-            //{
-            //    origin = cameraTargetPosition + this.player.transforms.playerCamera.right * 0.05f;
-            //}
-            //Ray ray2 = new Ray(origin, forward);
-
-            Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
-            //Debug.DrawRay(player.transforms.playerCamera.transform.position, forward * 1000, Color.blue);
-
-            if (!Physics.Raycast(ray2, this.player.MaxHookDistance, Common.layerNoHook))
-            {
-                int layerMask2 = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
-                bool flag2 = Physics.Raycast(ray2, out this.contact, this.player.MaxHookDistance, layerMask2);
-                if (flag2)
-                {
-                    this.AssignTargetVariables();
-                }
-                else
-                {
-                    this.targetAcquired = false;
-                }
-            }
-            else
-            {
-                this.targetAcquired = false;
-            }
+            SideHookTarget(forward);
         }
+
         GameObject x;
         if (this.isLeft)
         {
@@ -165,6 +109,61 @@ public class LauncherControl : MonoBehaviour
             {
                 this.player.RightHookTargetTag = this.targetTag;
             }
+        }
+    }
+
+    private void SideHookTarget(Vector3 forward)
+    {
+        float d = 1f;
+        float num = 0.05f;
+        if (this.isLeft)
+        {
+            d = -1f;
+        }
+        for (int i = 0; i < 15; i++)
+        {
+            Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
+            Ray ray = new Ray(this.player.transform.position, direction);
+            if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
+            {
+                int layerMask = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
+                bool flag = Physics.Raycast(ray, out this.contact, this.player.MaxHookDistance, layerMask);
+                if (flag)
+                {
+                    this.AssignTargetVariables();
+                    break;
+                }
+                this.targetAcquired = false;
+            }
+            else
+            {
+                this.targetAcquired = false;
+            }
+            num += 0.025f;
+        }
+    }
+
+    private void CenterHookTarget(Vector3 forward)
+    {
+        Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
+        //Debug.DrawRay(player.transforms.playerCamera.transform.position, forward * 1000, Color.blue);
+
+        if (!Physics.Raycast(ray2, this.player.MaxHookDistance, Common.layerNoHook))
+        {
+            int layerMask2 = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
+            bool flag2 = Physics.Raycast(ray2, out this.contact, this.player.MaxHookDistance, layerMask2);
+            if (flag2)
+            {
+                this.AssignTargetVariables();
+            }
+            else
+            {
+                this.targetAcquired = false;
+            }
+        }
+        else
+        {
+            this.targetAcquired = false;
         }
     }
 

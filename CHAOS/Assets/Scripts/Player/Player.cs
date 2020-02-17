@@ -62,8 +62,9 @@ public class Player : MonoBehaviour
     // Token: 0x0600012C RID: 300 RVA: 0x0000C974 File Offset: 0x0000AB74
     private void Update()
     {
-        this.jumpReelKeyDown = (Input.GetAxisRaw(this.axisName.jumpReel) != 0f);
-        this.hookSplitKeyDown = (Input.GetAxisRaw(this.axisName.hookSplit) != 0f);
+        //this.jumpReelKeyDown = (Input.GetAxisRaw(this.axisName.jumpReel) != 0f);
+        this.jumpReelKeyDown = (Input.GetButton(this.axisName.jumpReel));
+        this.centerHookKeyDown = (Input.GetAxisRaw(this.axisName.centerHook) != 0f);
         this.fireLeftHook = Input.GetButton(this.axisName.fireLeftHook);
         this.fireRightHook = Input.GetButton(this.axisName.fireRightHook);
         this.movementX = Input.GetAxis(this.axisName.moveLeftRight);
@@ -699,11 +700,11 @@ public class Player : MonoBehaviour
 
     // Token: 0x17000017 RID: 23
     // (get) Token: 0x0600014F RID: 335 RVA: 0x0000DC75 File Offset: 0x0000BE75
-    public bool HookSplitKeyDown
+    public bool CenterHookKeyDown
     {
         get
         {
-            return this.hookSplitKeyDown;
+            return this.centerHookKeyDown;
         }
     }
 
@@ -1716,7 +1717,7 @@ public class Player : MonoBehaviour
     private bool jumpReelKeyDown;
 
     // Token: 0x0400018D RID: 397
-    private bool hookSplitKeyDown;
+    private bool centerHookKeyDown;
 
     // Token: 0x0400018E RID: 398
     private bool fireLeftHook;

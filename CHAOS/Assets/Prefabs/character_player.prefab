@@ -4511,7 +4511,7 @@ MonoBehaviour:
     salute: Salute
     reload: Reload
     attack: Attack
-    hookSplit: Hook Split
+    centerHook: Center Hook
     jumpReel: Jump Reel
     jump: Jump
     verticalBurst: Vertical Burst
