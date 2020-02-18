@@ -4540,7 +4540,7 @@ MonoBehaviour:
     minWallVertical: 15
     takeOffHeight: 1
     camMaxFollowDist: 8
-    originalHookRange: 70
+    originalHookRange: 150
     burstRateSeconds: 0.75
     camMaxTrailDist: 30
   gas:

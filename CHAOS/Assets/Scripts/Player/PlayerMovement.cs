@@ -393,6 +393,13 @@ public class PlayerMovement : MonoBehaviour
             {
                 if ((!this.player.IsAnimating || this.player.IsSliding) && Time.timeScale != 0f)
                 {
+                    // Chaos Added
+                    if (this.player.CenterHookKeyDown)
+                    {
+                        yield return new WaitForSeconds(0.1f);
+                    }
+                    // Chaos Added
+
                     if (this.player.IsLeftTargetSet && Input.GetButton(this.player.axisName.fireLeftHook) && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true);
