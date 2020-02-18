@@ -411,15 +411,18 @@ public class Player : MonoBehaviour
     {
         if (this.leftHooked && this.rightHooked)
         {
-            this.hookDirection = (this.leftAnchorPosition - base.transform.position + (this.rightAnchorPosition - base.transform.position)).normalized;
+            //this.hookDirection = (this.leftAnchorPosition - base.transform.position + (this.rightAnchorPosition - base.transform.position)).normalized;
+            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForward) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
         }
         else if (this.leftHooked)
         {
-            this.hookDirection = (this.leftAnchorPosition - base.transform.position).normalized;
+            //this.hookDirection = (this.leftAnchorPosition - base.transform.position).normalized;
+            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForward) + (this.leftAnchorPosition - base.transform.position)).normalized;
         }
         else if (this.rightHooked)
         {
-            this.hookDirection = (this.rightAnchorPosition - base.transform.position).normalized;
+            //this.hookDirection = (this.rightAnchorPosition - base.transform.position).normalized;
+            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForward) + (this.rightAnchorPosition - base.transform.position)).normalized;
         }
         else
         {
