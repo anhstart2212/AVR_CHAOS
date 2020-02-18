@@ -49,5 +49,7 @@ public class PlayerSpeeds
     // Token: 0x04000570 RID: 1392
     public float horzBurst;
 
-    public float cameraForward;
+    public float cameraForwardSingle;
+
+    public float cameraForwardDouble;
 }

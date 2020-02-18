@@ -4532,7 +4532,8 @@ MonoBehaviour:
     reelGravBrake: 15
     impulse: 0
     horzBurst: 35
-    cameraForward: 10
+    cameraForwardSingle: 10
+    cameraForwardDouble: 20
   limit:
     maxHorizontal: 60
     maxVertical: 50
