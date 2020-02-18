@@ -34,8 +34,15 @@ public class LauncherControl : MonoBehaviour
         {
             x = this.player.CurrentRightHook;
         }
-        Vector3 direction2 = this.targetPoint - base.transform.position;
-        this.inRange = (this.TargetIsInRange(direction2, direction2.magnitude) && x == null);
+
+        // Chaos Added
+
+        //Vector3 direction2 = this.targetPoint - base.transform.position;
+        //this.inRange = (this.TargetIsInRange(direction2, direction2.magnitude) && x == null);
+        this.inRange = true; // Always detect Hook target
+
+        // Chaos Added
+
         if (this.targetAcquired && this.inRange)
         {
             this.TargetSetAssignments(true);
