@@ -173,16 +173,18 @@ public class PlayerRotations : MonoBehaviour
         this.rotator.LookAt(base.transform.position + direction);
         switch (type)
         {
-            case 0:
-                num *= 5f;
+            case 0: // HOOKED
+                //num *= 5f;
+                num *= 6f;
                 this.rotator.eulerAngles = new Vector3(this.rotator.eulerAngles.x, this.rotator.eulerAngles.y, this.HookEulerZ());
                 break;
             case 1:
                 num *= 5f;
                 this.rotator.eulerAngles = new Vector3(this.rotator.eulerAngles.x, this.rotator.eulerAngles.y, this.HookEulerZ());
                 break;
-            case 2:
-                num *= 5f;
+            case 2: // MOVE GROUND
+                //num *= 5f;
+                num *= 7f;
                 break;
             case 3:
                 num *= 5f;
