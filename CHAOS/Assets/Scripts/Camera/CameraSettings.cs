@@ -116,7 +116,13 @@ namespace Gamekit3D
             float num2 = Mathf.Clamp((this.playerScript.VelocityMagnitude - run) / num, 0f, 1f);
             //float b = this.defaultFOV + 10f * num2;
             float b = this.defaultFOV + fovOffset * num2;
-            //return Mathf.Lerp(this.myCamera.fieldOfView, b, LERP);
+
+            // limit CameraFOV
+            if (b > 90)
+            {
+                b = 90;
+            }
+
             return Mathf.Lerp(Current.m_Lens.FieldOfView, b, LERP);
         }
 
