@@ -4533,7 +4533,7 @@ MonoBehaviour:
     impulse: 0
     horzBurst: 35
     cameraForwardSingle: 10
-    cameraForwardDouble: 20
+    cameraForwardDouble: 15
   limit:
     maxHorizontal: 60
     maxVertical: 50
@@ -4542,7 +4542,7 @@ MonoBehaviour:
     minWallVertical: 15
     takeOffHeight: 1
     camMaxFollowDist: 8
-    originalHookRange: 150
+    originalHookRange: 130
     burstRateSeconds: 0.75
     camMaxTrailDist: 30
   gas:
