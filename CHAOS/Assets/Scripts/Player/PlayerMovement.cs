@@ -21,6 +21,14 @@ public class PlayerMovement : MonoBehaviour
         {
             this.velDirBeforeLand = this.player.VelocityDirectionXZ;
         }
+
+        // Chaos Added
+        if (!this.player.IsGrounded && !this.player.IsEitherHooked && !this.player.BurstForceIsRunning)
+        {
+            this.rb.AddForce(-Vector3.up * this.player.speed.groundGravity, ForceMode.Acceleration);
+        }
+        // Chaos Added
+
         if (this.player.WalledState != 0)
         {
             this.airMovementIsRunning = false;
@@ -593,7 +601,17 @@ public class PlayerMovement : MonoBehaviour
                 float velocityMagnitude = this.player.VelocityMagnitude;
                 float angleVelocityAndHook = Vector3.Angle(this.player.VelocityDirection, this.player.HookDirection);
                 float d3 = this.acceleration.GetAcceleration(velocityMagnitude, angleVelocityAndHook);
-                this.rb.AddForce(this.player.HookedSteerDirection() * d * d3, ForceMode.Acceleration);
+
+                // Chaos Added
+                if (this.player.FastSpeed)
+                {
+                    this.rb.AddForce(this.player.HookedSteerDirection() * d * d3 * this.player.speed.fastSpeed, ForceMode.Acceleration);
+                }
+                else
+                {
+                    this.rb.AddForce(this.player.HookedSteerDirection() * d * d3, ForceMode.Acceleration);
+                }
+                // Chaos Added
             }
             if (flag)
             {

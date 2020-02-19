@@ -52,4 +52,8 @@ public class PlayerSpeeds
     public float cameraForwardSingle;
 
     public float cameraForwardDouble;
+
+    public float groundGravity;
+
+    public float fastSpeed;
 }

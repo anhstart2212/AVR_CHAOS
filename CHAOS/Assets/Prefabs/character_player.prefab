@@ -4516,10 +4516,11 @@ MonoBehaviour:
     jump: Jump
     verticalBurst: Vertical Burst
     titanLock: Titan Lock
+    fastSpeed: Fast Speed
   speed:
-    run: 10
-    idleJump: 35
-    runJump: 40
+    run: 15
+    idleJump: 40
+    runJump: 45
     wallSideJump: 50
     wallUpJump: 25
     turn: 8
@@ -4531,9 +4532,11 @@ MonoBehaviour:
     reelGravSingle: 6
     reelGravBrake: 15
     impulse: 0
-    horzBurst: 35
+    horzBurst: 70
     cameraForwardSingle: 10
     cameraForwardDouble: 15
+    groundGravity: 9
+    fastSpeed: 3
   limit:
     maxHorizontal: 60
     maxVertical: 50

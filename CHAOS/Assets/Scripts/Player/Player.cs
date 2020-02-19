@@ -69,6 +69,11 @@ public class Player : MonoBehaviour
         this.fireRightHook = Input.GetButton(this.axisName.fireRightHook);
         this.movementX = Input.GetAxis(this.axisName.moveLeftRight);
         this.movementY = Input.GetAxis(this.axisName.moveFrontBack);
+
+        // Chaos Added
+        this.fastSpeed = (Input.GetButton(this.axisName.fastSpeed));
+        // Chaos Added
+
         //this.mouseAxisX = Input.GetAxis(this.axisName.mouseX);
         //this.mouseAxisY = Input.GetAxis(this.axisName.mouseY) * (float)((PlayerPrefs.GetInt(PlayerPrefKeys.invertYAxis) != 0) ? -1 : 1);
         this.CheckIfGrounded();
@@ -698,6 +703,14 @@ public class Player : MonoBehaviour
         get
         {
             return this.jumpReelKeyDown;
+        }
+    }
+
+    public bool FastSpeed
+    {
+        get
+        {
+            return this.fastSpeed;
         }
     }
 
@@ -1735,10 +1748,12 @@ public class Player : MonoBehaviour
     private float movementY;
 
     // Token: 0x04000192 RID: 402
-    private float mouseAxisX;
+    //private float mouseAxisX;
 
     // Token: 0x04000193 RID: 403
-    private float mouseAxisY;
+    //private float mouseAxisY;
+
+    private bool fastSpeed;
 
     // Token: 0x04000194 RID: 404
     public bool grounded;

@@ -44,4 +44,6 @@ public class InputAxisNames
 
     // Token: 0x04000561 RID: 1377
     public string titanLock;
+
+    public string fastSpeed;
 }
