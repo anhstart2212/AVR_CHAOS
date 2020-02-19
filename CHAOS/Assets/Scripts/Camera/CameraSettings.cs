@@ -10,6 +10,7 @@ namespace Gamekit3D
     {
         private float defaultFOV;
         private Player playerScript;
+        [SerializeField] private float fovOffset;
         public enum InputChoice
         {
             KeyboardAndMouse, Controller,
@@ -114,7 +115,7 @@ namespace Gamekit3D
             float num = this.playerScript.limit.maxHorizontal / 2f + run;
             float num2 = Mathf.Clamp((this.playerScript.VelocityMagnitude - run) / num, 0f, 1f);
             //float b = this.defaultFOV + 10f * num2;
-            float b = this.defaultFOV + 50f * num2;
+            float b = this.defaultFOV + fovOffset * num2;
             //return Mathf.Lerp(this.myCamera.fieldOfView, b, LERP);
             return Mathf.Lerp(Current.m_Lens.FieldOfView, b, LERP);
         }
