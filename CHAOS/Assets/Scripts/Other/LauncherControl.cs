@@ -14,6 +14,11 @@ public class LauncherControl : MonoBehaviour
     // Token: 0x06000123 RID: 291 RVA: 0x0000C27C File Offset: 0x0000A47C
     private void LateUpdate()
     {
+        if (this.player.transforms.playerCamera == null)
+        {
+            return;
+        }
+
         Vector3 forward = this.player.transforms.playerCamera.forward;
         this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
         if (this.player.CenterHookKeyDown)

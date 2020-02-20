@@ -4563,6 +4563,7 @@ MonoBehaviour:
     playerCamera: {fileID: 0}
     playerUI: {fileID: 4643998026157664}
     rotator: {fileID: 4779279079945292}
+    hookTargetNull: {fileID: 0}
   particles:
     gasCore: {fileID: 198293050759178386}
     gasFast: {fileID: 198043302649730770}

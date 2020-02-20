@@ -31,6 +31,11 @@ public class DrawPlayerHUD : MonoBehaviour
     // Token: 0x0600011B RID: 283 RVA: 0x0000BA14 File Offset: 0x00009C14
     private void LateUpdate()
     {
+        if (this.player.transforms.playerCamera == null)
+        {
+            return;
+        }
+
         this.rightInRange = this.launcherScripts[0].inRange;
         this.leftInRange = this.launcherScripts[1].inRange;
         this.rightTargetPosition = this.launcherScripts[0].targetPoint;

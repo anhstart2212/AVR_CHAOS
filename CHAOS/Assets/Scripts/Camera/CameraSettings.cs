@@ -11,6 +11,9 @@ namespace Gamekit3D
         private float defaultFOV;
         private Player playerScript;
         [SerializeField] private float fovOffset;
+        [SerializeField] private Transform hookTargetNull;
+        [SerializeField] private Transform cinemachineBrain;
+
         public enum InputChoice
         {
             KeyboardAndMouse, Controller,
@@ -41,6 +44,16 @@ namespace Gamekit3D
         public CinemachineFreeLook Current
         {
             get { return keyboardAndMouseCamera; }
+        }
+
+        public Transform HookTargetNull
+        {
+            get { return hookTargetNull; }
+        }
+
+        public Transform CinemachineBrain
+        {
+            get { return cinemachineBrain; }
         }
 
         void Reset()

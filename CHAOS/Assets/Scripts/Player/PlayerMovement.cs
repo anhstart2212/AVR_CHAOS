@@ -411,29 +411,41 @@ public class PlayerMovement : MonoBehaviour
                     if (this.player.IsLeftTargetSet && Input.GetButton(this.player.axisName.fireLeftHook) && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true);
-                        if (this.player.LeftHookTitanObject != null)
-                        {
-                            this.player.LeftHookedTitan = this.player.LeftHookTitanObject;
-                        }
+                        //if (this.player.LeftHookTitanObject != null)
+                        //{
+                        //    this.player.LeftHookedTitan = this.player.LeftHookTitanObject;
+                        //}
                     }
                     if (this.player.IsRightTargetSet && Input.GetButton(this.player.axisName.fireRightHook) && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false);
-                        if (this.player.RightHookTitanObject != null)
-                        {
-                            this.player.RightHookedTitan = this.player.RightHookTitanObject;
-                        }
+                        //if (this.player.RightHookTitanObject != null)
+                        //{
+                        //    this.player.RightHookedTitan = this.player.RightHookTitanObject;
+                        //}
                     }
                     if (!this.player.FireLeftHook && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(true);
-                        this.player.LeftHookedTitan = null;
+                        //this.player.LeftHookedTitan = null;
                     }
                     if (!this.player.FireRightHook && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(false);
-                        this.player.RightHookedTitan = null;
+                        //this.player.RightHookedTitan = null;
                     }
+
+                    // Chaos Added
+                    if (!this.player.IsLeftTargetSet && Input.GetButton(this.player.axisName.fireLeftHook) && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    {
+                        this.FireHook(true,true);
+                        
+                    }
+                    if (!this.player.IsRightTargetSet && Input.GetButton(this.player.axisName.fireRightHook) && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    {
+                        this.FireHook(false,true);
+                    }
+                    // Chaos Added
                 }
                 yield return null;
             }
@@ -475,10 +487,10 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Token: 0x0600023F RID: 575 RVA: 0x00014274 File Offset: 0x00012474
-    private void FireHook(bool isLeft)
+    private void FireHook(bool isLeft, bool isNull = false)
     {
         this.player.InstantGasConsumption(0);
-        this.HookSpawn(isLeft);
+        this.HookSpawn(isLeft, isNull);
         if (isLeft)
         {
             this.player.SoundScript.leftFire = true;
@@ -515,38 +527,87 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Token: 0x06000241 RID: 577 RVA: 0x0001435C File Offset: 0x0001255C
-    private void HookSpawn(bool isLeftHook)
+    private void HookSpawn(bool isLeftHook, bool isNull = false)
     {
-        Transform transform;
-        Vector3 vector;
-        GameObject titanObject;
-        if (isLeftHook)
+        Transform transform = null;
+        Vector3 vector = Vector3.zero;
+        //GameObject titanObject;
+        
+
+        if (isLeftHook && !isNull)
         {
+            player.IsLeftHookTargetNull = isNull;
             transform = this.player.transforms.hookOriginLeft;
             vector = this.player.LeftTargetPosition;
             this.player.LeftAnchorPosition = vector;
-            titanObject = this.player.LeftHookTitanObject;
+            //titanObject = this.player.LeftHookTitanObject;
         }
-        else
+        if(!isLeftHook && !isNull)
         {
+            player.IsRightHookTargetNull = isNull;
             transform = this.player.transforms.hookOriginRight;
             vector = this.player.RightTargetPosition;
             this.player.RightAnchorPosition = vector;
-            titanObject = this.player.RightHookTitanObject;
+            //titanObject = this.player.RightHookTitanObject;
         }
+        if (isLeftHook && isNull)
+        {
+            player.IsLeftHookTargetNull = isNull;
+            transform = this.player.transforms.hookOriginLeft;
+            vector = this.player.transforms.hookTargetNull.position;
+            this.player.LeftAnchorPosition = vector;
+        }
+        if (!isLeftHook && isNull)
+        {
+            player.IsRightHookTargetNull = isNull;
+            transform = this.player.transforms.hookOriginRight;
+            vector = this.player.transforms.hookTargetNull.position;
+            this.player.RightAnchorPosition = vector;
+        }
+
         GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(this.hook, transform.position, transform.rotation);
         DrawHookCable component = gameObject.GetComponent<DrawHookCable>();
         component.target = vector;
         component.playerObject = base.gameObject;
         component.isLeft = isLeftHook;
-        component.titanObject = titanObject;
-        if (isLeftHook)
+        //component.titanObject = titanObject;
+        if (isLeftHook && !isNull)
         {
             this.player.CurrentLeftHook = gameObject;
         }
-        else
+        if (!isLeftHook && !isNull)
         {
             this.player.CurrentRightHook = gameObject;
+        }
+        if (isLeftHook && isNull)
+        {
+            this.player.CurrentLeftHook = gameObject;
+            StartCoroutine(RetractLeftHookDelay(1.2f));
+        }
+        if (!isLeftHook && isNull)
+        {
+            this.player.CurrentRightHook = gameObject;
+            StartCoroutine(RetractRightHookDelay(1.2f));
+        }
+    }
+
+    IEnumerator RetractLeftHookDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+       
+        if (this.player.CurrentLeftHook != null)
+        {
+            this.RetractHook(true);
+        }
+    }
+
+    IEnumerator RetractRightHookDelay(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        if (this.player.CurrentRightHook != null)
+        {
+            this.RetractHook(false);
         }
     }
 

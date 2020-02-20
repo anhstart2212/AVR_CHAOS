@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Gamekit3D;
 
 // Token: 0x02000030 RID: 48
 public class Player : MonoBehaviour
@@ -20,8 +21,14 @@ public class Player : MonoBehaviour
         this.soundScript = base.GetComponent<PlayerSoundController>();
         this.fxScript = base.GetComponentInChildren<PlayerParticleEffects>();
         this.hudScript = base.GetComponent<DrawPlayerHUD>();
-        this.camScript = this.transforms.playerCamera.GetComponent<CameraControl>();
+        //this.camScript = this.transforms.playerCamera.GetComponent<CameraControl>();
+        cameraSettings = FindObjectOfType<CameraSettings>();
         //this.gameScript = GameObject.FindWithTag("GameController").GetComponent<GameBase>();
+        if (cameraSettings != null)
+        {
+            transforms.playerCamera = cameraSettings.CinemachineBrain;
+            transforms.hookTargetNull = cameraSettings.HookTargetNull;
+        }
     }
 
 
@@ -951,7 +958,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return this.leftHooked;
+            return this.leftHooked && !isLeftHookTargetNull;
         }
         set
         {
@@ -966,7 +973,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return this.rightHooked;
+            return this.rightHooked && !isRightHookTargetNull;
         }
         set
         {
@@ -980,7 +987,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return this.IsLeftHooked && this.IsRightHooked;
+            return this.IsLeftHooked && this.IsRightHooked && !isLeftHookTargetNull && !isRightHookTargetNull;
         }
     }
 
@@ -990,7 +997,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return this.IsLeftHooked || this.IsRightHooked;
+            return (this.IsLeftHooked || this.IsRightHooked) && (!isLeftHookTargetNull || !isRightHookTargetNull);
         }
     }
 
@@ -1694,13 +1701,13 @@ public class Player : MonoBehaviour
 
     // Token: 0x17000065 RID: 101
     // (get) Token: 0x060001C4 RID: 452 RVA: 0x0000E12B File Offset: 0x0000C32B
-    public CameraControl CamScript
-    {
-        get
-        {
-            return this.camScript;
-        }
-    }
+    //public CameraControl CamScript
+    //{
+    //    get
+    //    {
+    //        return this.camScript;
+    //    }
+    //}
 
     // Token: 0x17000066 RID: 102
     // (get) Token: 0x060001C5 RID: 453 RVA: 0x0000E133 File Offset: 0x0000C333
@@ -1709,6 +1716,30 @@ public class Player : MonoBehaviour
         get
         {
             return this.gasScript;
+        }
+    }
+   
+    public bool IsLeftHookTargetNull
+    {
+        get
+        {
+            return this.isLeftHookTargetNull;
+        }
+        set
+        {
+            this.isLeftHookTargetNull = value;
+        }
+    }
+
+    public bool IsRightHookTargetNull
+    {
+        get
+        {
+            return this.isRightHookTargetNull;
+        }
+        set
+        {
+            this.isRightHookTargetNull = value;
         }
     }
 
@@ -1728,6 +1759,10 @@ public class Player : MonoBehaviour
     //        return this.uiMessageScript;
     //    }
     //}
+
+    private bool isLeftHookTargetNull;
+
+    private bool isRightHookTargetNull;
 
     // Token: 0x0400018C RID: 396
     private bool jumpReelKeyDown;
@@ -2009,4 +2044,6 @@ public class Player : MonoBehaviour
 
     // Token: 0x040001E8 RID: 488
     private bool[] rayHits = new bool[5];
+
+    private CameraSettings cameraSettings;
 }
