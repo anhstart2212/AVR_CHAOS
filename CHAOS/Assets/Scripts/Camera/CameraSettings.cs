@@ -9,8 +9,13 @@ namespace Gamekit3D
     public class CameraSettings : MonoBehaviour
     {
         private float defaultFOV;
+        private float defaultCameraFollowDis;
         private Player playerScript;
+
         [SerializeField] private float fovOffset;
+        [SerializeField] private float cameraFOVLimit;
+        [SerializeField] private float cameraFollowDisOffset;
+        [SerializeField] private float cameraFollowDisLimit;
         [SerializeField] private Transform hookTargetNull;
         [SerializeField] private Transform cinemachineBrain;
 
@@ -87,6 +92,7 @@ namespace Gamekit3D
             if (Current != null)
             {
                 defaultFOV = Current.m_Lens.FieldOfView;
+                defaultCameraFollowDis = Current.m_Orbits[1].m_Radius; // Middle Rig Radius
             }
         }
 
@@ -100,6 +106,7 @@ namespace Gamekit3D
             if (Current != null)
             {
                 Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
+                Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
             }
 
             UpdateCursorSettings();
@@ -131,12 +138,28 @@ namespace Gamekit3D
             float b = this.defaultFOV + fovOffset * num2;
 
             // limit CameraFOV
-            if (b > 90)
+            if (b > cameraFOVLimit)
             {
-                b = 90;
+                b = cameraFOVLimit;
             }
 
             return Mathf.Lerp(Current.m_Lens.FieldOfView, b, LERP);
+        }
+
+        private float NewCameraDis(float LERP)
+        {
+            float run = this.playerScript.speed.run;
+            float num = this.playerScript.limit.maxHorizontal / 2f + run;
+            float num2 = Mathf.Clamp((this.playerScript.VelocityMagnitude - run) / num, 0f, 1f);
+            float b = this.defaultCameraFollowDis + cameraFollowDisOffset * num2;
+
+            // limit Camera Follow Distance
+            if (b > cameraFollowDisLimit)
+            {
+                b = cameraFollowDisLimit;
+            }
+
+            return Mathf.Lerp(Current.m_Orbits[1].m_Radius, b, LERP);
         }
 
         private void UpdateCursorSettings()
