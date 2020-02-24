@@ -73,6 +73,11 @@ public static class PlayerAnimation
         anim.SetBool(PlayerAnimation.PARAMS.attackReleased, released);
     }
 
+    public static void SetAttackState(Animator anim)
+    {
+        anim.SetTrigger(PARAMS.hashMeleeAttack);
+    }
+
     // Token: 0x04000204 RID: 516
     public static PlayerAnimation.Tags TAGS = new PlayerAnimation.Tags();
 
@@ -163,6 +168,16 @@ public static class PlayerAnimation
 
         // Token: 0x0400021F RID: 543
         public readonly string grabbedState = "GrabbedState";
+
+        public readonly int hashMeleeAttack = Animator.StringToHash("MeleeAttack");
+
+        public readonly int hashCombatStateTime = Animator.StringToHash("CombatStateTime");
+
+        public readonly int hashPlayerCombo1 = Animator.StringToHash("PlayerCombo1");
+
+        public readonly int hashPlayerCombo2 = Animator.StringToHash("PlayerCombo2");
+
+        public readonly int hashPlayerCombo3 = Animator.StringToHash("PlayerCombo3");
     }
 }
 

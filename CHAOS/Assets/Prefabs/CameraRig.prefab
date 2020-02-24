@@ -229,7 +229,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1579890683440024}
-  m_LocalRotation: {x: 0.23464292, y: 0.17729017, z: -0.04356884, w: 0.95478415}
+  m_LocalRotation: {x: 0.23336267, y: 0.2033447, z: -0.049971763, w: 0.94957656}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -260,7 +260,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1899280029567852}
-  m_LocalRotation: {x: 0.23464298, y: 0.17729013, z: -0.043568593, w: 0.9547841}
+  m_LocalRotation: {x: 0.23336323, y: 0.20334461, z: -0.049971607, w: 0.9495765}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -274,7 +274,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1738224431878012}
-  m_LocalRotation: {x: 0.23464298, y: 0.17729014, z: -0.043568596, w: 0.9547841}
+  m_LocalRotation: {x: 0.23336321, y: 0.20334461, z: -0.049971607, w: 0.94957644}
   m_LocalPosition: {x: 0, y: 1.8099995, z: -2.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -327,7 +327,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1413464797259438}
-  m_LocalRotation: {x: 0.2346426, y: 0.17729028, z: -0.043568864, w: 0.95478415}
+  m_LocalRotation: {x: 0.23336284, y: 0.20334473, z: -0.049971864, w: 0.94957656}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -838,10 +838,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2f5f92e7c729914fbc9a54ab0407182, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fovOffset: 30
-  cameraFOVLimit: 85
-  cameraFollowDisOffset: 2
-  cameraFollowDisLimit: 6
+  fovOffset: 0
+  cameraFOVLimit: 60
+  cameraFollowDisOffset: 5
+  cameraFollowDisLimit: 10
   hookTargetNull: {fileID: 4092791608801362}
   cinemachineBrain: {fileID: 4476454128503204}
   follow: {fileID: 0}

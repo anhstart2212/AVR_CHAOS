@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         this.player = base.GetComponent<Player>();
+        playerCombat = GetComponent<PlayerCombat>();
         this.rb = base.GetComponent<Rigidbody>();
         this.acceleration = new PlayerAcceleration(this.maxAccel, this.qConst, this.lConst, this.player.limit.maxHorizontal);
         this.StartHookActions();
@@ -107,6 +108,13 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
+                // Chaos Added
+                if (playerCombat != null && playerCombat.InCombo)
+                {
+                    speed = 0;
+                }
+                // Chaos Added
+
                 this.DetermineMoveState();
                 if (this.player.IsSlopedTerrain)
                 {
@@ -802,4 +810,6 @@ public class PlayerMovement : MonoBehaviour
 
     // Token: 0x04000266 RID: 614
     private bool hookActionRunning;
+
+    private PlayerCombat playerCombat;
 }
