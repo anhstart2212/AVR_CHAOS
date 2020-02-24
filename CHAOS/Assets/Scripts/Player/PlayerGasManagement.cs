@@ -70,8 +70,12 @@ public class PlayerGasManagement : MonoBehaviour
         }
         else if (this.player.IsMoving && this.player.JumpReelKeyDown)
         {
-            this.GasCoreLifeAdjust(false);
-            this.GasTrailOnOff(true, false, this.player.BurstForceIsRunning);
+            // Chaos added
+
+            //this.GasCoreLifeAdjust(false);
+            //this.GasTrailOnOff(true, false, this.player.BurstForceIsRunning);
+
+            // Chaos added
         }
         else
         {
