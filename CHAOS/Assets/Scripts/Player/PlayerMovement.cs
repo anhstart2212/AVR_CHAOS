@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start()
     {
         this.player = base.GetComponent<Player>();
-        playerCombat = GetComponent<PlayerCombat>();
+        m_PlayerCombat = GetComponent<PlayerCombat>();
         this.rb = base.GetComponent<Rigidbody>();
         this.acceleration = new PlayerAcceleration(this.maxAccel, this.qConst, this.lConst, this.player.limit.maxHorizontal);
         this.StartHookActions();
@@ -109,10 +109,11 @@ public class PlayerMovement : MonoBehaviour
             else
             {
                 // Chaos Added
-                if (playerCombat != null && playerCombat.InCombo)
+                if (m_PlayerCombat != null && m_PlayerCombat.InCombo)
                 {
-                    speed = 0;
+                    this.rb.velocity = Vector3.zero;
                 }
+                yield return new WaitUntil(() => m_PlayerCombat.InCombo == false);
                 // Chaos Added
 
                 this.DetermineMoveState();
@@ -811,5 +812,5 @@ public class PlayerMovement : MonoBehaviour
     // Token: 0x04000266 RID: 614
     private bool hookActionRunning;
 
-    private PlayerCombat playerCombat;
+    private PlayerCombat m_PlayerCombat;
 }
