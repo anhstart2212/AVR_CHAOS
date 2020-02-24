@@ -135,7 +135,12 @@ public class LauncherControl : MonoBehaviour
         for (int i = 0; i < 15; i++)
         {
             Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
-            Ray ray = new Ray(this.player.transform.position, direction);
+            //Ray ray = new Ray(this.player.transform.position, direction);
+
+            //Chaos Added
+            Ray ray = new Ray(this.player.transforms.playerCamera.position, direction);
+            //Chaos Added
+
             if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
             {
                 int layerMask = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
