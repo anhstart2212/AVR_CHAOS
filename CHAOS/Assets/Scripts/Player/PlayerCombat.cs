@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
+    public MeleeWeapon meleeWeapon;
+    public float attackDuration = 0.03f;
+    public bool canAttack;
 
     private AnimatorStateInfo m_CurrentStateInfo;    // Information about the base layer of the animator cached.
     private AnimatorStateInfo m_NextStateInfo;
@@ -13,12 +16,11 @@ public class PlayerCombat : MonoBehaviour
     private Player m_Player;
     private Animator m_Animator;
     private bool m_InCombo;
+
+
+
+
     
-
-    public float attackDuration = 0.03f;
-    public bool canAttack;
-
-
 
 
     public bool InCombo
@@ -34,6 +36,8 @@ public class PlayerCombat : MonoBehaviour
     {
         m_Player = GetComponent<Player>();
         m_Animator = m_Player.Animator;
+        meleeWeapon = GetComponentInChildren<MeleeWeapon>();
+        meleeWeapon.SetOwner(gameObject);
     }
 
     // Update is called once per frame
@@ -72,9 +76,7 @@ public class PlayerCombat : MonoBehaviour
     IEnumerator AttackWait()
     {
         m_Attack = true;
-
         yield return new WaitForSeconds(attackDuration);
-
         m_Attack = false;
     }
 
@@ -99,8 +101,19 @@ public class PlayerCombat : MonoBehaviour
     void EquipMeleeWeapon(bool equip)
     {
         m_InCombo = equip;
+    }
 
-        //if (!equip)
-        //    m_Animator.ResetTrigger(PlayerAnimation.PARAMS.hashMeleeAttack);
+    // This is called by an animation event when swings staff.
+    public void MeleeAttackStart(int throwing = 0)
+    {
+        meleeWeapon.BeginAttack(throwing != 0);
+        //m_InAttack = true;
+    }
+
+    // This is called by an animation event when finishes swinging staff.
+    public void MeleeAttackEnd()
+    {
+        meleeWeapon.EndAttack();
+        //m_InAttack = false;
     }
 }
