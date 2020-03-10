@@ -58,7 +58,7 @@ public class PlayerCombat : MonoBehaviour
         m_Animator.SetFloat(PlayerAnimation.PARAMS.hashCombatStateTime, Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f));
         m_Animator.ResetTrigger(PlayerAnimation.PARAMS.hashMeleeAttack);
 
-        if (Input.GetButtonDown(m_Player.axisName.attack))
+        if (m_Player.AttackKeyDown)
         {
             if (m_AttackWaitCoroutine != null)
                 StopCoroutine(m_AttackWaitCoroutine);

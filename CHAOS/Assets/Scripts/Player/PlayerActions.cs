@@ -254,7 +254,7 @@ public class PlayerActions : MonoBehaviour
         bool flag = false;
         if (this.playerScript.Height > 1.25f && !Common.CurrentOrNextStateTag(this.anim, 0, "AttackRelease"))
         {
-            if (Input.GetButtonDown(this.playerScript.axisName.attack) && !this.attackPrimed)
+            if (playerScript.AttackKeyDown && !this.attackPrimed)
             {
                 flag = (this.attackPrimed = true);
             }
@@ -270,7 +270,7 @@ public class PlayerActions : MonoBehaviour
             {
                 this.attackPrimed = false;
             }
-            else if (flag2 && Input.GetButtonDown(this.playerScript.axisName.attack) && !flag)
+            else if (flag2 && playerScript.AttackKeyDown && !flag)
             {
                 this.attackReleased = true;
                 this.attackPrimed = false;
@@ -410,7 +410,7 @@ public class PlayerActions : MonoBehaviour
     // Token: 0x060001DF RID: 479 RVA: 0x0000E9A8 File Offset: 0x0000CBA8
     private bool CancelAttack(bool sameFrame, bool releaseValid = true)
     {
-        return (Input.GetButtonDown(this.playerScript.axisName.attack) && !sameFrame && releaseValid) || this.playerScript.IsGrounded || (Input.GetButtonDown(this.playerScript.axisName.fireLeftHook) || Input.GetButtonDown(this.playerScript.axisName.fireRightHook)) || (this.playerScript.BurstTurnIsRunning || this.playerScript.BurstForceIsRunning) || this.playerScript.WalledState != 0;
+        return (playerScript.AttackKeyDown && !sameFrame && releaseValid) || this.playerScript.IsGrounded || (/*Input.GetButtonDown(this.playerScript.axisName.fireLeftHook)*/ playerScript.FireLeftHook || /*Input.GetButtonDown(this.playerScript.axisName.fireRightHook)*/ playerScript.FireRightHook) || (this.playerScript.BurstTurnIsRunning || this.playerScript.BurstForceIsRunning) || this.playerScript.WalledState != 0;
     }
 
 

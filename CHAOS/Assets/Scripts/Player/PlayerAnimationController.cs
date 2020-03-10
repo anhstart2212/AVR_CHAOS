@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 // Token: 0x02000036 RID: 54
-public class PlayerAnimationController : MonoBehaviour
+public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x060001F1 RID: 497 RVA: 0x0000F693 File Offset: 0x0000D893
     private void Start()
@@ -16,6 +16,11 @@ public class PlayerAnimationController : MonoBehaviour
     // Token: 0x060001F2 RID: 498 RVA: 0x0000F6C4 File Offset: 0x0000D8C4
     private void Update()
     {
+        //if (this.anim.GetBool("IsHooked") && this.player.IsAnimating)
+        //{
+        //    this.ToggleAnimatingState("end");
+        //}
+
         if (this.anim.GetBool("IsHooked") && this.player.IsAnimating)
         {
             this.ToggleAnimatingState("end");
@@ -45,7 +50,7 @@ public class PlayerAnimationController : MonoBehaviour
         this.SetGrabbed();
         this.SetJumped();
         this.SetSalute();
-        this.SetRunning();
+        //this.SetRunning();
         this.SetAirborne();
         this.SetSlide();
         this.SetHooks();
@@ -136,7 +141,7 @@ public class PlayerAnimationController : MonoBehaviour
     // Token: 0x060001FA RID: 506 RVA: 0x0000FB42 File Offset: 0x0000DD42
     private void SetJumped()
     {
-        if (this.player.IsJumping)
+        if (state.IsJump)
         {
             this.anim.SetBool("IsJumping", true);
             base.Invoke("JumpComplete", 0.1f);
@@ -157,22 +162,45 @@ public class PlayerAnimationController : MonoBehaviour
                 this.anim.SetBool("IsSaluting", true);
             }
         }
-        if (this.anim.GetBool("IsSaluting") && (Input.GetAxis(this.player.axisName.moveLeftRight) != 0f || Input.GetAxis(this.player.axisName.moveFrontBack) != 0f))
+        //if (this.anim.GetBool("IsSaluting") && (Input.GetAxis(this.player.axisName.moveLeftRight) != 0f || Input.GetAxis(this.player.axisName.moveFrontBack) != 0f))
+        //{
+        //    this.anim.SetBool("IsSaluting", false);
+        //}
+
+        if (this.anim.GetBool("IsSaluting") && (player.MovementX != 0f || player.MovementY != 0f))
         {
             this.anim.SetBool("IsSaluting", false);
         }
     }
 
     // Token: 0x060001FC RID: 508 RVA: 0x0000FC70 File Offset: 0x0000DE70
-    private void SetRunning()
+    public void SetRunning(ChaosPlayerCommand cmd)
     {
-        if (Input.GetAxisRaw(this.player.axisName.moveLeftRight) != 0f || Input.GetAxisRaw(this.player.axisName.moveFrontBack) != 0f)
+        //if (Input.GetAxisRaw(this.player.axisName.moveLeftRight) != 0f || Input.GetAxisRaw(this.player.axisName.moveFrontBack) != 0f)
+        //{
+        //    this.anim.SetBool("IsRunning", true);
+        //}
+        //else
+        //{
+        //    this.anim.SetBool("IsRunning", false);
+        //}
+
+        //if (player.MovementX != 0f || player.MovementY != 0f)
+        //{
+        //    this.anim.SetBool("IsRunning", true);
+        //}
+        //else
+        //{
+        //    this.anim.SetBool("IsRunning", false);
+        //}
+
+        if (cmd.Input.MovementX != 0f || cmd.Input.MovementY != 0f)
         {
-            this.anim.SetBool("IsRunning", true);
+            state.IsRunning = true;
         }
         else
         {
-            this.anim.SetBool("IsRunning", false);
+            state.IsRunning = false;
         }
     }
 

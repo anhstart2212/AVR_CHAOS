@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 // Token: 0x0200003C RID: 60
-public class PlayerParticleEffects : MonoBehaviour
+public class PlayerParticleEffects :MonoBehaviour
 {
     // Token: 0x0600024B RID: 587 RVA: 0x00015360 File Offset: 0x00013560
     private void Start()

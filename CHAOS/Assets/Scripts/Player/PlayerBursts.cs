@@ -47,8 +47,12 @@ public class PlayerBursts : MonoBehaviour
         bool flag6 = false;
         bool flag7 = false;
         bool flag8 = false;
-        float axisRaw = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-        float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+        //float axisRaw = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+        //float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+        //float axisRaw3 = Input.GetAxisRaw(this.player.axisName.verticalBurst);
+
+        float axisRaw = player.MovementX;
+        float axisRaw2 = player.MovementY;
         float axisRaw3 = Input.GetAxisRaw(this.player.axisName.verticalBurst);
         if (axisRaw > 0f)
         {

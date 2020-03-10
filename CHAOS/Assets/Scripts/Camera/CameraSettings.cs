@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Gamekit3D
 {
-    public class CameraSettings : MonoBehaviour
+    public class CameraSettings : BoltSingletonPrefab<CameraSettings>
     {
         private float defaultFOV;
         private float defaultCameraFollowDis;
@@ -46,6 +46,9 @@ namespace Gamekit3D
         //    get { return inputChoice == InputChoice.KeyboardAndMouse ? keyboardAndMouseCamera : controllerCamera; }
         //}
 
+        [SerializeField]
+        private Transform m_DummyCam;
+
         public CinemachineFreeLook Current
         {
             get { return keyboardAndMouseCamera; }
@@ -59,6 +62,11 @@ namespace Gamekit3D
         public Transform CinemachineBrain
         {
             get { return cinemachineBrain; }
+        }
+
+        public Transform DummyCamera
+        {
+            get { return m_DummyCam; }
         }
 
         void Reset()
@@ -89,11 +97,11 @@ namespace Gamekit3D
 
             this.playerScript = FindObjectOfType<Player>();
 
-            if (Current != null)
-            {
-                defaultFOV = Current.m_Lens.FieldOfView;
-                defaultCameraFollowDis = Current.m_Orbits[1].m_Radius; // Middle Rig Radius
-            }
+            //if (Current != null)
+            //{
+            //    defaultFOV = Current.m_Lens.FieldOfView;
+            //    defaultCameraFollowDis = Current.m_Orbits[1].m_Radius; // Middle Rig Radius
+            //}
         }
 
         void Update()
@@ -103,19 +111,32 @@ namespace Gamekit3D
                 UpdateCameraSettings();
             }
 
-            if (Current != null)
-            {
-                Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
-                Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
-            }
+            //if (Current != null)
+            //{
+            //    Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
+            //    Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
+            //}
 
             UpdateCursorSettings();
+
+            //if (follow)
+            //{
+            //    Vector3 pos;
+            //    Quaternion rot;
+            //    var p = getPitch != null ? getPitch() : 0f;
+            //    CalculateCameraTransform(follow, p, 20f, out pos, out rot);
+            //}
+            
         }
 
         void UpdateCameraSettings()
         {
-            keyboardAndMouseCamera.Follow = follow;
-            keyboardAndMouseCamera.LookAt = lookAt;
+            if (follow != null && lookAt != null)
+            {
+                keyboardAndMouseCamera.Follow = follow;
+                keyboardAndMouseCamera.LookAt = lookAt;
+            }
+            
             //keyboardAndMouseCamera.m_XAxis.m_InvertInput = keyboardAndMouseInvertSettings.invertX;
             //keyboardAndMouseCamera.m_YAxis.m_InvertInput = keyboardAndMouseInvertSettings.invertY;
 
@@ -166,6 +187,21 @@ namespace Gamekit3D
         {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+        }
+
+        public void SetTarget(BoltEntity entity)
+        {
+            follow = entity.transform;
+            lookAt = entity.transform;
+        }
+
+        public void CalculateDummyCameraTransform(IChaos_PlayerState state, out Vector3 pos, out Quaternion rot)
+        {
+            m_DummyCam.position = state.CamPos;
+            m_DummyCam.rotation = state.CamRot;
+
+            pos = m_DummyCam.position;
+            rot = m_DummyCam.rotation;
         }
     } 
 }

@@ -68,8 +68,13 @@ public class DrawPlayerHUD : MonoBehaviour
     }
 
     // Token: 0x0600011C RID: 284 RVA: 0x0000BD34 File Offset: 0x00009F34
-    private void OnGUI()
+    public void OnGUI()
     {
+        if (!m_IsDraw)
+        {
+            return;
+        }
+
         if (this.skipDraw)
         {
             return;
@@ -91,6 +96,11 @@ public class DrawPlayerHUD : MonoBehaviour
         {
             GUI.DrawTexture(new Rect(this.rightTargetScreenPosition.x, (float)Screen.height - this.rightTargetScreenPosition.y - (float)this.activeRightCrosshair.height * this.rightTargetScale / 2f, (float)this.activeRightCrosshair.width * this.rightTargetScale, (float)this.activeRightCrosshair.height * this.rightTargetScale), this.activeRightCrosshair);
         }
+    }
+
+    public void DrawOwnerHookTarget(bool isDraw)
+    {
+        m_IsDraw = isDraw;
     }
 
     // Token: 0x04000163 RID: 355
@@ -176,4 +186,6 @@ public class DrawPlayerHUD : MonoBehaviour
 
     // Token: 0x0400017E RID: 382
     public bool skipDraw;
+
+    private bool m_IsDraw;
 }

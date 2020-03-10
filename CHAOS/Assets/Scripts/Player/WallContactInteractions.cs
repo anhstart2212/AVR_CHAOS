@@ -113,7 +113,8 @@ public class WallContactInteractions : MonoBehaviour
                 this.reeledState = 0;
                 this.hookedOnWallIsRunning = false;
             }
-            brakingLastFrame = Input.GetButton(this.player.axisName.jumpReel);
+            //brakingLastFrame = Input.GetButton(this.player.axisName.jumpReel);
+            brakingLastFrame = player.JumpReelKeyDown;
             yield return null;
         }
         yield break;
@@ -177,7 +178,7 @@ public class WallContactInteractions : MonoBehaviour
             {
                 break;
             }
-            if (Input.GetButtonDown(this.player.axisName.jumpReel))
+            if (/*Input.GetButtonDown(this.player.axisName.jumpReel)*/ player.JumpReelKeyDown)
             {
                 this.StopJump();
                 this.StartJump(16);
@@ -284,7 +285,7 @@ public class WallContactInteractions : MonoBehaviour
         {
             this.jumpStarted = true;
         }
-        if (this.jumpStarted && (flag || Input.GetButtonDown(this.player.axisName.jumpReel)))
+        if (this.jumpStarted && (flag || /*Input.GetButtonDown(this.player.axisName.jumpReel)*/ player.JumpReelKeyDown))
         {
             this.jumpStarted = false;
             return true;

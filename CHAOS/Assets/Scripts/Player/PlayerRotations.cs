@@ -1,14 +1,15 @@
+using Gamekit3D;
 using System;
 using UnityEngine;
 
 // Token: 0x0200003D RID: 61
-public class PlayerRotations : MonoBehaviour
+public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000254 RID: 596 RVA: 0x00015D06 File Offset: 0x00013F06
     private void Start()
     {
         this.player = base.GetComponent<Player>();
-        this.cam = this.player.transforms.playerCamera;
+        //this.cam = this.player.transforms.playerCamera;
         this.rotator = this.player.transforms.rotator;
     }
 
@@ -34,7 +35,7 @@ public class PlayerRotations : MonoBehaviour
             return;
         }
         Vector3 direction = Vector3.zero;
-        int num;
+        
         if (!this.player.IsGrounded)
         {
             if (this.player.ReeledState == 0)
@@ -88,36 +89,117 @@ public class PlayerRotations : MonoBehaviour
                 num = 2;
                 direction = this.HookDirection();
             }
+
+            this.RotatePlayer(num, direction);
         }
         else
         {
             num = -1;
         }
+    }
+
+    public void PlayerRotation(float movementX, float movementY, float mouseX)
+    {
         if (num == -1)
         {
-            int num2 = 0;
-            float axisRaw = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
-            float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-            if (axisRaw2 < 0f)
+            //int num2 = 0;
+            ////float axisRaw = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+            ////float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+            //float axisRaw = this.player.MovementY;
+            //float axisRaw2 = this.player.MovementX;
+            //if (axisRaw2 < 0f)
+            //{
+            //    num2++;
+            //}
+            //else if (axisRaw2 > 0f)
+            //{
+            //    num2 += 2;
+            //}
+            //if (axisRaw < 0f)
+            //{
+            //    num2 += 4;
+            //}
+            //else if (axisRaw > 0f)
+            //{
+            //    num2 += 8;
+            //}
+            //num = 2;
+
+            //direction = this.DetermineMoveDirection(num2);
+
+            m_Movement.Set(movementX, movementY);
+
+            SetTargetRotation(mouseX);
+
+            if (IsMoveInput)
             {
-                num2++;
+                UpdateOrientation();
             }
-            else if (axisRaw2 > 0f)
-            {
-                num2 += 2;
-            }
-            if (axisRaw < 0f)
-            {
-                num2 += 4;
-            }
-            else if (axisRaw > 0f)
-            {
-                num2 += 8;
-            }
-            num = 2;
-            direction = this.DetermineMoveDirection(num2);
         }
-        this.RotatePlayer(num, direction);
+    }
+
+    public Vector2 MoveInput
+    {
+        get
+        {
+            return m_Movement;
+        }
+    }
+
+    protected Vector2 m_Movement;
+
+    protected bool IsMoveInput
+    {
+        get { return !Mathf.Approximately(MoveInput.sqrMagnitude, 0f); }
+    }
+
+    public Quaternion m_TargetRotation;
+
+    void SetTargetRotation(float mouseX)
+    {
+        // Create three variables, move input local to the player, flattened forward direction of the camera and a local target rotation.
+        Vector2 moveInput = MoveInput;
+        Vector3 localMovementDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
+
+
+        Vector3 forward = Quaternion.Euler(0f, mouseX, 0f) * Vector3.forward;
+        forward.y = 0f;
+        forward.Normalize();
+
+        Quaternion targetRotation;
+
+        // If the local movement direction is the opposite of forward then the target rotation should be towards the camera.
+        if (Mathf.Approximately(Vector3.Dot(localMovementDirection, Vector3.forward), -1.0f))
+        {
+            targetRotation = Quaternion.LookRotation(-forward);
+        }
+        else
+        {
+            // Otherwise the rotation should be the offset of the input from the camera's forward.
+            Quaternion cameraToInputOffset = Quaternion.FromToRotation(Vector3.forward, localMovementDirection);
+            targetRotation = Quaternion.LookRotation(cameraToInputOffset * forward);
+        }
+
+        //// The desired forward direction of Ellen.
+        //Vector3 resultingForward = targetRotation * Vector3.forward;
+
+        //// Find the difference between the current rotation of the player and the desired rotation of the player in radians.
+        //float angleCurrent = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
+        //float targetAngle = Mathf.Atan2(resultingForward.x, resultingForward.z) * Mathf.Rad2Deg;
+
+        //m_AngleDiff = Mathf.DeltaAngle(angleCurrent, targetAngle);
+        m_TargetRotation = targetRotation;
+    }
+
+    void UpdateOrientation()
+    {
+
+        Vector3 localInput = new Vector3(MoveInput.x, 0f, MoveInput.y);
+        float groundedTurnSpeed = Mathf.Lerp(800, 500, 0.2f);
+        float actualTurnSpeed = this.player.IsGrounded ? groundedTurnSpeed : Vector3.Angle(transform.forward, localInput) * 5 * groundedTurnSpeed;
+        m_TargetRotation = Quaternion.RotateTowards(transform.rotation, m_TargetRotation, actualTurnSpeed * Time.deltaTime);
+
+        transform.rotation = m_TargetRotation;
     }
 
     // Token: 0x06000256 RID: 598 RVA: 0x00015F8D File Offset: 0x0001418D
@@ -131,40 +213,40 @@ public class PlayerRotations : MonoBehaviour
     }
 
     // Token: 0x06000258 RID: 600 RVA: 0x00015F94 File Offset: 0x00014194
-    private Vector3 DetermineMoveDirection(int inputIndex)
-    {
-        Vector3 v;
-        switch (inputIndex)
-        {
-            case 1:
-                v = -this.cam.right;
-                goto IL_122;
-            case 2:
-                v = this.cam.right;
-                goto IL_122;
-            case 4:
-                v = -this.cam.forward;
-                goto IL_122;
-            case 5:
-                v = -this.cam.forward - this.cam.right;
-                goto IL_122;
-            case 6:
-                v = -this.cam.forward + this.cam.right;
-                goto IL_122;
-            case 8:
-                v = this.cam.forward;
-                goto IL_122;
-            case 9:
-                v = this.cam.forward - this.cam.right;
-                goto IL_122;
-            case 10:
-                v = this.cam.forward + this.cam.right;
-                goto IL_122;
-        }
-        v = base.transform.forward;
-        IL_122:
-        return Common.RemoveYComponent(v);
-    }
+    //private Vector3 DetermineMoveDirection(int inputIndex)
+    //{
+    //    Vector3 v;
+    //    switch (inputIndex)
+    //    {
+    //        case 1:
+    //            v = -this.cam.right;
+    //            goto IL_122;
+    //        case 2:
+    //            v = this.cam.right;
+    //            goto IL_122;
+    //        case 4:
+    //            v = -this.cam.forward;
+    //            goto IL_122;
+    //        case 5:
+    //            v = -this.cam.forward - this.cam.right;
+    //            goto IL_122;
+    //        case 6:
+    //            v = -this.cam.forward + this.cam.right;
+    //            goto IL_122;
+    //        case 8:
+    //            v = this.cam.forward;
+    //            goto IL_122;
+    //        case 9:
+    //            v = this.cam.forward - this.cam.right;
+    //            goto IL_122;
+    //        case 10:
+    //            v = this.cam.forward + this.cam.right;
+    //            goto IL_122;
+    //    }
+    //    v = base.transform.forward;
+    //    IL_122:
+    //    return Common.RemoveYComponent(v);
+    //}
 
     // Token: 0x06000259 RID: 601 RVA: 0x000160CC File Offset: 0x000142CC
     public void RotatePlayer(int type, Vector3 direction)
@@ -315,11 +397,13 @@ public class PlayerRotations : MonoBehaviour
     }
 
     // Token: 0x04000281 RID: 641
-    private Transform cam;
+    //private Transform cam;
 
     // Token: 0x04000282 RID: 642
     private Player player;
 
     // Token: 0x04000283 RID: 643
     private Transform rotator;
+
+    private int num;
 }

@@ -1,9 +1,18 @@
 using System;
 using UnityEngine;
 using Gamekit3D;
+using Bolt.AdvancedTutorial;
+using Bolt;
+using System.Collections;
+
+public struct State
+{
+    public Vector3 position;
+    public Quaternion rotation;
+}
 
 // Token: 0x02000030 RID: 48
-public class Player : MonoBehaviour
+public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000128 RID: 296 RVA: 0x0000C7CC File Offset: 0x0000A9CC
     private void Awake()
@@ -23,19 +32,18 @@ public class Player : MonoBehaviour
         this.hudScript = base.GetComponent<DrawPlayerHUD>();
         //this.camScript = this.transforms.playerCamera.GetComponent<CameraControl>();
         cameraSettings = FindObjectOfType<CameraSettings>();
-        //this.gameScript = GameObject.FindWithTag("GameController").GetComponent<GameBase>();
+        ////this.gameScript = GameObject.FindWithTag("GameController").GetComponent<GameBase>();
         if (cameraSettings != null)
         {
             transforms.playerCamera = cameraSettings.CinemachineBrain;
             transforms.hookTargetNull = cameraSettings.HookTargetNull;
         }
+
+        m_State = new State();
+        m_State.position = transform.position;
+
+        m_LauncherControls = GetComponentsInChildren<LauncherControl>();
     }
-
-
-    //public void SetUIMessageScript(HitMessageManager script)
-    //{
-    //    this.uiMessageScript = script;
-    //}
 
     // Token: 0x0600012A RID: 298 RVA: 0x0000C8A4 File Offset: 0x0000AAA4
     private void InitColliders()
@@ -70,29 +78,33 @@ public class Player : MonoBehaviour
     private void Update()
     {
         //this.jumpReelKeyDown = (Input.GetAxisRaw(this.axisName.jumpReel) != 0f);
-        this.jumpReelKeyDown = (Input.GetButton(this.axisName.jumpReel));
-        this.centerHookKeyDown = (Input.GetAxisRaw(this.axisName.centerHook) != 0f);
-        this.fireLeftHook = Input.GetButton(this.axisName.fireLeftHook);
-        this.fireRightHook = Input.GetButton(this.axisName.fireRightHook);
-        this.movementX = Input.GetAxis(this.axisName.moveLeftRight);
-        this.movementY = Input.GetAxis(this.axisName.moveFrontBack);
+        //this.jumpReelKeyDown = (Input.GetButton(this.axisName.jumpReel));
+        //this.centerHookKeyDown = (Input.GetAxisRaw(this.axisName.centerHook) != 0f);
+        //this.fireLeftHook = Input.GetButton(this.axisName.fireLeftHook);
+        //this.fireRightHook = Input.GetButton(this.axisName.fireRightHook);
+        //jumpKeyDown = Input.GetButtonDown(this.axisName.jump);
+        //attackKeyDown = Input.GetButtonDown(this.axisName.attack);
+        //this.movementX = Input.GetAxis(this.axisName.moveLeftRight);
+        //this.movementY = Input.GetAxis(this.axisName.moveFrontBack);
 
-        // Chaos Added
-        this.fastSpeed = (Input.GetButton(this.axisName.fastSpeed));
-        // Chaos Added
+        //// Chaos Added
+        //this.fastSpeed = (Input.GetButton(this.axisName.fastSpeed));
+        //// Chaos Added
 
         //this.mouseAxisX = Input.GetAxis(this.axisName.mouseX);
         //this.mouseAxisY = Input.GetAxis(this.axisName.mouseY) * (float)((PlayerPrefs.GetInt(PlayerPrefKeys.invertYAxis) != 0) ? -1 : 1);
+
         this.CheckIfGrounded();
         this.CheckIfStationary();
         this.CheckSliding();
-        this.CheckIfJumping();
+        //this.CheckIfJumping();
         this.CheckForGrabRelease();
         this.SetColliders();
         this.SetPhysicsState();
         this.SetAndResetHookDirection();
         this.ResetImpulse();
         this.ResetAnchors();
+
     }
 
     // Token: 0x0600012D RID: 301 RVA: 0x0000CAA7 File Offset: 0x0000ACA7
@@ -110,7 +122,185 @@ public class Player : MonoBehaviour
         this.SetVelocityLastFrame();
     }
 
-    // Token: 0x0600012F RID: 303 RVA: 0x0000CACC File Offset: 0x0000ACCC
+
+
+    void PollKeys()
+    {
+        if (cameraSettings != null)
+        {
+            m_MouseXaxis = cameraSettings.Current.m_XAxis.Value;
+            m_MouseYaxis = cameraSettings.Current.m_YAxis.Value;
+        }
+
+        movementX = Input.GetAxis(axisName.moveLeftRight);
+        movementY = Input.GetAxis(axisName.moveFrontBack);
+        jumpKeyDown = Input.GetButtonDown(axisName.jump);
+        centerHookKeyDown = (Input.GetButton(axisName.centerHook));
+        fireLeftHook = Input.GetButton(axisName.fireLeftHook);
+        fireRightHook = Input.GetButton(axisName.fireRightHook);
+        jumpReelKeyDown = (Input.GetButton(axisName.jumpReel));
+
+        //titanAimLock = Input.GetButton(axisName.titanLock);
+    }
+
+    public override void Attached()
+    {
+        // This couples the Transform property of the State with the GameObject Transform
+        state.SetTransforms(state.Transform, transform);
+        state.SetAnimator(GetComponent<Animator>());
+
+        // setting layerweights 
+        state.Animator.SetLayerWeight(0, 1);
+        state.Animator.SetLayerWeight(1, 1);
+
+        state.OnPlayerHook += OnPlayerHook;
+    }
+
+    public override void SimulateController()
+    {
+        PollKeys();
+
+        DrawOwnerHookTarget();
+
+        IChaosPlayerCommandInput input = ChaosPlayerCommand.Create();
+
+        input.MouseX = m_MouseXaxis;
+        input.MouseY = m_MouseYaxis;
+        input.MovementX = movementX;
+        input.MovementY = movementY;
+        input.Jump = jumpKeyDown;
+        input.CenterHook = centerHookKeyDown;
+        input.FireLeftHook = fireLeftHook;
+        input.FireRightHook = fireRightHook;
+        input.JumpReel = jumpReelKeyDown;
+
+
+        input.CamPos = cameraSettings.CinemachineBrain.position;
+        input.CamRot = transforms.playerCamera.rotation;
+
+        entity.QueueInput(input);
+    }
+
+    public override void ExecuteCommand(Command command, bool resetState)
+    {
+        ChaosPlayerCommand cmd = (ChaosPlayerCommand)command;
+
+        if (resetState)
+        {
+            // we got a correction from the server, reset (this only runs on the client)
+            SetState(cmd.Result.Position, cmd.Result.Rotation);
+        }
+        else
+        {
+            // apply movement(this runs on both server and client)
+            State result = Apply(cmd.Input.MovementX, cmd.Input.MovementY, cmd.Input.MouseX, cmd.Input.Jump, cmd.Input.FireLeftHook, cmd.Input.FireRightHook, cmd.Input.JumpReel);
+
+            // copy the state to the commands result (this gets sent back to the client)
+            cmd.Result.Position = result.position;
+            cmd.Result.Rotation = result.rotation;
+
+            state.CamPos = cmd.Input.CamPos;
+            state.CamRot = cmd.Input.CamRot;
+
+            if (cmd.IsFirstExecution)
+            {
+                // animation run
+                AnimateRun(cmd);
+
+                //FindHookTarget();
+
+                state.IsCenterHook = cmd.Input.CenterHook;
+                state.IsLeftHook = cmd.Input.FireLeftHook;
+                state.IsRightHook = cmd.Input.FireRightHook;
+                state.IsJump = IsJumping;
+
+                if (cmd.Input.CenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
+                {
+                    PlayerHook();
+                }
+
+                AnimateHook();
+            }
+        }
+    }
+
+    void AnimateRun(ChaosPlayerCommand cmd)
+    {
+        AnimationScript.SetRunning(cmd);
+    }
+
+    void AnimateHook()
+    {
+        //AnimationScript.SetHooks(entity);
+    }
+
+    //void FindHookTarget()
+    //{
+    //    foreach (var launcherControl in m_LauncherControls)
+    //    {
+    //        launcherControl.HookTarget(entity);
+    //    }
+    //}
+
+    void PlayerHook()
+    {
+        state.PlayerHook();
+    }
+
+    void OnPlayerHook()
+    {
+        MovementScript.StartHookActions(entity);
+    }
+
+    void DrawOwnerHookTarget()
+    {
+        hudScript.DrawOwnerHookTarget(true);
+    }
+
+    public void SetState(Vector3 position, Quaternion rotation)
+    {
+        // assign new state
+        m_State.position = position;
+        m_State.rotation = rotation;
+
+        // assign local transform
+        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
+        transform.rotation = m_State.rotation;
+    }
+
+    private State Apply(float movementX, float movementY, float mouseX, bool jumpKey, bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    {
+        PlayerMoveInput(movementX, movementY);
+
+        PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
+
+        RotationScript.PlayerRotation(movementX, movementY, mouseX);
+
+        // jump
+        CheckIfJumping(jumpKey);
+
+        // update transform
+        m_State.position = transform.position;
+        m_State.rotation = transform.rotation;
+
+        // done
+        return m_State;
+    }
+
+    private void PlayerMoveInput(float movementX, float movementY)
+    {
+        MovementX = movementX;
+        MovementY = movementY;
+    }
+
+    private void PlayerHookInput(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    {
+        FireLeftHook = fireLeftHook;
+        FireRightHook = fireRightHook;
+        JumpReelKeyDown = jumpReelKey;
+    }
+
+
     private void CheckIfGrounded()
     {
         bool flag = false;
@@ -187,7 +377,7 @@ public class Player : MonoBehaviour
                 }
             }
         }
-        if (this.grounded)
+        if (this.isGrounded)
         {
             this.ApplyHeightCorrection();
         }
@@ -205,22 +395,22 @@ public class Player : MonoBehaviour
     // Token: 0x06000131 RID: 305 RVA: 0x0000CEB4 File Offset: 0x0000B0B4
     private void SetControlGroundState(bool grounded, bool slopedTerrain)
     {
-        this.grounded = grounded;
+        this.isGrounded = grounded;
         this.slopedTerrain = slopedTerrain;
     }
 
     // Token: 0x06000132 RID: 306 RVA: 0x0000CEC4 File Offset: 0x0000B0C4
-    private void CheckIfJumping()
+    private void CheckIfJumping(bool jumpKey)
     {
-        if (Input.GetButtonDown(this.axisName.jump) && this.grounded && !this.jumping && !this.IsEitherHooked)
+        if (jumpKey && this.isGrounded && !this.jumping && !this.IsEitherHooked)
         {
             this.jumping = true;
         }
-        else if (this.JumpReelKeyDown && this.grounded && this.IsEitherHooked)
+        else if (this.JumpReelKeyDown && this.isGrounded && this.IsEitherHooked)
         {
             this.groundTakeOff = true;
         }
-        else if (!this.grounded)
+        else if (!this.isGrounded)
         {
             this.jumping = false;
         }
@@ -253,7 +443,7 @@ public class Player : MonoBehaviour
     // Token: 0x06000135 RID: 309 RVA: 0x0000CFB3 File Offset: 0x0000B1B3
     private void CheckSliding()
     {
-        if (!this.grounded)
+        if (!this.isGrounded)
         {
             this.sliding = false;
         }
@@ -309,17 +499,17 @@ public class Player : MonoBehaviour
     // Token: 0x06000138 RID: 312 RVA: 0x0000D0CC File Offset: 0x0000B2CC
     private void SetColliders()
     {
-        this.capCollider.enabled = this.grounded;
+        this.capCollider.enabled = this.isGrounded;
         for (int i = 0; i < this.lowerColliders.Length; i++)
         {
-            this.lowerColliders[i].enabled = !this.grounded;
+            this.lowerColliders[i].enabled = !this.isGrounded;
         }
     }
 
     // Token: 0x06000139 RID: 313 RVA: 0x0000D11C File Offset: 0x0000B31C
     private void SetPhysicsState()
     {
-        if (this.grounded)
+        if (this.isGrounded)
         {
             this.physicsState = 0;
         }
@@ -711,7 +901,27 @@ public class Player : MonoBehaviour
         {
             return this.jumpReelKeyDown;
         }
+        set
+        {
+            this.jumpReelKeyDown = value;
+        }
     }
+
+    public bool JumpKeyDown
+    {
+        get
+        {
+            return this.jumpKeyDown;
+        }
+    }
+    public bool AttackKeyDown
+    {
+        get
+        {
+            return this.attackKeyDown;
+        }
+    }
+
 
     public bool FastSpeed
     {
@@ -729,6 +939,10 @@ public class Player : MonoBehaviour
         {
             return this.centerHookKeyDown;
         }
+        set
+        {
+            this.centerHookKeyDown = value;
+        }
     }
 
     // Token: 0x17000018 RID: 24
@@ -738,6 +952,10 @@ public class Player : MonoBehaviour
         get
         {
             return this.fireLeftHook;
+        }
+        set
+        {
+            this.fireLeftHook = value;
         }
     }
 
@@ -749,6 +967,10 @@ public class Player : MonoBehaviour
         {
             return this.fireRightHook;
         }
+        set
+        {
+            this.fireRightHook = value;
+        }
     }
 
     // Token: 0x1700001A RID: 26
@@ -759,6 +981,11 @@ public class Player : MonoBehaviour
         {
             return this.movementX;
         }
+        set
+        {
+            this.movementX = value;
+        }
+
     }
 
     // Token: 0x1700001B RID: 27
@@ -768,6 +995,10 @@ public class Player : MonoBehaviour
         get
         {
             return this.movementY;
+        }
+        set
+        {
+            this.movementY = value;
         }
     }
 
@@ -797,7 +1028,7 @@ public class Player : MonoBehaviour
     {
         get
         {
-            return this.grounded;
+            return this.isGrounded;
         }
     }
 
@@ -1718,7 +1949,7 @@ public class Player : MonoBehaviour
             return this.gasScript;
         }
     }
-   
+
     public bool IsLeftHookTargetNull
     {
         get
@@ -1767,6 +1998,10 @@ public class Player : MonoBehaviour
     // Token: 0x0400018C RID: 396
     private bool jumpReelKeyDown;
 
+    private bool jumpKeyDown;
+
+    private bool attackKeyDown;
+
     // Token: 0x0400018D RID: 397
     private bool centerHookKeyDown;
 
@@ -1782,16 +2017,16 @@ public class Player : MonoBehaviour
     // Token: 0x04000191 RID: 401
     private float movementY;
 
-    // Token: 0x04000192 RID: 402
-    //private float mouseAxisX;
+    //Token: 0x04000192 RID: 402
+    private float mouseAxisX;
 
-    // Token: 0x04000193 RID: 403
-    //private float mouseAxisY;
+    //Token: 0x04000193 RID: 403
+    private float mouseAxisY;
 
     private bool fastSpeed;
 
     // Token: 0x04000194 RID: 404
-    public bool grounded;
+    public bool isGrounded;
 
     // Token: 0x04000195 RID: 405
     private bool slopedTerrain;
@@ -2046,4 +2281,12 @@ public class Player : MonoBehaviour
     private bool[] rayHits = new bool[5];
 
     private CameraSettings cameraSettings;
+
+    private State m_State;
+
+    private float m_MouseXaxis;
+
+    private float m_MouseYaxis;
+
+    private LauncherControl[] m_LauncherControls;
 }

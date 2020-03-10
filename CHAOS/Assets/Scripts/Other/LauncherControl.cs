@@ -1,8 +1,9 @@
+using Gamekit3D;
 using System;
 using UnityEngine;
 
 // Token: 0x0200002F RID: 47
-public class LauncherControl : MonoBehaviour
+public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000122 RID: 290 RVA: 0x0000C250 File Offset: 0x0000A450
     private void Start()
@@ -14,20 +15,28 @@ public class LauncherControl : MonoBehaviour
     // Token: 0x06000123 RID: 291 RVA: 0x0000C27C File Offset: 0x0000A47C
     private void LateUpdate()
     {
-        if (this.player.transforms.playerCamera == null)
-        {
-            return;
-        }
+        //if (this.player.transforms.playerCamera == null)
+        //{
+        //    return;
+        //}
 
-        Vector3 forward = this.player.transforms.playerCamera.forward;
-        this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
-        if (this.player.CenterHookKeyDown)
+        Vector3 pos;
+        Quaternion rot;
+        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+
+        // this calculate the looking angle for this specific entity
+        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+
+        m_Forward = rot * Vector3.forward;
+        m_Pos = pos;
+        //this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
+        if (state.IsCenterHook)
         {
-            CenterHookTarget(forward);
+            CenterHookTarget(m_Pos, m_Forward);
         }
         else
         {
-            SideHookTarget(forward);
+            SideHookTarget(m_Pos, m_Forward);
         }
 
         GameObject x;
@@ -55,6 +64,35 @@ public class LauncherControl : MonoBehaviour
         else
         {
             this.TargetSetAssignments(false);
+        }
+    }
+
+    public void HookTarget(BoltEntity entity)
+    {
+        this.player = entity.GetComponent<Player>(); ;
+
+        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+
+        Vector3 pos;
+        Quaternion rot;
+
+        // this calculate the looking angle for this specific entity
+        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+
+        // display debug
+        //Debug.DrawRay(pos, rot * Vector3.forward * 100, Color.blue);
+
+        //Vector3 forward = player.transforms.playerCamera.forward;
+        m_Forward = rot * Vector3.forward;
+        m_Pos = pos;
+
+        if (state.IsCenterHook)
+        {
+            CenterHookTarget(m_Pos, m_Forward);
+        }
+        else
+        {
+            SideHookTarget(m_Pos, m_Forward);
         }
     }
 
@@ -124,7 +162,7 @@ public class LauncherControl : MonoBehaviour
         }
     }
 
-    private void SideHookTarget(Vector3 forward)
+    private void SideHookTarget(Vector3 pos, Vector3 forward)
     {
         float d = 1f;
         float num = 0.05f;
@@ -134,12 +172,17 @@ public class LauncherControl : MonoBehaviour
         }
         for (int i = 0; i < 15; i++)
         {
-            Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
+            //Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
             //Ray ray = new Ray(this.player.transform.position, direction);
 
+            Vector3 direction = forward + CameraSettings.instance.DummyCamera.right * num * d;
+
             //Chaos Added
-            Ray ray = new Ray(this.player.transforms.playerCamera.position, direction);
+            //Ray ray = new Ray(this.player.transforms.playerCamera.position, direction);
+            Ray ray = new Ray(pos, direction);
             //Chaos Added
+
+            //Debug.DrawRay(pos, direction * 100, Color.red);
 
             if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
             {
@@ -160,15 +203,17 @@ public class LauncherControl : MonoBehaviour
         }
     }
 
-    private void CenterHookTarget(Vector3 forward)
+    private void CenterHookTarget(Vector3 pos, Vector3 forward)
     {
-        Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
+        //Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
         //Debug.DrawRay(player.transforms.playerCamera.transform.position, forward * 1000, Color.blue);
 
-        if (!Physics.Raycast(ray2, this.player.MaxHookDistance, Common.layerNoHook))
+        Ray ray = new Ray(pos, forward);
+
+        if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
         {
             int layerMask2 = (!this.player.TitanAimLock) ? Common.layerOGT : Common.layerTitan;
-            bool flag2 = Physics.Raycast(ray2, out this.contact, this.player.MaxHookDistance, layerMask2);
+            bool flag2 = Physics.Raycast(ray, out this.contact, this.player.MaxHookDistance, layerMask2);
             if (flag2)
             {
                 this.AssignTargetVariables();
@@ -213,4 +258,8 @@ public class LauncherControl : MonoBehaviour
 
     // Token: 0x0400018B RID: 395
     private string targetTag;
+
+    private Vector3 m_Pos;
+
+    private Vector3 m_Forward;
 }

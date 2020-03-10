@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 // Token: 0x0200003A RID: 58
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x0600022D RID: 557 RVA: 0x00013930 File Offset: 0x00011B30
     private void Start()
@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
         m_PlayerCombat = GetComponent<PlayerCombat>();
         this.rb = base.GetComponent<Rigidbody>();
         this.acceleration = new PlayerAcceleration(this.maxAccel, this.qConst, this.lConst, this.player.limit.maxHorizontal);
-        this.StartHookActions();
+        //this.StartHookActions();
     }
 
     // Token: 0x0600022E RID: 558 RVA: 0x00013988 File Offset: 0x00011B88
@@ -37,11 +37,13 @@ public class PlayerMovement : MonoBehaviour
             this.hookMovementIsRunning = false;
             return;
         }
+
         if (this.player.IsGrounded && !this.groundMovementIsRunning)
         {
             base.StartCoroutine(this.GroundMovement());
             this.airMovementIsRunning = false;
         }
+
         if (this.AirMovementQualified() && !this.airMovementIsRunning)
         {
             base.StartCoroutine(this.AirMovement());
@@ -56,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
     // Token: 0x0600022F RID: 559 RVA: 0x00013A5D File Offset: 0x00011C5D
     public void Enable()
     {
-        this.StartHookActions();
+        //this.StartHookActions();
     }
 
     // Token: 0x06000230 RID: 560 RVA: 0x00013A68 File Offset: 0x00011C68
@@ -76,6 +78,22 @@ public class PlayerMovement : MonoBehaviour
             this.RetractHook(false);
         }
     }
+
+    //public void PlayerMove(Player player, float movementX, float movementY)
+    //{
+    //    this.player = player;
+    //    this.player.MovementX = movementX;
+    //    this.player.MovementY = movementY;
+    //}
+
+    //public void PlayerHook(Player player, bool fireLeftHook, bool fireRightHook, bool jumpReelKey, bool centerHook)
+    //{
+    //    this.player = player;
+    //    this.player.FireLeftHook = fireLeftHook;
+    //    this.player.FireRightHook = fireRightHook;
+    //    this.player.JumpReelKeyDown = jumpReelKey;
+    //    //this.player.CenterHookKeyDown = centerHook;
+    //}
 
     // Token: 0x06000231 RID: 561 RVA: 0x00013AD4 File Offset: 0x00011CD4
     private IEnumerator GroundMovement()
@@ -163,8 +181,11 @@ public class PlayerMovement : MonoBehaviour
     // Token: 0x06000233 RID: 563 RVA: 0x00013BC0 File Offset: 0x00011DC0
     private void DetermineMoveState()
     {
-        float num = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
-        float num2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+        //float num = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+        //float num2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+        float num = this.player.MovementY;
+        float num2 = this.player.MovementX;
+
         int num3 = 0;
         if (num != 0f)
         {
@@ -379,18 +400,19 @@ public class PlayerMovement : MonoBehaviour
         return !this.player.IsEitherHooked && this.player.IsGasVFX;
     }
 
-    // Token: 0x0600023C RID: 572 RVA: 0x00014221 File Offset: 0x00012421
-    public void StartHookActions()
+    public void StartHookActions(BoltEntity entity)
     {
         if (!this.hookActionRunning)
         {
-            base.StartCoroutine(this.HookCableActions());
+            base.StartCoroutine(this.HookCableActions(entity));
         }
     }
 
     // Token: 0x0600023D RID: 573 RVA: 0x0001423C File Offset: 0x0001243C
-    private IEnumerator HookCableActions()
+    private IEnumerator HookCableActions(BoltEntity entity)
     {
+        this.player = entity.GetComponent<Player>();
+
         this.hookActionRunning = true;
         for (; ; )
         {
@@ -411,55 +433,44 @@ public class PlayerMovement : MonoBehaviour
                 if ((!this.player.IsAnimating || this.player.IsSliding) && Time.timeScale != 0f)
                 {
                     // Chaos Added
-                    if (this.player.CenterHookKeyDown)
+                    if (state.IsCenterHook)
                     {
-                        yield return new WaitForSeconds(0.1f);
+                        yield return new WaitForSeconds(0.05f);
                     }
                     // Chaos Added
 
-                    if (this.player.IsLeftTargetSet && Input.GetButton(this.player.axisName.fireLeftHook) && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsLeftTargetSet && state.IsLeftHook && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true);
-                        //if (this.player.LeftHookTitanObject != null)
-                        //{
-                        //    this.player.LeftHookedTitan = this.player.LeftHookTitanObject;
-                        //}
                     }
-                    if (this.player.IsRightTargetSet && Input.GetButton(this.player.axisName.fireRightHook) && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsRightTargetSet && state.IsRightHook && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false);
-                        //if (this.player.RightHookTitanObject != null)
-                        //{
-                        //    this.player.RightHookedTitan = this.player.RightHookTitanObject;
-                        //}
                     }
-                    if (!this.player.FireLeftHook && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (!state.IsLeftHook && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(true);
-                        //this.player.LeftHookedTitan = null;
                     }
-                    if (!this.player.FireRightHook && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (!state.IsRightHook && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(false);
-                        //this.player.RightHookedTitan = null;
                     }
 
                     // Chaos Added
-                    if (!this.player.IsLeftTargetSet && Input.GetButton(this.player.axisName.fireLeftHook) && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsLeftTargetSet && state.IsLeftHook && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
-                        this.FireHook(true,true);
-                        
+                        this.FireHook(true, true);
+
                     }
-                    if (!this.player.IsRightTargetSet && Input.GetButton(this.player.axisName.fireRightHook) && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsRightTargetSet && state.IsRightHook && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
-                        this.FireHook(false,true);
+                        this.FireHook(false, true);
                     }
                     // Chaos Added
                 }
                 yield return null;
             }
         }
-        //yield break;
     }
 
     // Token: 0x0600023E RID: 574 RVA: 0x00014258 File Offset: 0x00012458
@@ -496,7 +507,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Token: 0x0600023F RID: 575 RVA: 0x00014274 File Offset: 0x00012474
-    private void FireHook(bool isLeft, bool isNull = false)
+    public void FireHook(bool isLeft, bool isNull = false)
     {
         this.player.InstantGasConsumption(0);
         this.HookSpawn(isLeft, isNull);
@@ -513,7 +524,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Token: 0x06000240 RID: 576 RVA: 0x000142D0 File Offset: 0x000124D0
-    private void RetractHook(bool isLeft)
+    public void RetractHook(bool isLeft)
     {
         if (isLeft)
         {
@@ -813,4 +824,12 @@ public class PlayerMovement : MonoBehaviour
     private bool hookActionRunning;
 
     private PlayerCombat m_PlayerCombat;
+
+    public bool HookActionRunning
+    {
+        get
+        {
+            return this.hookActionRunning;
+        }
+    }
 }
