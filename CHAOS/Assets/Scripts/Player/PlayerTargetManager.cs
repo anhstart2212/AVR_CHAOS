@@ -129,12 +129,12 @@ public class PlayerTargetManager : MonoBehaviour
     }
 
     // Token: 0x060002C1 RID: 705 RVA: 0x0001ABDC File Offset: 0x00018DDC
-    private float GetHookedOnFactor(PlayerTarget pt)
-    {
-        float num = (!(pt.GetPlayerScript().LeftHookedTitan == base.gameObject)) ? 0f : 0.5f;
-        float num2 = (!(pt.GetPlayerScript().RightHookedTitan == base.gameObject)) ? 0f : 0.5f;
-        return num + num2;
-    }
+    //private float GetHookedOnFactor(PlayerTarget pt)
+    //{
+    //    float num = (!(pt.GetPlayerScript().LeftHookedTitan == base.gameObject)) ? 0f : 0.5f;
+    //    float num2 = (!(pt.GetPlayerScript().RightHookedTitan == base.gameObject)) ? 0f : 0.5f;
+    //    return num + num2;
+    //}
 
     // Token: 0x060002C2 RID: 706 RVA: 0x0001AC42 File Offset: 0x00018E42
     private float GetBlockingFactor()

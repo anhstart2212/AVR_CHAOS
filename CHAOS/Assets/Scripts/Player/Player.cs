@@ -17,25 +17,25 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000128 RID: 296 RVA: 0x0000C7CC File Offset: 0x0000A9CC
     private void Awake()
     {
-        this.rigidBody = base.GetComponent<Rigidbody>();
-        this.animator = base.GetComponent<Animator>();
+        this.m_RigidBody = base.GetComponent<Rigidbody>();
+        this.m_Animator = base.GetComponent<Animator>();
         this.InitColliders();
-        this.moveScript = base.GetComponent<PlayerMovement>();
-        this.rotScript = base.GetComponent<PlayerRotations>();
-        this.burstScript = base.GetComponent<PlayerBursts>();
-        this.actionScript = base.GetComponent<PlayerActions>();
-        this.wallScript = base.GetComponent<WallContactInteractions>();
-        this.gasScript = base.GetComponent<PlayerGasManagement>();
-        this.animScript = base.GetComponent<PlayerAnimationController>();
-        this.soundScript = base.GetComponent<PlayerSoundController>();
-        this.fxScript = base.GetComponentInChildren<PlayerParticleEffects>();
-        this.hudScript = base.GetComponent<DrawPlayerHUD>();
+        this.m_MoveScript = base.GetComponent<PlayerMovement>();
+        this.m_RotScript = base.GetComponent<PlayerRotations>();
+        this.m_BurstScript = base.GetComponent<PlayerBursts>();
+        this.m_ActionScript = base.GetComponent<PlayerActions>();
+        this.m_WallScript = base.GetComponent<WallContactInteractions>();
+        this.m_GasScript = base.GetComponent<PlayerGasManagement>();
+        this.m_AnimScript = base.GetComponent<PlayerAnimationController>();
+        this.m_SoundScript = base.GetComponent<PlayerSoundController>();
+        this.m_FxScript = base.GetComponentInChildren<PlayerParticleEffects>();
+        this.m_HudScript = base.GetComponent<DrawPlayerHUD>();
         //this.camScript = this.transforms.playerCamera.GetComponent<CameraControl>();
-        cameraSettings = FindObjectOfType<CameraSettings>();
         ////this.gameScript = GameObject.FindWithTag("GameController").GetComponent<GameBase>();
-        if (cameraSettings != null)
+        
+        if (CameraSettings.instance != null)
         {
-            transforms.playerCamera = cameraSettings.CinemachineBrain;
+            transforms.playerCamera = CameraSettings.instance.CinemachineBrain;
         }
 
         m_State = new State(); // State 
@@ -45,14 +45,14 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600012A RID: 298 RVA: 0x0000C8A4 File Offset: 0x0000AAA4
     private void InitColliders()
     {
-        this.capCollider = base.GetComponent<CapsuleCollider>();
+        this.m_CapCollider = base.GetComponent<CapsuleCollider>();
         Transform[] componentsInChildren = base.GetComponentsInChildren<Transform>();
         int num = 0;
         foreach (Transform transform in componentsInChildren)
         {
             if (this.ValidateColliders(transform.name))
             {
-                this.lowerColliders[num++] = transform.gameObject.GetComponent<CapsuleCollider>();
+                this.m_LowerColliders[num++] = transform.gameObject.GetComponent<CapsuleCollider>();
             }
         }
         if (num != 4)
@@ -121,19 +121,19 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     public void PollKeys()
     {
-        if (cameraSettings != null)
+        if (CameraSettings.instance != null)
         {
-            m_MouseXaxis = cameraSettings.Current.m_XAxis.Value;
-            m_MouseYaxis = cameraSettings.Current.m_YAxis.Value;
+            m_MouseXaxis = CameraSettings.instance.Current.m_XAxis.Value;
+            m_MouseYaxis = CameraSettings.instance.Current.m_YAxis.Value;
         }
 
-        movementX = Input.GetAxis(axisName.moveLeftRight);
-        movementY = Input.GetAxis(axisName.moveFrontBack);
-        jumpKeyDown = Input.GetButtonDown(axisName.jump);
-        centerHookKeyDown = (Input.GetButton(axisName.centerHook));
-        fireLeftHook = Input.GetButton(axisName.fireLeftHook);
-        fireRightHook = Input.GetButton(axisName.fireRightHook);
-        jumpReelKeyDown = (Input.GetButton(axisName.jumpReel));
+        m_MovementX = Input.GetAxis(axisName.moveLeftRight);
+        m_MovementY = Input.GetAxis(axisName.moveFrontBack);
+        m_JumpKeyDown = Input.GetButtonDown(axisName.jump);
+        m_CenterHookKeyDown = (Input.GetButton(axisName.centerHook));
+        m_FireLeftHook = Input.GetButton(axisName.fireLeftHook);
+        m_FireRightHook = Input.GetButton(axisName.fireRightHook);
+        m_JumpReelKeyDown = (Input.GetButton(axisName.jumpReel));
 
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
@@ -163,14 +163,14 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     public void DrawOwnerHookTarget()
     {
-        hudScript.DrawOwnerHookTarget(true);
+        m_HudScript.DrawOwnerHookTarget(true);
     }
 
     public State Apply(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
     {
         //PlayerMoveInput(movementX, movementY);
 
-        PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
+        //PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
 
         //RotationScript.PlayerRotation(movementX, movementY, mouseX);
 
@@ -196,57 +196,50 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 2f * Time.deltaTime);
     }
 
-    private void PlayerHookInput(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
-    {
-        FireLeftHook = fireLeftHook;
-        FireRightHook = fireRightHook;
-        JumpReelKeyDown = jumpReelKey;
-    }
-
 
     private void CheckIfGrounded()
     {
         bool flag = false;
-        for (int i = 0; i < this.rayHits.Length; i++)
+        for (int i = 0; i < this.m_RayHits.Length; i++)
         {
-            this.rayHits[i] = false;
+            this.m_RayHits[i] = false;
         }
-        if (this.animator.GetCurrentAnimatorStateInfo(0).IsTag("Jump"))
+        if (this.m_Animator.GetCurrentAnimatorStateInfo(0).IsTag("Jump"))
         {
             this.SetControlGroundState(false, false);
             flag = true;
         }
-        if (this.IsEitherHooked && this.groundTakeOff)
+        if (this.IsEitherHooked && this.m_GroundTakeOff)
         {
-            if (this.animator.GetFloat("Height") > 2f || !this.JumpReelKeyDown)
+            if (this.m_Animator.GetFloat("Height") > 2f || !this.JumpReelKeyDown)
             {
                 base.Invoke("ResetGroundTakeOff", 0.25f);
             }
             this.SetControlGroundState(false, false);
             flag = true;
         }
-        if (this.IsEitherHooked && this.jumpReelKeyDown && this.animator.GetFloat("HookLowPass") > 0f)
+        if (this.IsEitherHooked && state.IsJumpReelKey && this.m_Animator.GetFloat("HookLowPass") > 0f)
         {
             this.SetControlGroundState(false, false);
             flag = true;
         }
         bool flag2 = false;
-        this.rayOrigins[0] = base.transform.position;
-        this.groundRays[0] = new Ray(this.rayOrigins[0], Vector3.down);
+        this.m_RayOrigins[0] = base.transform.position;
+        this.m_GroundRays[0] = new Ray(this.m_RayOrigins[0], Vector3.down);
         RaycastHit raycastHit;
-        this.rayHits[0] = Physics.Raycast(this.groundRays[0], out raycastHit, 500f, Common.layerObstacle | Common.layerGround | Common.layerNoHook);
-        if (this.rayHits[0])
+        this.m_RayHits[0] = Physics.Raycast(this.m_GroundRays[0], out raycastHit, 500f, Common.layerObstacle | Common.layerGround | Common.layerNoHook);
+        if (this.m_RayHits[0])
         {
-            this.height = this.rayOrigins[0].y - raycastHit.point.y;
+            this.m_Height = this.m_RayOrigins[0].y - raycastHit.point.y;
             if (flag)
             {
                 return;
             }
-            if (this.height <= 1.1f)
+            if (this.m_Height <= 1.1f)
             {
                 this.SetControlGroundState(true, false);
             }
-            else if (this.height <= 1.5f)
+            else if (this.m_Height <= 1.5f)
             {
                 flag2 = true;
             }
@@ -261,26 +254,26 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         if (flag2)
         {
-            this.rayOrigins[1] = base.transform.position + 0.25f * base.transform.forward;
-            this.rayOrigins[2] = base.transform.position + 0.25f * -base.transform.forward;
-            this.rayOrigins[3] = base.transform.position + 0.25f * -base.transform.right;
-            this.rayOrigins[4] = base.transform.position + 0.25f * base.transform.right;
-            for (int j = 1; j < this.groundRays.Length; j++)
+            this.m_RayOrigins[1] = base.transform.position + 0.25f * base.transform.forward;
+            this.m_RayOrigins[2] = base.transform.position + 0.25f * -base.transform.forward;
+            this.m_RayOrigins[3] = base.transform.position + 0.25f * -base.transform.right;
+            this.m_RayOrigins[4] = base.transform.position + 0.25f * base.transform.right;
+            for (int j = 1; j < this.m_GroundRays.Length; j++)
             {
-                this.groundRays[j] = new Ray(this.rayOrigins[j], Vector3.down);
-                this.rayHits[j] = Physics.Raycast(this.groundRays[j], 1.2f, Common.layerObstacle | Common.layerGround | Common.layerNoHook);
-                if (this.rayHits[j])
+                this.m_GroundRays[j] = new Ray(this.m_RayOrigins[j], Vector3.down);
+                this.m_RayHits[j] = Physics.Raycast(this.m_GroundRays[j], 1.2f, Common.layerObstacle | Common.layerGround | Common.layerNoHook);
+                if (this.m_RayHits[j])
                 {
                     this.SetControlGroundState(true, true);
                     break;
                 }
-                if (j == this.rayHits.Length - 1)
+                if (j == this.m_RayHits.Length - 1)
                 {
                     this.SetControlGroundState(false, false);
                 }
             }
         }
-        if (this.isGrounded)
+        if (this.m_IsGrounded)
         {
             this.ApplyHeightCorrection();
         }
@@ -289,7 +282,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000130 RID: 304 RVA: 0x0000CE6C File Offset: 0x0000B06C
     private void ApplyHeightCorrection()
     {
-        float num = this.height - 1f;
+        float num = this.m_Height - 1f;
         Vector3 position = base.transform.position;
         position.y = position.y - num + 0.025f;
         base.transform.position = position;
@@ -298,31 +291,31 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000131 RID: 305 RVA: 0x0000CEB4 File Offset: 0x0000B0B4
     private void SetControlGroundState(bool grounded, bool slopedTerrain)
     {
-        this.isGrounded = grounded;
-        this.slopedTerrain = slopedTerrain;
+        this.m_IsGrounded = grounded;
+        this.m_SlopedTerrain = slopedTerrain;
     }
 
     // Token: 0x06000132 RID: 306 RVA: 0x0000CEC4 File Offset: 0x0000B0C4
     private void CheckIfJumping()
     {
-        if (state.IsJumpKey && this.isGrounded && !this.jumping && !this.IsEitherHooked)
+        if (state.IsJumpKey && this.m_IsGrounded && !this.m_Jumping && !this.IsEitherHooked)
         {
-            this.jumping = true;
+            this.m_Jumping = true;
         }
-        else if (this.JumpReelKeyDown && this.isGrounded && this.IsEitherHooked)
+        else if (this.JumpReelKeyDown && this.m_IsGrounded && this.IsEitherHooked)
         {
-            this.groundTakeOff = true;
+            this.m_GroundTakeOff = true;
         }
-        else if (!this.isGrounded)
+        else if (!this.m_IsGrounded)
         {
-            this.jumping = false;
+            this.m_Jumping = false;
         }
     }
 
     // Token: 0x06000133 RID: 307 RVA: 0x0000CF52 File Offset: 0x0000B152
     private void ResetGroundTakeOff()
     {
-        this.groundTakeOff = false;
+        this.m_GroundTakeOff = false;
     }
 
     // Token: 0x06000134 RID: 308 RVA: 0x0000CF5C File Offset: 0x0000B15C
@@ -330,68 +323,68 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         if (Mathf.Round(this.VelocityMagnitude) <= 3f)
         {
-            if (this.stationaryCount >= 10)
+            if (this.m_StationaryCount >= 10)
             {
-                this.stationary = true;
+                this.m_Stationary = true;
             }
-            this.stationaryCount++;
+            this.m_StationaryCount++;
         }
         else
         {
-            this.stationary = false;
-            this.stationaryCount = 0;
+            this.m_Stationary = false;
+            this.m_StationaryCount = 0;
         }
     }
 
     // Token: 0x06000135 RID: 309 RVA: 0x0000CFB3 File Offset: 0x0000B1B3
     private void CheckSliding()
     {
-        if (!this.isGrounded)
+        if (!this.m_IsGrounded)
         {
-            this.sliding = false;
+            this.m_Sliding = false;
         }
     }
 
     // Token: 0x06000136 RID: 310 RVA: 0x0000CFC8 File Offset: 0x0000B1C8
     public void ResetImpulse()
     {
-        if (this.leftImpulse && this.rightImpulse && !this.resetImpulse)
+        if (this.m_LeftImpulse && this.m_RightImpulse && !this.m_ResetImpulse)
         {
-            this.resetImpulse = true;
+            this.m_ResetImpulse = true;
             return;
         }
-        if (this.resetImpulse)
+        if (this.m_ResetImpulse)
         {
-            this.leftImpulse = false;
-            this.rightImpulse = false;
-            this.resetImpulse = false;
+            this.m_LeftImpulse = false;
+            this.m_RightImpulse = false;
+            this.m_ResetImpulse = false;
         }
-        if (this.leftImpulse && !this.resetImpulse)
+        if (this.m_LeftImpulse && !this.m_ResetImpulse)
         {
-            this.resetImpulse = true;
+            this.m_ResetImpulse = true;
             return;
         }
-        if (this.resetImpulse)
+        if (this.m_ResetImpulse)
         {
-            this.leftImpulse = false;
-            this.resetImpulse = false;
+            this.m_LeftImpulse = false;
+            this.m_ResetImpulse = false;
         }
-        if (this.rightImpulse && !this.resetImpulse)
+        if (this.m_RightImpulse && !this.m_ResetImpulse)
         {
-            this.resetImpulse = true;
+            this.m_ResetImpulse = true;
             return;
         }
-        if (this.resetImpulse)
+        if (this.m_ResetImpulse)
         {
-            this.rightImpulse = false;
-            this.resetImpulse = false;
+            this.m_RightImpulse = false;
+            this.m_ResetImpulse = false;
         }
     }
 
     // Token: 0x06000137 RID: 311 RVA: 0x0000D08C File Offset: 0x0000B28C
     private void CheckForGrabRelease()
     {
-        if (this.grabbed)
+        if (this.m_Grabbed)
         {
             base.transform.localPosition = Vector3.zero;
             base.transform.localRotation = Quaternion.identity;
@@ -402,45 +395,45 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000138 RID: 312 RVA: 0x0000D0CC File Offset: 0x0000B2CC
     private void SetColliders()
     {
-        this.capCollider.enabled = this.isGrounded;
-        for (int i = 0; i < this.lowerColliders.Length; i++)
+        this.m_CapCollider.enabled = this.m_IsGrounded;
+        for (int i = 0; i < this.m_LowerColliders.Length; i++)
         {
-            this.lowerColliders[i].enabled = !this.isGrounded;
+            this.m_LowerColliders[i].enabled = !this.m_IsGrounded;
         }
     }
 
     // Token: 0x06000139 RID: 313 RVA: 0x0000D11C File Offset: 0x0000B31C
     private void SetPhysicsState()
     {
-        if (this.isGrounded)
+        if (this.m_IsGrounded)
         {
-            this.physicsState = 0;
+            this.m_PhysicsState = 0;
         }
-        else if (!this.IsEitherHooked && this.walledState == 0)
+        else if (!this.IsEitherHooked && this.m_WalledState == 0)
         {
             if (!this.IsMoving)
             {
-                this.physicsState = 1;
+                this.m_PhysicsState = 1;
             }
             else
             {
-                this.physicsState = 2;
+                this.m_PhysicsState = 2;
             }
         }
-        else if (this.IsEitherHooked && this.walledState == 0)
+        else if (this.IsEitherHooked && this.m_WalledState == 0)
         {
-            if (!this.jumpReelKeyDown)
+            if (!state.IsJumpReelKey)
             {
-                this.physicsState = 3;
+                this.m_PhysicsState = 3;
             }
             else
             {
-                this.physicsState = 4;
+                this.m_PhysicsState = 4;
             }
         }
         else
         {
-            this.physicsState = 5;
+            this.m_PhysicsState = 5;
         }
         this.AssignPhysicsValues();
     }
@@ -451,7 +444,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         switch (this.PhysicsState)
         {
             case 0:
-                if (this.height > 1.1f)
+                if (this.m_Height > 1.1f)
                 {
                     this.SetPhysicsVariables(true, 0f);
                 }
@@ -467,7 +460,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
                 this.SetPhysicsVariables(true, 0f);
                 break;
             case 3:
-                if (this.reeledState == 0)
+                if (this.m_ReeledState == 0)
                 {
                     this.SetPhysicsVariables(false, 0f);
                 }
@@ -495,20 +488,20 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600013B RID: 315 RVA: 0x0000D2B6 File Offset: 0x0000B4B6
     private void SetPhysicsVariables(bool useGrav, float drag)
     {
-        this.rigidBody.useGravity = useGrav;
-        this.rigidBody.drag = drag;
+        this.m_RigidBody.useGravity = useGrav;
+        this.m_RigidBody.drag = drag;
     }
 
     // Token: 0x0600013C RID: 316 RVA: 0x0000D2D0 File Offset: 0x0000B4D0
     private void SetPositionNextFrame()
     {
-        this.positionNextFrame = base.transform.position + this.rigidBody.velocity * Time.fixedDeltaTime;
+        this.m_PositionNextFrame = base.transform.position + this.m_RigidBody.velocity * Time.fixedDeltaTime;
     }
 
     // Token: 0x0600013D RID: 317 RVA: 0x0000D2FD File Offset: 0x0000B4FD
     private void SetVelocityLastFrame()
     {
-        this.velocityLastFrame = this.rigidBody.velocity;
+        this.m_VelocityLastFrame = this.m_RigidBody.velocity;
     }
 
     // Token: 0x0600013E RID: 318 RVA: 0x0000D310 File Offset: 0x0000B510
@@ -523,68 +516,68 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         Vector3 forward = rot * Vector3.forward;
 
-        if (this.leftHooked && this.rightHooked)
+        if (this.m_LeftHooked && this.m_RightHooked)
         {
             //this.hookDirection = (this.leftAnchorPosition - base.transform.position + (this.rightAnchorPosition - base.transform.position)).normalized;
             //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardDouble) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
-            this.hookDirection = ((forward * this.speed.cameraForwardDouble) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            this.m_HookDirection = ((forward * this.speed.cameraForwardDouble) + (this.m_LeftAnchorPosition - base.transform.position) + (this.m_RightAnchorPosition - base.transform.position)).normalized;
         }
-        else if (this.leftHooked)
+        else if (this.m_LeftHooked)
         {
             //this.hookDirection = (this.leftAnchorPosition - base.transform.position).normalized;
             //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.leftAnchorPosition - base.transform.position)).normalized;
-            this.hookDirection = ((forward * this.speed.cameraForwardSingle) + (this.leftAnchorPosition - base.transform.position)).normalized;
+            this.m_HookDirection = ((forward * this.speed.cameraForwardSingle) + (this.m_LeftAnchorPosition - base.transform.position)).normalized;
         }
-        else if (this.rightHooked)
+        else if (this.m_RightHooked)
         {
             //this.hookDirection = (this.rightAnchorPosition - base.transform.position).normalized;
             //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.rightAnchorPosition - base.transform.position)).normalized;
-            this.hookDirection = ((forward * this.speed.cameraForwardSingle) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            this.m_HookDirection = ((forward * this.speed.cameraForwardSingle) + (this.m_RightAnchorPosition - base.transform.position)).normalized;
         }
         else
         {
-            this.hookDirection = Vector3.zero;
+            this.m_HookDirection = Vector3.zero;
         }
     }
 
     // Token: 0x0600013F RID: 319 RVA: 0x0000D3EC File Offset: 0x0000B5EC
     private void ResetAnchors()
     {
-        if (this.leftAnchorPosition != Vector3.zero && !this.leftHooked)
+        if (this.m_LeftAnchorPosition != Vector3.zero && !this.m_LeftHooked)
         {
-            this.leftAnchorPosition = Vector3.zero;
+            this.m_LeftAnchorPosition = Vector3.zero;
         }
-        if (this.rightAnchorPosition != Vector3.zero && !this.rightHooked)
+        if (this.m_RightAnchorPosition != Vector3.zero && !this.m_RightHooked)
         {
-            this.rightAnchorPosition = Vector3.zero;
+            this.m_RightAnchorPosition = Vector3.zero;
         }
     }
 
     // Token: 0x06000140 RID: 320 RVA: 0x0000D450 File Offset: 0x0000B650
     private void CacheVelocityVariables()
     {
-        Vector3 velocity = this.rigidBody.velocity;
+        Vector3 velocity = this.m_RigidBody.velocity;
         Vector3 a = Common.RemoveYComponent(velocity);
-        this.velocityMagnitude = velocity.magnitude;
-        this.velocityMagnitudeXZ = a.magnitude;
-        if (this.velocityMagnitude == 0f)
+        this.m_VelocityMagnitude = velocity.magnitude;
+        this.m_VelocityMagnitudeXZ = a.magnitude;
+        if (this.m_VelocityMagnitude == 0f)
         {
-            this.velocityDirection = Vector3.zero;
+            this.m_VelocityDirection = Vector3.zero;
         }
         else
         {
-            this.velocityDirection = velocity / this.velocityMagnitude;
+            this.m_VelocityDirection = velocity / this.m_VelocityMagnitude;
         }
-        if (this.velocityMagnitudeXZ == 0f)
+        if (this.m_VelocityMagnitudeXZ == 0f)
         {
-            this.velocityDirectionXZ = Vector3.zero;
+            this.m_VelocityDirectionXZ = Vector3.zero;
         }
         else
         {
-            this.velocityDirectionXZ = a / this.velocityMagnitudeXZ;
+            this.m_VelocityDirectionXZ = a / this.m_VelocityMagnitudeXZ;
         }
-        this.velocityY = velocity.y;
-        this.velocityYAbs = Mathf.Abs(velocity.y);
+        this.m_VelocityY = velocity.y;
+        this.m_VelocityYAbs = Mathf.Abs(velocity.y);
     }
 
     // Token: 0x06000141 RID: 321 RVA: 0x0000D510 File Offset: 0x0000B710
@@ -601,8 +594,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
             }
         }
         a = a.normalized;
-        this.rigidBody.AddForce(a * 10f * d * Time.fixedDeltaTime, ForceMode.VelocityChange);
-        this.jumping = false;
+        this.m_RigidBody.AddForce(a * 10f * d * Time.fixedDeltaTime, ForceMode.VelocityChange);
+        this.m_Jumping = false;
     }
 
     // Token: 0x06000142 RID: 322 RVA: 0x0000D590 File Offset: 0x0000B790
@@ -641,7 +634,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             amount = this.gas.costHorzBurst * 2f;
         }
-        this.gasScript.ExpendGas(amount);
+        this.m_GasScript.ExpendGas(amount);
     }
 
     // Token: 0x06000144 RID: 324 RVA: 0x0000D689 File Offset: 0x0000B889
@@ -654,35 +647,35 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000145 RID: 325 RVA: 0x0000D698 File Offset: 0x0000B898
     public void DisableScripts()
     {
-        this.moveScript.Disable();
-        this.moveScript.enabled = false;
-        this.rotScript.Disable();
-        this.rotScript.enabled = false;
-        this.burstScript.Disable();
-        this.burstScript.enabled = false;
-        this.actionScript.Disable();
-        this.actionScript.enabled = false;
-        this.wallScript.Disable();
-        this.wallScript.enabled = false;
-        this.hudScript.Disable();
-        this.hudScript.enabled = false;
+        this.m_MoveScript.Disable();
+        this.m_MoveScript.enabled = false;
+        this.m_RotScript.Disable();
+        this.m_RotScript.enabled = false;
+        this.m_BurstScript.Disable();
+        this.m_BurstScript.enabled = false;
+        this.m_ActionScript.Disable();
+        this.m_ActionScript.enabled = false;
+        this.m_WallScript.Disable();
+        this.m_WallScript.enabled = false;
+        this.m_HudScript.Disable();
+        this.m_HudScript.enabled = false;
     }
 
     // Token: 0x06000146 RID: 326 RVA: 0x0000D730 File Offset: 0x0000B930
     public void EnableScripts()
     {
-        this.moveScript.Enable();
-        this.moveScript.enabled = true;
-        this.rotScript.Enable();
-        this.rotScript.enabled = true;
-        this.burstScript.Enable();
-        this.burstScript.enabled = true;
-        this.actionScript.Enable();
-        this.actionScript.enabled = true;
-        this.wallScript.Enable();
-        this.wallScript.enabled = true;
-        this.hudScript.Enable();
-        this.hudScript.enabled = true;
+        this.m_MoveScript.Enable();
+        this.m_MoveScript.enabled = true;
+        this.m_RotScript.Enable();
+        this.m_RotScript.enabled = true;
+        this.m_BurstScript.Enable();
+        this.m_BurstScript.enabled = true;
+        this.m_ActionScript.Enable();
+        this.m_ActionScript.enabled = true;
+        this.m_WallScript.Enable();
+        this.m_WallScript.enabled = true;
+        this.m_HudScript.Enable();
+        this.m_HudScript.enabled = true;
     }
 
     // Token: 0x06000147 RID: 327 RVA: 0x0000D7C8 File Offset: 0x0000B9C8
@@ -696,13 +689,13 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         base.transform.localPosition = Vector3.zero;
         base.transform.localRotation = Quaternion.identity;
         base.transform.localScale = Vector3.one;
-        this.rigidBody.velocity = Vector3.zero;
-        this.rigidBody.isKinematic = true;
-        this.soundScript.SwordSound("stop");
+        this.m_RigidBody.velocity = Vector3.zero;
+        this.m_RigidBody.isKinematic = true;
+        this.m_SoundScript.SwordSound("stop");
         this.DisableScripts();
-        this.grabbed = true;
-        this.actionScript.StartDamageEffect();
-        this.actionScript.StartGrabEscapeAttempt();
+        this.m_Grabbed = true;
+        this.m_ActionScript.StartDamageEffect();
+        this.m_ActionScript.StartGrabEscapeAttempt();
         //this.camScript.StartGrabZoom();
     }
 
@@ -712,11 +705,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         GameObject gameObject = Common.GetRootObject(base.transform.parent).gameObject;
         //gameObject.GetComponent<TitanMain>().ReleaseGrabbedPlayer();
         base.transform.parent = null;
-        this.rigidBody.isKinematic = false;
+        this.m_RigidBody.isKinematic = false;
         //this.camScript.ResetFollowDistance();
         this.EnableScripts();
-        this.actionScript.StopDamageEffect();
-        this.grabbed = false;
+        this.m_ActionScript.StopDamageEffect();
+        this.m_Grabbed = false;
     }
 
     // Token: 0x06000149 RID: 329 RVA: 0x0000D900 File Offset: 0x0000BB00
@@ -740,8 +733,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     public void ReleaseAttack()
     {
         this.IsAttacking = false;
-        this.animator.SetBool("AttackReleased", true);
-        this.animator.SetBool("AttackPrimed", false);
+        this.m_Animator.SetBool("AttackReleased", true);
+        this.m_Animator.SetBool("AttackPrimed", false);
     }
 
     // Token: 0x0600014B RID: 331 RVA: 0x0000D9F0 File Offset: 0x0000BBF0
@@ -756,17 +749,17 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             if (this.VelocityYSigned < 0f)
             {
-                this.rigidBody.velocity = new Vector3(this.rigidBody.velocity.x, -this.limit.maxVertical, this.rigidBody.velocity.z);
+                this.m_RigidBody.velocity = new Vector3(this.m_RigidBody.velocity.x, -this.limit.maxVertical, this.m_RigidBody.velocity.z);
             }
             else
             {
-                this.rigidBody.velocity = new Vector3(this.rigidBody.velocity.x, this.limit.maxVertical, this.rigidBody.velocity.z);
+                this.m_RigidBody.velocity = new Vector3(this.m_RigidBody.velocity.x, this.limit.maxVertical, this.m_RigidBody.velocity.z);
             }
         }
         if (this.VelocityMagnitudeXZ > this.limit.maxHorizontal)
         {
-            Vector3 b = new Vector3(0f, this.rigidBody.velocity.y, 0f);
-            this.rigidBody.velocity = this.VelocityDirectionXZ * this.limit.maxHorizontal + b;
+            Vector3 b = new Vector3(0f, this.m_RigidBody.velocity.y, 0f);
+            this.m_RigidBody.velocity = this.VelocityDirectionXZ * this.limit.maxHorizontal + b;
         }
     }
 
@@ -780,15 +773,15 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         if (this.IsEitherHooked && this.JumpReelKeyDown)
         {
             Vector3 onNormal = this.HookedSteerDirection();
-            float num = Vector3.Angle(new Vector3(this.rigidBody.velocity.x, 0f, this.rigidBody.velocity.z), new Vector3(onNormal.x, 0f, onNormal.z));
+            float num = Vector3.Angle(new Vector3(this.m_RigidBody.velocity.x, 0f, this.m_RigidBody.velocity.z), new Vector3(onNormal.x, 0f, onNormal.z));
             if (num < 90f)
             {
                 num = 90f;
             }
             num -= 90f;
             float num2 = num / 90f;
-            Vector3 vector = Vector3.Project(this.rigidBody.velocity, onNormal);
-            Vector3 vector2 = this.rigidBody.velocity - vector;
+            Vector3 vector = Vector3.Project(this.m_RigidBody.velocity, onNormal);
+            Vector3 vector2 = this.m_RigidBody.velocity - vector;
             float num3;
             float num4;
             if (this.IsDoubleHooked)
@@ -804,7 +797,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
             vector2 = new Vector3(vector2.x * num3, vector2.y * num4, vector2.z * num3);
             vector2 = Vector3.RotateTowards(vector2, vector, 0.00196349551f, 0f);
             Vector3 velocity = vector2 + vector;
-            this.rigidBody.velocity = velocity;
+            this.m_RigidBody.velocity = velocity;
         }
     }
 
@@ -814,11 +807,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.jumpReelKeyDown;
+            return this.m_JumpReelKeyDown;
         }
         set
         {
-            this.jumpReelKeyDown = value;
+            this.m_JumpReelKeyDown = value;
         }
     }
 
@@ -826,14 +819,14 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.jumpKeyDown;
+            return this.m_JumpKeyDown;
         }
     }
     public bool AttackKeyDown
     {
         get
         {
-            return this.attackKeyDown;
+            return this.m_AttackKeyDown;
         }
     }
 
@@ -842,7 +835,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.fastSpeed;
+            return this.m_FastSpeed;
         }
     }
 
@@ -852,11 +845,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.centerHookKeyDown;
+            return this.m_CenterHookKeyDown;
         }
         set
         {
-            this.centerHookKeyDown = value;
+            this.m_CenterHookKeyDown = value;
         }
     }
 
@@ -866,11 +859,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.fireLeftHook;
+            return this.m_FireLeftHook;
         }
         set
         {
-            this.fireLeftHook = value;
+            this.m_FireLeftHook = value;
         }
     }
 
@@ -880,11 +873,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.fireRightHook;
+            return this.m_FireRightHook;
         }
         set
         {
-            this.fireRightHook = value;
+            this.m_FireRightHook = value;
         }
     }
 
@@ -894,11 +887,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.movementX;
+            return this.m_MovementX;
         }
         set
         {
-            this.movementX = value;
+            this.m_MovementX = value;
         }
 
     }
@@ -909,11 +902,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.movementY;
+            return this.m_MovementY;
         }
         set
         {
-            this.movementY = value;
+            this.m_MovementY = value;
         }
     }
 
@@ -943,7 +936,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.isGrounded;
+            return this.m_IsGrounded;
         }
     }
 
@@ -953,7 +946,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.slopedTerrain;
+            return this.m_SlopedTerrain;
         }
     }
 
@@ -963,7 +956,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.jumping;
+            return this.m_Jumping;
         }
     }
 
@@ -973,7 +966,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.groundTakeOff;
+            return this.m_GroundTakeOff;
         }
     }
 
@@ -983,7 +976,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.movementX != 0f || this.movementY != 0f;
+            return this.m_MovementX != 0f || this.m_MovementY != 0f;
         }
     }
 
@@ -994,11 +987,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.sliding;
+            return this.m_Sliding;
         }
         set
         {
-            this.sliding = value;
+            this.m_Sliding = value;
         }
     }
 
@@ -1009,11 +1002,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.attacking;
+            return this.m_Attacking;
         }
         set
         {
-            this.attacking = value;
+            this.m_Attacking = value;
         }
     }
 
@@ -1024,11 +1017,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.attackReadied;
+            return this.m_AttackReadied;
         }
         set
         {
-            this.attackReadied = value;
+            this.m_AttackReadied = value;
         }
     }
 
@@ -1038,7 +1031,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.grabbed;
+            return this.m_Grabbed;
         }
     }
 
@@ -1049,11 +1042,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.escaping;
+            return this.m_Escaping;
         }
         set
         {
-            this.escaping = value;
+            this.m_Escaping = value;
         }
     }
 
@@ -1064,11 +1057,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.gasEffectActive;
+            return this.m_GasEffectActive;
         }
         set
         {
-            this.gasEffectActive = value;
+            this.m_GasEffectActive = value;
         }
     }
 
@@ -1078,7 +1071,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.stationary;
+            return this.m_Stationary;
         }
     }
 
@@ -1089,11 +1082,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.animating;
+            return this.m_Animating;
         }
         set
         {
-            this.animating = value;
+            this.m_Animating = value;
         }
     }
 
@@ -1104,11 +1097,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftHooked && !isLeftHookTargetNull;
+            return this.m_LeftHooked && !m_IsLeftHookTargetNull;
         }
         set
         {
-            this.leftHooked = value;
+            this.m_LeftHooked = value;
         }
     }
 
@@ -1119,11 +1112,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightHooked && !isRightHookTargetNull;
+            return this.m_RightHooked && !m_IsRightHookTargetNull;
         }
         set
         {
-            this.rightHooked = value;
+            this.m_RightHooked = value;
         }
     }
 
@@ -1133,7 +1126,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.IsLeftHooked && this.IsRightHooked && !isLeftHookTargetNull && !isRightHookTargetNull;
+            return this.IsLeftHooked && this.IsRightHooked && !m_IsLeftHookTargetNull && !m_IsRightHookTargetNull;
         }
     }
 
@@ -1143,7 +1136,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return (this.IsLeftHooked || this.IsRightHooked) && (!isLeftHookTargetNull || !isRightHookTargetNull);
+            return (this.IsLeftHooked || this.IsRightHooked) && (!m_IsLeftHookTargetNull || !m_IsRightHookTargetNull);
         }
     }
 
@@ -1154,11 +1147,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftImpulse;
+            return this.m_LeftImpulse;
         }
         set
         {
-            this.leftImpulse = value;
+            this.m_LeftImpulse = value;
         }
     }
 
@@ -1169,11 +1162,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightImpulse;
+            return this.m_RightImpulse;
         }
         set
         {
-            this.rightImpulse = value;
+            this.m_RightImpulse = value;
         }
     }
 
@@ -1184,11 +1177,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftTargetSet;
+            return this.m_LeftTargetSet;
         }
         set
         {
-            this.leftTargetSet = value;
+            this.m_LeftTargetSet = value;
         }
     }
 
@@ -1199,11 +1192,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightTargetSet;
+            return this.m_RightTargetSet;
         }
         set
         {
-            this.rightTargetSet = value;
+            this.m_RightTargetSet = value;
         }
     }
 
@@ -1213,7 +1206,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.physicsState;
+            return this.m_PhysicsState;
         }
     }
 
@@ -1224,11 +1217,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.reeledState;
+            return this.m_ReeledState;
         }
         set
         {
-            this.reeledState = value;
+            this.m_ReeledState = value;
         }
     }
 
@@ -1239,11 +1232,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.walledState;
+            return this.m_WalledState;
         }
         set
         {
-            this.walledState = value;
+            this.m_WalledState = value;
         }
     }
 
@@ -1254,11 +1247,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.slideState;
+            return this.m_slideState;
         }
         set
         {
-            this.slideState = value;
+            this.m_slideState = value;
         }
     }
 
@@ -1268,7 +1261,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return Mathf.Round(this.height * 100f) / 100f;
+            return Mathf.Round(this.m_Height * 100f) / 100f;
         }
     }
 
@@ -1278,7 +1271,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.positionNextFrame;
+            return this.m_PositionNextFrame;
         }
     }
 
@@ -1288,7 +1281,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityLastFrame;
+            return this.m_VelocityLastFrame;
         }
     }
 
@@ -1298,7 +1291,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            Vector3 vector = new Vector3(this.rigidBody.velocity.x, 0f, this.rigidBody.velocity.z);
+            Vector3 vector = new Vector3(this.m_RigidBody.velocity.x, 0f, this.m_RigidBody.velocity.z);
             Vector3 onNormal = new Vector3(this.transforms.playerCamera.forward.x, 0f, this.transforms.playerCamera.forward.z);
             float magnitude = Vector3.Project(vector, onNormal).magnitude;
             return this.limit.originalHookRange + magnitude / 2f;
@@ -1312,11 +1305,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.maxLengthLeft;
+            return this.m_MaxLengthLeft;
         }
         set
         {
-            this.maxLengthLeft = value;
+            this.m_MaxLengthLeft = value;
         }
     }
 
@@ -1327,11 +1320,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.maxLengthRight;
+            return this.m_MaxLengthRight;
         }
         set
         {
-            this.maxLengthRight = value;
+            this.m_MaxLengthRight = value;
         }
     }
 
@@ -1342,11 +1335,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.currentLengthLeft;
+            return this.m_CurrentLengthLeft;
         }
         set
         {
-            this.currentLengthLeft = value;
+            this.m_CurrentLengthLeft = value;
         }
     }
 
@@ -1357,11 +1350,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.currentLengthRight;
+            return this.m_CurrentLengthRight;
         }
         set
         {
-            this.currentLengthRight = value;
+            this.m_CurrentLengthRight = value;
         }
     }
 
@@ -1371,7 +1364,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.hookDirection;
+            return this.m_HookDirection;
         }
     }
 
@@ -1382,11 +1375,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftAnchorPosition;
+            return this.m_LeftAnchorPosition;
         }
         set
         {
-            this.leftAnchorPosition = value;
+            this.m_LeftAnchorPosition = value;
         }
     }
 
@@ -1397,11 +1390,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightAnchorPosition;
+            return this.m_RightAnchorPosition;
         }
         set
         {
-            this.rightAnchorPosition = value;
+            this.m_RightAnchorPosition = value;
         }
     }
 
@@ -1412,11 +1405,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftTargetPosition;
+            return this.m_LeftTargetPosition;
         }
         set
         {
-            this.leftTargetPosition = value;
+            this.m_LeftTargetPosition = value;
         }
     }
 
@@ -1427,11 +1420,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightTargetPosition;
+            return this.m_RightTargetPosition;
         }
         set
         {
-            this.rightTargetPosition = value;
+            this.m_RightTargetPosition = value;
         }
     }
 
@@ -1442,11 +1435,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.currentLeftHook;
+            return this.m_CurrentLeftHook;
         }
         set
         {
-            this.currentLeftHook = value;
+            this.m_CurrentLeftHook = value;
         }
     }
 
@@ -1457,41 +1450,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.currentRightHook;
+            return this.m_CurrentRightHook;
         }
         set
         {
-            this.currentRightHook = value;
-        }
-    }
-
-    // Token: 0x17000046 RID: 70
-    // (get) Token: 0x06000197 RID: 407 RVA: 0x0000DFB5 File Offset: 0x0000C1B5
-    // (set) Token: 0x06000198 RID: 408 RVA: 0x0000DFBD File Offset: 0x0000C1BD
-    public GameObject LeftHookedTitan
-    {
-        get
-        {
-            return this.leftHookedTitan;
-        }
-        set
-        {
-            this.leftHookedTitan = value;
-        }
-    }
-
-    // Token: 0x17000047 RID: 71
-    // (get) Token: 0x06000199 RID: 409 RVA: 0x0000DFC6 File Offset: 0x0000C1C6
-    // (set) Token: 0x0600019A RID: 410 RVA: 0x0000DFCE File Offset: 0x0000C1CE
-    public GameObject RightHookedTitan
-    {
-        get
-        {
-            return this.rightHookedTitan;
-        }
-        set
-        {
-            this.rightHookedTitan = value;
+            this.m_CurrentRightHook = value;
         }
     }
 
@@ -1502,11 +1465,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.titanAimLock;
+            return this.m_TitanAimLock;
         }
         set
         {
-            this.titanAimLock = value;
+            this.m_TitanAimLock = value;
         }
     }
 
@@ -1517,11 +1480,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstStartRotation;
+            return this.m_BurstStartRotation;
         }
         set
         {
-            this.burstStartRotation = value;
+            this.m_BurstStartRotation = value;
         }
     }
 
@@ -1532,11 +1495,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstEndRotation;
+            return this.m_BurstEndRotation;
         }
         set
         {
-            this.burstEndRotation = value;
+            this.m_BurstEndRotation = value;
         }
     }
 
@@ -1547,11 +1510,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstTurnIsRunning;
+            return this.m_BurstTurnIsRunning;
         }
         set
         {
-            this.burstTurnIsRunning = value;
+            this.m_BurstTurnIsRunning = value;
         }
     }
 
@@ -1562,11 +1525,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstForceIsRunning;
+            return this.m_BurstForceIsRunning;
         }
         set
         {
-            this.burstForceIsRunning = value;
+            this.m_BurstForceIsRunning = value;
         }
     }
 
@@ -1577,11 +1540,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstStartTime;
+            return this.m_BurstStartTime;
         }
         set
         {
-            this.burstStartTime = value;
+            this.m_BurstStartTime = value;
         }
     }
 
@@ -1592,11 +1555,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.currentBurstRate;
+            return this.m_CurrentBurstRate;
         }
         set
         {
-            this.currentBurstRate = value;
+            this.m_CurrentBurstRate = value;
         }
     }
 
@@ -1607,11 +1570,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstTankLevel;
+            return this.m_BurstTankLevel;
         }
         set
         {
-            this.burstTankLevel = value;
+            this.m_BurstTankLevel = value;
         }
     }
 
@@ -1621,7 +1584,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityMagnitude;
+            return this.m_VelocityMagnitude;
         }
     }
 
@@ -1631,7 +1594,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityMagnitudeXZ;
+            return this.m_VelocityMagnitudeXZ;
         }
     }
 
@@ -1641,7 +1604,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityY;
+            return this.m_VelocityY;
         }
     }
 
@@ -1651,7 +1614,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityYAbs;
+            return this.m_VelocityYAbs;
         }
     }
 
@@ -1661,7 +1624,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityDirection;
+            return this.m_VelocityDirection;
         }
     }
 
@@ -1671,7 +1634,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.velocityDirectionXZ;
+            return this.m_VelocityDirectionXZ;
         }
     }
 
@@ -1681,7 +1644,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rigidBody;
+            return this.m_RigidBody;
         }
     }
 
@@ -1691,37 +1654,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.animator;
-        }
-    }
-
-    // Token: 0x17000058 RID: 88
-    // (get) Token: 0x060001B3 RID: 435 RVA: 0x0000E09F File Offset: 0x0000C29F
-    // (set) Token: 0x060001B4 RID: 436 RVA: 0x0000E0A7 File Offset: 0x0000C2A7
-    public GameObject LeftHookTitanObject
-    {
-        get
-        {
-            return this.leftTitanObject;
-        }
-        set
-        {
-            this.leftTitanObject = value;
-        }
-    }
-
-    // Token: 0x17000059 RID: 89
-    // (get) Token: 0x060001B5 RID: 437 RVA: 0x0000E0B0 File Offset: 0x0000C2B0
-    // (set) Token: 0x060001B6 RID: 438 RVA: 0x0000E0B8 File Offset: 0x0000C2B8
-    public GameObject RightHookTitanObject
-    {
-        get
-        {
-            return this.rightTitanObject;
-        }
-        set
-        {
-            this.rightTitanObject = value;
+            return this.m_Animator;
         }
     }
 
@@ -1732,11 +1665,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.leftHookTargetTag;
+            return this.m_LeftHookTargetTag;
         }
         set
         {
-            this.leftHookTargetTag = value;
+            this.m_LeftHookTargetTag = value;
         }
     }
 
@@ -1747,11 +1680,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rightHookTargetTag;
+            return this.m_RightHookTargetTag;
         }
         set
         {
-            this.rightHookTargetTag = value;
+            this.m_RightHookTargetTag = value;
         }
     }
 
@@ -1761,7 +1694,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.moveScript;
+            return this.m_MoveScript;
         }
     }
 
@@ -1771,7 +1704,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.rotScript;
+            return this.m_RotScript;
         }
     }
 
@@ -1781,7 +1714,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.burstScript;
+            return this.m_BurstScript;
         }
     }
 
@@ -1791,7 +1724,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.actionScript;
+            return this.m_ActionScript;
         }
     }
 
@@ -1801,7 +1734,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.wallScript;
+            return this.m_WallScript;
         }
     }
 
@@ -1811,7 +1744,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.animScript;
+            return this.m_AnimScript;
         }
     }
 
@@ -1821,7 +1754,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.soundScript;
+            return this.m_SoundScript;
         }
     }
 
@@ -1831,7 +1764,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.fxScript;
+            return this.m_FxScript;
         }
     }
 
@@ -1841,7 +1774,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.hudScript;
+            return this.m_HudScript;
         }
     }
 
@@ -1861,7 +1794,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.gasScript;
+            return this.m_GasScript;
         }
     }
 
@@ -1869,11 +1802,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.isLeftHookTargetNull;
+            return this.m_IsLeftHookTargetNull;
         }
         set
         {
-            this.isLeftHookTargetNull = value;
+            this.m_IsLeftHookTargetNull = value;
         }
     }
 
@@ -1881,283 +1814,257 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         get
         {
-            return this.isRightHookTargetNull;
+            return this.m_IsRightHookTargetNull;
         }
         set
         {
-            this.isRightHookTargetNull = value;
+            this.m_IsRightHookTargetNull = value;
         }
     }
 
-    //public GameBase GameScript
-    //{
-    //    get
-    //    {
-    //        return this.gameScript;
-    //    }
-    //}
+    public float MouseXaxis
+    {
+        get
+        {
+            return m_MouseXaxis;
+        }
+    }
+    public float MouseYaxis
+    {
+        get
+        {
+            return m_MouseYaxis;
+        }
+    }
 
+    private bool m_IsLeftHookTargetNull;
 
-    //public HitMessageManager HitMessageScript
-    //{
-    //    get
-    //    {
-    //        return this.uiMessageScript;
-    //    }
-    //}
-
-    private bool isLeftHookTargetNull;
-
-    private bool isRightHookTargetNull;
+    private bool m_IsRightHookTargetNull;
 
     // Token: 0x0400018C RID: 396
-    public bool jumpReelKeyDown;
+    private bool m_JumpReelKeyDown;
 
-    public bool jumpKeyDown;
+    private bool m_JumpKeyDown;
 
-    private bool attackKeyDown;
+    private bool m_AttackKeyDown;
 
     // Token: 0x0400018D RID: 397
-    public bool centerHookKeyDown;
+    private bool m_CenterHookKeyDown;
 
     // Token: 0x0400018E RID: 398
-    public bool fireLeftHook;
+    private bool m_FireLeftHook;
 
     // Token: 0x0400018F RID: 399
-    public bool fireRightHook;
+    private bool m_FireRightHook;
 
     // Token: 0x04000190 RID: 400
-    public float movementX;
+    private float m_MovementX;
 
     // Token: 0x04000191 RID: 401
-    public float movementY;
+    private float m_MovementY;
 
-    //Token: 0x04000192 RID: 402
-    public float mouseAxisX;
-
-    //Token: 0x04000193 RID: 403
-    public float mouseAxisY;
-
-    private bool fastSpeed;
+    private bool m_FastSpeed;
 
     // Token: 0x04000194 RID: 404
-    public bool isGrounded;
+    private bool m_IsGrounded;
 
     // Token: 0x04000195 RID: 405
-    private bool slopedTerrain;
+    private bool m_SlopedTerrain;
 
     // Token: 0x04000196 RID: 406
-    private bool jumping;
+    private bool m_Jumping;
 
     // Token: 0x04000197 RID: 407
-    private bool groundTakeOff;
+    private bool m_GroundTakeOff;
 
     // Token: 0x04000198 RID: 408
-    private bool animating;
+    private bool m_Animating;
 
     // Token: 0x04000199 RID: 409
-    private bool stationary;
+    private bool m_Stationary;
 
     // Token: 0x0400019A RID: 410
-    private bool sliding;
+    private bool m_Sliding;
 
     // Token: 0x0400019B RID: 411
-    private bool attackReadied;
+    private bool m_AttackReadied;
 
     // Token: 0x0400019C RID: 412
-    private bool attacking;
+    private bool m_Attacking;
 
     // Token: 0x0400019D RID: 413
-    private bool grabbed;
+    private bool m_Grabbed;
 
     // Token: 0x0400019E RID: 414
-    private bool escaping;
+    private bool m_Escaping;
 
     // Token: 0x0400019F RID: 415
-    private bool gasEffectActive;
+    private bool m_GasEffectActive;
 
     // Token: 0x040001A0 RID: 416
-    private bool leftHooked;
+    private bool m_LeftHooked;
 
     // Token: 0x040001A1 RID: 417
-    private bool rightHooked;
+    private bool m_RightHooked;
 
     // Token: 0x040001A2 RID: 418
-    private bool leftImpulse;
+    private bool m_LeftImpulse;
 
     // Token: 0x040001A3 RID: 419
-    private bool rightImpulse;
+    private bool m_RightImpulse;
 
     // Token: 0x040001A4 RID: 420
-    private bool leftTargetSet;
+    private bool m_LeftTargetSet;
 
     // Token: 0x040001A5 RID: 421
-    private bool rightTargetSet;
+    private bool m_RightTargetSet;
 
     // Token: 0x040001A6 RID: 422
-    private int physicsState;
+    private int m_PhysicsState;
 
     // Token: 0x040001A7 RID: 423
-    private int reeledState;
+    private int m_ReeledState;
 
     // Token: 0x040001A8 RID: 424
-    private int walledState;
+    private int m_WalledState;
 
     // Token: 0x040001A9 RID: 425
-    private int slideState;
+    private int m_slideState;
 
     // Token: 0x040001AA RID: 426
-    private Vector3 positionNextFrame;
+    private Vector3 m_PositionNextFrame;
 
     // Token: 0x040001AB RID: 427
-    private Vector3 velocityLastFrame;
+    private Vector3 m_VelocityLastFrame;
 
     // Token: 0x040001AC RID: 428
-    private float height;
+    private float m_Height;
 
     // Token: 0x040001AD RID: 429
-    private Vector3 hookDirection;
+    private Vector3 m_HookDirection;
 
     // Token: 0x040001AE RID: 430
-    private Vector3 leftAnchorPosition;
+    private Vector3 m_LeftAnchorPosition;
 
     // Token: 0x040001AF RID: 431
-    private Vector3 rightAnchorPosition;
+    private Vector3 m_RightAnchorPosition;
 
     // Token: 0x040001B0 RID: 432
-    private Vector3 leftTargetPosition;
+    private Vector3 m_LeftTargetPosition;
 
     // Token: 0x040001B1 RID: 433
-    private Vector3 rightTargetPosition;
+    private Vector3 m_RightTargetPosition;
 
     // Token: 0x040001B2 RID: 434
-    private GameObject currentLeftHook;
+    private GameObject m_CurrentLeftHook;
 
     // Token: 0x040001B3 RID: 435
-    private GameObject currentRightHook;
-
-    // Token: 0x040001B4 RID: 436
-    private GameObject leftHookedTitan;
-
-    // Token: 0x040001B5 RID: 437
-    private GameObject rightHookedTitan;
+    private GameObject m_CurrentRightHook;
 
     // Token: 0x040001B6 RID: 438
-    private float maxLengthLeft;
+    private float m_MaxLengthLeft;
 
     // Token: 0x040001B7 RID: 439
-    private float maxLengthRight;
+    private float m_MaxLengthRight;
 
     // Token: 0x040001B8 RID: 440
-    private float currentLengthLeft;
+    private float m_CurrentLengthLeft;
 
     // Token: 0x040001B9 RID: 441
-    private float currentLengthRight;
+    private float m_CurrentLengthRight;
 
     // Token: 0x040001BA RID: 442
-    private bool titanAimLock;
+    private bool m_TitanAimLock;
 
     // Token: 0x040001BB RID: 443
-    private float velocityMagnitude;
+    private float m_VelocityMagnitude;
 
     // Token: 0x040001BC RID: 444
-    private float velocityMagnitudeXZ;
+    private float m_VelocityMagnitudeXZ;
 
     // Token: 0x040001BD RID: 445
-    private float velocityY;
+    private float m_VelocityY;
 
     // Token: 0x040001BE RID: 446
-    private float velocityYAbs;
+    private float m_VelocityYAbs;
 
     // Token: 0x040001BF RID: 447
-    private Vector3 velocityDirection;
+    private Vector3 m_VelocityDirection;
 
     // Token: 0x040001C0 RID: 448
-    private Vector3 velocityDirectionXZ;
+    private Vector3 m_VelocityDirectionXZ;
 
     // Token: 0x040001C1 RID: 449
-    private Quaternion burstStartRotation;
+    private Quaternion m_BurstStartRotation;
 
     // Token: 0x040001C2 RID: 450
-    private Quaternion burstEndRotation;
+    private Quaternion m_BurstEndRotation;
 
     // Token: 0x040001C3 RID: 451
-    private bool burstTurnIsRunning;
+    private bool m_BurstTurnIsRunning;
 
     // Token: 0x040001C4 RID: 452
-    private bool burstForceIsRunning;
+    private bool m_BurstForceIsRunning;
 
     // Token: 0x040001C5 RID: 453
-    private float burstStartTime;
+    private float m_BurstStartTime;
 
     // Token: 0x040001C6 RID: 454
-    private float currentBurstRate;
+    private float m_CurrentBurstRate;
 
     // Token: 0x040001C7 RID: 455
-    private float burstTankLevel;
-
-    // Token: 0x040001C8 RID: 456
-    private GameObject leftTitanObject;
-
-    // Token: 0x040001C9 RID: 457
-    private GameObject rightTitanObject;
+    private float m_BurstTankLevel;
 
     // Token: 0x040001CA RID: 458
-    private string leftHookTargetTag;
+    private string m_LeftHookTargetTag;
 
     // Token: 0x040001CB RID: 459
-    private string rightHookTargetTag;
+    private string m_RightHookTargetTag;
 
     // Token: 0x040001CC RID: 460
-    private Rigidbody rigidBody;
+    private Rigidbody m_RigidBody;
 
     // Token: 0x040001CD RID: 461
-    private Animator animator;
+    private Animator m_Animator;
 
     // Token: 0x040001CE RID: 462
-    private CapsuleCollider capCollider;
+    private CapsuleCollider m_CapCollider;
 
     // Token: 0x040001CF RID: 463
-    private CapsuleCollider[] lowerColliders = new CapsuleCollider[4];
+    private CapsuleCollider[] m_LowerColliders = new CapsuleCollider[4];
 
     // Token: 0x040001D0 RID: 464
-    private PlayerMovement moveScript;
+    private PlayerMovement m_MoveScript;
 
     // Token: 0x040001D1 RID: 465
-    private PlayerRotations rotScript;
+    private PlayerRotations m_RotScript;
 
     // Token: 0x040001D2 RID: 466
-    private PlayerBursts burstScript;
+    private PlayerBursts m_BurstScript;
 
     // Token: 0x040001D3 RID: 467
-    private PlayerActions actionScript;
+    private PlayerActions m_ActionScript;
 
     // Token: 0x040001D4 RID: 468
-    private WallContactInteractions wallScript;
+    private WallContactInteractions m_WallScript;
 
     // Token: 0x040001D5 RID: 469
-    private PlayerGasManagement gasScript;
+    private PlayerGasManagement m_GasScript;
 
     // Token: 0x040001D6 RID: 470
-    private PlayerAnimationController animScript;
+    private PlayerAnimationController m_AnimScript;
 
     // Token: 0x040001D7 RID: 471
-    private PlayerSoundController soundScript;
+    private PlayerSoundController m_SoundScript;
 
     // Token: 0x040001D8 RID: 472
-    private PlayerParticleEffects fxScript;
+    private PlayerParticleEffects m_FxScript;
 
     // Token: 0x040001D9 RID: 473
-    private DrawPlayerHUD hudScript;
+    private DrawPlayerHUD m_HudScript;
 
     // Token: 0x040001DA RID: 474
-    private CameraControl camScript;
-
-    // Token: 0x040001DB RID: 475
-    //private GameBase gameScript;
-
-    // Token: 0x040001DC RID: 476
-    //private HitMessageManager uiMessageScript;
+    private CameraControl m_CamScript;
 
     // Token: 0x040001DD RID: 477
     public InputAxisNames axisName;
@@ -2178,28 +2085,26 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     public PlayerParticles particles;
 
     // Token: 0x040001E3 RID: 483
-    private bool resetImpulse;
+    private bool m_ResetImpulse;
 
     // Token: 0x040001E4 RID: 484
     private const int STATIONARY_LIMIT = 10;
 
     // Token: 0x040001E5 RID: 485
-    private int stationaryCount;
+    private int m_StationaryCount;
 
     // Token: 0x040001E6 RID: 486
-    private Vector3[] rayOrigins = new Vector3[5];
+    private Vector3[] m_RayOrigins = new Vector3[5];
 
     // Token: 0x040001E7 RID: 487
-    private Ray[] groundRays = new Ray[5];
+    private Ray[] m_GroundRays = new Ray[5];
 
     // Token: 0x040001E8 RID: 488
-    private bool[] rayHits = new bool[5];
-
-    public CameraSettings cameraSettings;
+    private bool[] m_RayHits = new bool[5];
 
     private State m_State;
 
-    public float m_MouseXaxis;
+    private float m_MouseXaxis;
 
-    public float m_MouseYaxis;
+    private float m_MouseYaxis;
 }

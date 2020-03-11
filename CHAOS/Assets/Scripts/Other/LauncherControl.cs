@@ -140,7 +140,6 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             this.player.LeftTargetPosition = this.targetPoint;
             this.player.IsLeftTargetSet = targetSet;
-            this.player.LeftHookTitanObject = this.titanObject;
             if (this.player.CurrentLeftHook == null)
             {
                 this.player.LeftHookTargetTag = this.targetTag;
@@ -150,7 +149,6 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             this.player.RightTargetPosition = this.targetPoint;
             this.player.IsRightTargetSet = targetSet;
-            this.player.RightHookTitanObject = this.titanObject;
             if (this.player.CurrentRightHook == null)
             {
                 this.player.RightHookTargetTag = this.targetTag;

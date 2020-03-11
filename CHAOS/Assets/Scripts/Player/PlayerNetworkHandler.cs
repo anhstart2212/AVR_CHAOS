@@ -1,4 +1,5 @@
 ﻿using Bolt;
+using Gamekit3D;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,18 +57,21 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         IChaosPlayerCommandInput input = ChaosPlayerCommand.Create();
 
-        input.MouseX = player.m_MouseXaxis;
-        input.MouseY = player.m_MouseYaxis;
-        input.MovementX = player.movementX;
-        input.MovementY = player.movementY;
-        input.Jump = player.jumpKeyDown;
-        input.FireCenterHook = player.centerHookKeyDown;
-        input.FireLeftHook = player.fireLeftHook;
-        input.FireRightHook = player.fireRightHook;
-        input.JumpReel = player.jumpReelKeyDown;
+        input.MouseX = player.MouseXaxis;
+        input.MouseY = player.MouseYaxis;
+        input.MovementX = player.MovementX;
+        input.MovementY = player.MovementY;
+        input.Jump = player.JumpKeyDown;
+        input.FireCenterHook = player.CenterHookKeyDown;
+        input.FireLeftHook = player.FireLeftHook;
+        input.FireRightHook = player.FireRightHook;
+        input.JumpReel = player.JumpReelKeyDown;
 
-        input.CamPos = player.cameraSettings.CinemachineBrain.position;
-        input.CamRot = player.transforms.playerCamera.rotation;
+        if (CameraSettings.instance != null)
+        {
+            input.CamPos = CameraSettings.instance.CinemachineBrain.position;
+            input.CamRot = CameraSettings.instance.CinemachineBrain.rotation;
+        }
 
         entity.QueueInput(input);
     }

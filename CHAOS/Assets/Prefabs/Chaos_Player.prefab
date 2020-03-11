@@ -4540,16 +4540,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2286bdea4cbb5fd4fae8cf0d24bbd71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpReelKeyDown: 0
-  jumpKeyDown: 0
-  centerHookKeyDown: 0
-  fireLeftHook: 0
-  fireRightHook: 0
-  movementX: 0
-  movementY: 0
-  mouseAxisX: 0
-  mouseAxisY: 0
-  isGrounded: 0
   axisName:
     moveLeftRight: Move Horizontal
     moveFrontBack: Move Vertical
@@ -4616,9 +4606,6 @@ MonoBehaviour:
     gasFast: {fileID: 198043302649730770}
     gasBurst: {fileID: 198074957772921390}
     deathVFX: {fileID: 0}
-  cameraSettings: {fileID: 0}
-  m_MouseXaxis: 0
-  m_MouseYaxis: 0
 --- !u!114 &114630607990808298
 MonoBehaviour:
   m_ObjectHideFlags: 1

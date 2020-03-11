@@ -410,7 +410,8 @@ public class PlayerActions : MonoBehaviour
     // Token: 0x060001DF RID: 479 RVA: 0x0000E9A8 File Offset: 0x0000CBA8
     private bool CancelAttack(bool sameFrame, bool releaseValid = true)
     {
-        return (playerScript.AttackKeyDown && !sameFrame && releaseValid) || this.playerScript.IsGrounded || (/*Input.GetButtonDown(this.playerScript.axisName.fireLeftHook)*/ playerScript.FireLeftHook || /*Input.GetButtonDown(this.playerScript.axisName.fireRightHook)*/ playerScript.FireRightHook) || (this.playerScript.BurstTurnIsRunning || this.playerScript.BurstForceIsRunning) || this.playerScript.WalledState != 0;
+        return false;
+        //return (playerScript.AttackKeyDown && !sameFrame && releaseValid) || this.playerScript.IsGrounded || (/*Input.GetButtonDown(this.playerScript.axisName.fireLeftHook)*/ playerScript.FireLeftHook || /*Input.GetButtonDown(this.playerScript.axisName.fireRightHook)*/ playerScript.FireRightHook) || (this.playerScript.BurstTurnIsRunning || this.playerScript.BurstForceIsRunning) || this.playerScript.WalledState != 0;
     }
 
 
