@@ -16,7 +16,6 @@ namespace Gamekit3D
         [SerializeField] private float cameraFOVLimit;
         [SerializeField] private float cameraFollowDisOffset;
         [SerializeField] private float cameraFollowDisLimit;
-        [SerializeField] private Transform hookTargetNull;
         [SerializeField] private Transform cinemachineBrain;
 
         public enum InputChoice
@@ -46,27 +45,14 @@ namespace Gamekit3D
         //    get { return inputChoice == InputChoice.KeyboardAndMouse ? keyboardAndMouseCamera : controllerCamera; }
         //}
 
-        [SerializeField]
-        private Transform m_DummyCam;
-
         public CinemachineFreeLook Current
         {
             get { return keyboardAndMouseCamera; }
         }
 
-        public Transform HookTargetNull
-        {
-            get { return hookTargetNull; }
-        }
-
         public Transform CinemachineBrain
         {
             get { return cinemachineBrain; }
-        }
-
-        public Transform DummyCamera
-        {
-            get { return m_DummyCam; }
         }
 
         void Reset()
@@ -95,13 +81,11 @@ namespace Gamekit3D
         {
             UpdateCameraSettings();
 
-            this.playerScript = FindObjectOfType<Player>();
-
-            //if (Current != null)
-            //{
-            //    defaultFOV = Current.m_Lens.FieldOfView;
-            //    defaultCameraFollowDis = Current.m_Orbits[1].m_Radius; // Middle Rig Radius
-            //}
+            if (Current != null)
+            {
+                defaultFOV = Current.m_Lens.FieldOfView;
+                defaultCameraFollowDis = Current.m_Orbits[1].m_Radius; // Middle Rig Radius
+            }
         }
 
         void Update()
@@ -111,11 +95,11 @@ namespace Gamekit3D
                 UpdateCameraSettings();
             }
 
-            //if (Current != null)
-            //{
-            //    Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
-            //    Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
-            //}
+            if (Current != null && playerScript != null)
+            {
+                Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
+                Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
+            }
 
             UpdateCursorSettings();
 
@@ -193,15 +177,14 @@ namespace Gamekit3D
         {
             follow = entity.transform;
             lookAt = entity.transform;
+
+            playerScript = entity.GetComponent<Player>();
         }
 
         public void CalculateDummyCameraTransform(IChaos_PlayerState state, out Vector3 pos, out Quaternion rot)
         {
-            m_DummyCam.position = state.CamPos;
-            m_DummyCam.rotation = state.CamRot;
-
-            pos = m_DummyCam.position;
-            rot = m_DummyCam.rotation;
+            pos = state.CamPos;
+            rot = state.CamRot;
         }
     } 
 }

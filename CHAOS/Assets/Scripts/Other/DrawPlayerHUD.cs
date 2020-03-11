@@ -1,8 +1,9 @@
+using Gamekit3D;
 using System;
 using UnityEngine;
 
 // Token: 0x0200002D RID: 45
-public class DrawPlayerHUD : MonoBehaviour
+public class DrawPlayerHUD : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000117 RID: 279 RVA: 0x0000B9E3 File Offset: 0x00009BE3
     private void Start()
@@ -36,6 +37,15 @@ public class DrawPlayerHUD : MonoBehaviour
             return;
         }
 
+        Vector3 pos;
+        Quaternion rot;
+        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+
+        // this calculate the looking angle for this specific entity
+        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+
+        Vector3 forward = rot * Vector3.forward;
+
         this.rightInRange = this.launcherScripts[0].inRange;
         this.leftInRange = this.launcherScripts[1].inRange;
         this.rightTargetPosition = this.launcherScripts[0].targetPoint;
@@ -47,11 +57,14 @@ public class DrawPlayerHUD : MonoBehaviour
         this.activeLeftCrosshair = ((!this.leftInRange) ? this.leftRedCrosshair : this.leftGreenCrosshair);
         this.activeRightCrosshair = ((!this.rightInRange) ? this.rightRedCrosshair : this.rightGreenCrosshair);
         this.activeCenterCrosshair = ((!this.player.TitanAimLock) ? this.centerCrosshair : this.centerCrosshairLocked);
-        Vector3 normalized = (this.leftTargetPosition - this.player.transforms.playerCamera.position).normalized;
+        //Vector3 normalized = (this.leftTargetPosition - this.player.transforms.playerCamera.position).normalized;
+        Vector3 normalized = (this.leftTargetPosition - pos).normalized;
         normalized = new Vector3(normalized.x, 0f, normalized.z);
-        Vector3 normalized2 = (this.rightTargetPosition - this.player.transforms.playerCamera.position).normalized;
+        //Vector3 normalized2 = (this.rightTargetPosition - this.player.transforms.playerCamera.position).normalized;
+        Vector3 normalized2 = (this.rightTargetPosition - pos).normalized;
         normalized2 = new Vector3(normalized2.x, 0f, normalized2.z);
-        Vector3 to = new Vector3(this.player.transforms.playerCamera.forward.x, 0f, this.player.transforms.playerCamera.forward.z);
+        //Vector3 to = new Vector3(this.player.transforms.playerCamera.forward.x, 0f, this.player.transforms.playerCamera.forward.z);
+        Vector3 to = new Vector3(forward.x, 0f, forward.z);
         float num = Vector3.Angle(normalized, to);
         float num2 = Vector3.Angle(normalized2, to);
         float num3 = 90f;

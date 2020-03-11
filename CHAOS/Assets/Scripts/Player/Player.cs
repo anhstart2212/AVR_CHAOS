@@ -36,13 +36,10 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         if (cameraSettings != null)
         {
             transforms.playerCamera = cameraSettings.CinemachineBrain;
-            transforms.hookTargetNull = cameraSettings.HookTargetNull;
         }
 
-        m_State = new State();
+        m_State = new State(); // State 
         m_State.position = transform.position;
-
-        m_LauncherControls = GetComponentsInChildren<LauncherControl>();
     }
 
     // Token: 0x0600012A RID: 298 RVA: 0x0000C8A4 File Offset: 0x0000AAA4
@@ -97,7 +94,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         this.CheckIfGrounded();
         this.CheckIfStationary();
         this.CheckSliding();
-        //this.CheckIfJumping();
+        this.CheckIfJumping();
         this.CheckForGrabRelease();
         this.SetColliders();
         this.SetPhysicsState();
@@ -146,11 +143,6 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         AnimationScript.SetRunning(cmd);
     }
 
-    public void AnimateHook()
-    {
-        //AnimationScript.SetHooks(entity);
-    }
-
     //void FindHookTarget()
     //{
     //    foreach (var launcherControl in m_LauncherControls)
@@ -174,16 +166,16 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         hudScript.DrawOwnerHookTarget(true);
     }
 
-    public State Apply(float movementX, float movementY, float mouseX, bool jumpKey, bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    public State Apply(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
     {
-        PlayerMoveInput(movementX, movementY);
+        //PlayerMoveInput(movementX, movementY);
 
         PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
 
-        RotationScript.PlayerRotation(movementX, movementY, mouseX);
+        //RotationScript.PlayerRotation(movementX, movementY, mouseX);
 
         // jump
-        CheckIfJumping(jumpKey);
+        //CheckIfJumping(jumpKey);
 
         // update transform
         m_State.position = transform.position;
@@ -193,10 +185,15 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         return m_State;
     }
 
-    private void PlayerMoveInput(float movementX, float movementY)
+    public void SetState(Vector3 position, Quaternion rotation)
     {
-        MovementX = movementX;
-        MovementY = movementY;
+        // assign new state
+        m_State.position = position;
+        m_State.rotation = rotation;
+
+        // assign local transform
+        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 2f * Time.deltaTime);
     }
 
     private void PlayerHookInput(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
@@ -306,9 +303,9 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     }
 
     // Token: 0x06000132 RID: 306 RVA: 0x0000CEC4 File Offset: 0x0000B0C4
-    private void CheckIfJumping(bool jumpKey)
+    private void CheckIfJumping()
     {
-        if (jumpKey && this.isGrounded && !this.jumping && !this.IsEitherHooked)
+        if (state.IsJumpKey && this.isGrounded && !this.jumping && !this.IsEitherHooked)
         {
             this.jumping = true;
         }
@@ -517,20 +514,32 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600013E RID: 318 RVA: 0x0000D310 File Offset: 0x0000B510
     private void SetAndResetHookDirection()
     {
+        Vector3 pos;
+        Quaternion rot;
+        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+
+        // this calculate the looking angle for this specific entity
+        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+
+        Vector3 forward = rot * Vector3.forward;
+
         if (this.leftHooked && this.rightHooked)
         {
             //this.hookDirection = (this.leftAnchorPosition - base.transform.position + (this.rightAnchorPosition - base.transform.position)).normalized;
-            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardDouble) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardDouble) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            this.hookDirection = ((forward * this.speed.cameraForwardDouble) + (this.leftAnchorPosition - base.transform.position) + (this.rightAnchorPosition - base.transform.position)).normalized;
         }
         else if (this.leftHooked)
         {
             //this.hookDirection = (this.leftAnchorPosition - base.transform.position).normalized;
-            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.leftAnchorPosition - base.transform.position)).normalized;
+            //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.leftAnchorPosition - base.transform.position)).normalized;
+            this.hookDirection = ((forward * this.speed.cameraForwardSingle) + (this.leftAnchorPosition - base.transform.position)).normalized;
         }
         else if (this.rightHooked)
         {
             //this.hookDirection = (this.rightAnchorPosition - base.transform.position).normalized;
-            this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            //this.hookDirection = ((this.transforms.playerCamera.transform.forward * this.speed.cameraForwardSingle) + (this.rightAnchorPosition - base.transform.position)).normalized;
+            this.hookDirection = ((forward * this.speed.cameraForwardSingle) + (this.rightAnchorPosition - base.transform.position)).normalized;
         }
         else
         {
@@ -2193,6 +2202,4 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     public float m_MouseXaxis;
 
     public float m_MouseYaxis;
-
-    private LauncherControl[] m_LauncherControls;
 }

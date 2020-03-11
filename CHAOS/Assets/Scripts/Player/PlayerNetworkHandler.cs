@@ -10,10 +10,8 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     private Player player; //Reference to component Player
 
     [SerializeField]
-    [Tooltip("Player Component")]
+    [Tooltip("Animator Component")]
     private Animator animator;
-
-    private State m_State; // State 
 
     /// <summary>
     /// Initialize values
@@ -22,9 +20,6 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         player = this.GetComponent<Player>();
         animator = this.GetComponent<Animator>();
-
-        m_State = new State();
-        m_State.position = transform.position;
     }
 
     /// <summary>
@@ -66,7 +61,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         input.MovementX = player.movementX;
         input.MovementY = player.movementY;
         input.Jump = player.jumpKeyDown;
-        input.CenterHook = player.centerHookKeyDown;
+        input.FireCenterHook = player.centerHookKeyDown;
         input.FireLeftHook = player.fireLeftHook;
         input.FireRightHook = player.fireRightHook;
         input.JumpReel = player.jumpReelKeyDown;
@@ -90,12 +85,12 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         if (resetState)
         {
             // we got a correction from the server, reset (this only runs on the client)
-            SetState(cmd.Result.Position, cmd.Result.Rotation);
+            player.SetState(cmd.Result.Position, cmd.Result.Rotation);
         }
         else
         {
             // apply movement(this runs on both server and client)
-            State result = player.Apply(cmd.Input.MovementX, cmd.Input.MovementY, cmd.Input.MouseX, cmd.Input.Jump, cmd.Input.FireLeftHook, cmd.Input.FireRightHook, cmd.Input.JumpReel);
+            State result = player.Apply(cmd.Input.FireLeftHook, cmd.Input.FireRightHook, cmd.Input.JumpReel);
 
             // copy the state to the commands result (this gets sent back to the client)
             cmd.Result.Position = result.position;
@@ -109,30 +104,22 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                 // animation run
                 player.AnimateRun(cmd);
 
-                //FindHookTarget();
-                state.IsCenterHook = cmd.Input.CenterHook;
-                state.IsLeftHook = cmd.Input.FireLeftHook;
-                state.IsRightHook = cmd.Input.FireRightHook;
+                state.MovementXKey = cmd.Input.MovementX;
+                state.MovementYKey = cmd.Input.MovementY;
+                state.MouseXKey = cmd.Input.MouseX;
+                state.IsFireCenterHookKey = cmd.Input.FireCenterHook;
+                state.IsFireLeftHookKey = cmd.Input.FireLeftHook;
+                state.IsFireRightHookKey = cmd.Input.FireRightHook;
+                state.IsJumpReelKey = cmd.Input.JumpReel;
+                state.IsJumpKey = cmd.Input.Jump;
                 state.IsJump = player.IsJumping;
+                state.IsGrounded = player.IsGrounded;
 
-                if (cmd.Input.CenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
+                if (cmd.Input.FireCenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
                 {
                     player.PlayerHook();
                 }
-
-                player.AnimateHook();
             }
         }
-    }
-
-    public void SetState(Vector3 position, Quaternion rotation)
-    {
-        // assign new state
-        m_State.position = position;
-        m_State.rotation = rotation;
-
-        // assign local transform
-        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
-        transform.rotation = m_State.rotation;
     }
 }

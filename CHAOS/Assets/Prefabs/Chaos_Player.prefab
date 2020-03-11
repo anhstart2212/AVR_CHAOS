@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 114894489476488628}
   - component: {fileID: 114529056228805508}
   - component: {fileID: 114681628147749856}
+  - component: {fileID: 114059939868762764}
   m_Layer: 8
   m_Name: Chaos_Player
   m_TagString: Player
@@ -4164,6 +4165,19 @@ TrailRenderer:
     generateLightingData: 0
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
+--- !u!114 &114059939868762764
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1116045452685704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1314482b6413d34469d5a91d53bf38f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!114 &114112329354647254
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4526,6 +4540,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2286bdea4cbb5fd4fae8cf0d24bbd71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  jumpReelKeyDown: 0
+  jumpKeyDown: 0
+  centerHookKeyDown: 0
+  fireLeftHook: 0
+  fireRightHook: 0
+  movementX: 0
+  movementY: 0
+  mouseAxisX: 0
+  mouseAxisY: 0
   isGrounded: 0
   axisName:
     moveLeftRight: Move Horizontal
@@ -4547,11 +4570,11 @@ MonoBehaviour:
     runJump: 45
     wallSideJump: 50
     wallUpJump: 25
-    turn: 8
+    turnSpeed: 600
     look: 20
     gasFree: 40
-    reelDouble: 3.15
-    reelSingle: 2.7
+    reelDouble: 4.15
+    reelSingle: 3.7
     reelGravDouble: 4
     reelGravSingle: 6
     reelGravBrake: 15
@@ -4559,7 +4582,7 @@ MonoBehaviour:
     horzBurst: 70
     cameraForwardSingle: 10
     cameraForwardDouble: 15
-    groundGravity: 9
+    groundGravity: 9.8
     fastSpeed: 3
   limit:
     maxHorizontal: 60
@@ -4593,6 +4616,9 @@ MonoBehaviour:
     gasFast: {fileID: 198043302649730770}
     gasBurst: {fileID: 198074957772921390}
     deathVFX: {fileID: 0}
+  cameraSettings: {fileID: 0}
+  m_MouseXaxis: 0
+  m_MouseYaxis: 0
 --- !u!114 &114630607990808298
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4669,7 +4695,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1116045452685704}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 68f137d05cf641249a41dbc4444bc81a, type: 3}
   m_Name: 

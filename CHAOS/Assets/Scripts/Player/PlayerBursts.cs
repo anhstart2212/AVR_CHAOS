@@ -1,9 +1,10 @@
+using Gamekit3D;
 using System;
 using System.Collections;
 using UnityEngine;
 
 // Token: 0x02000037 RID: 55
-public class PlayerBursts : MonoBehaviour
+public class PlayerBursts : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000205 RID: 517 RVA: 0x000105E8 File Offset: 0x0000E7E8
     private void Start()
@@ -20,7 +21,7 @@ public class PlayerBursts : MonoBehaviour
     // Token: 0x06000206 RID: 518 RVA: 0x00010660 File Offset: 0x0000E860
     private void Update()
     {
-        if (!this.player.IsGrounded && this.player.BurstTankLevel > 0f)
+        if (!state.IsGrounded && this.player.BurstTankLevel > 0f)
         {
             if (Time.time > this.player.BurstStartTime + this.player.CurrentBurstRate)
             {
@@ -51,8 +52,8 @@ public class PlayerBursts : MonoBehaviour
         //float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
         //float axisRaw3 = Input.GetAxisRaw(this.player.axisName.verticalBurst);
 
-        float axisRaw = player.MovementX;
-        float axisRaw2 = player.MovementY;
+        float axisRaw = state.MovementXKey;
+        float axisRaw2 = state.MovementYKey;
         float axisRaw3 = Input.GetAxisRaw(this.player.axisName.verticalBurst);
         if (axisRaw > 0f)
         {
@@ -958,7 +959,7 @@ public class PlayerBursts : MonoBehaviour
     // Token: 0x0600021B RID: 539 RVA: 0x0001122E File Offset: 0x0000F42E
     private bool BurstLoopExitCheck()
     {
-        if (this.player.IsGrounded)
+        if (state.IsGrounded)
         {
             this.player.BurstForceIsRunning = false;
             return true;

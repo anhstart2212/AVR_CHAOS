@@ -20,7 +20,7 @@ public class PlayerSpeeds
     public float wallUpJump;
 
     // Token: 0x04000567 RID: 1383
-    public float turn;
+    public float turnSpeed;
 
     // Token: 0x04000568 RID: 1384
     public float look;

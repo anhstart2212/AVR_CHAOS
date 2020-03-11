@@ -27,16 +27,14 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         // this calculate the looking angle for this specific entity
         CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
 
-        m_Forward = rot * Vector3.forward;
-        m_Pos = pos;
         //this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
-        if (state.IsCenterHook)
+        if (state.IsFireCenterHookKey)
         {
-            CenterHookTarget(m_Pos, m_Forward);
+            CenterHookTarget(pos, rot);
         }
         else
         {
-            SideHookTarget(m_Pos, m_Forward);
+            SideHookTarget(pos, rot);
         }
 
         GameObject x;
@@ -69,31 +67,29 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     public void HookTarget(BoltEntity entity)
     {
-        this.player = entity.GetComponent<Player>(); ;
+        //this.player = entity.GetComponent<Player>(); ;
 
-        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+        //IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
 
-        Vector3 pos;
-        Quaternion rot;
+        //Vector3 pos;
+        //Quaternion rot;
 
-        // this calculate the looking angle for this specific entity
-        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+        //// this calculate the looking angle for this specific entity
+        //CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
 
-        // display debug
-        //Debug.DrawRay(pos, rot * Vector3.forward * 100, Color.blue);
+        //// display debug
+        ////Debug.DrawRay(pos, rot * Vector3.forward * 100, Color.blue);
 
-        //Vector3 forward = player.transforms.playerCamera.forward;
-        m_Forward = rot * Vector3.forward;
-        m_Pos = pos;
+        ////Vector3 forward = player.transforms.playerCamera.forward;
 
-        if (state.IsCenterHook)
-        {
-            CenterHookTarget(m_Pos, m_Forward);
-        }
-        else
-        {
-            SideHookTarget(m_Pos, m_Forward);
-        }
+        //if (state.IsFireCenterHook)
+        //{
+        //    CenterHookTarget(pos, rot);
+        //}
+        //else
+        //{
+        //    SideHookTarget(pos, rot);
+        //}
     }
 
     // Token: 0x06000124 RID: 292 RVA: 0x0000C55C File Offset: 0x0000A75C
@@ -162,7 +158,7 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    private void SideHookTarget(Vector3 pos, Vector3 forward)
+    private void SideHookTarget(Vector3 pos, Quaternion rot)
     {
         float d = 1f;
         float num = 0.05f;
@@ -175,14 +171,17 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
             //Vector3 direction = forward + this.player.transforms.playerCamera.right * num * d;
             //Ray ray = new Ray(this.player.transform.position, direction);
 
-            Vector3 direction = forward + CameraSettings.instance.DummyCamera.right * num * d;
+            Vector3 forward = rot * Vector3.forward;
+            Vector3 right = rot * Vector3.right;
+
+            Vector3 direction = forward + right * num * d;
 
             //Chaos Added
             //Ray ray = new Ray(this.player.transforms.playerCamera.position, direction);
             Ray ray = new Ray(pos, direction);
             //Chaos Added
 
-            //Debug.DrawRay(pos, direction * 100, Color.red);
+            Debug.DrawRay(pos, direction * 100, Color.red);
 
             if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
             {
@@ -203,11 +202,12 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    private void CenterHookTarget(Vector3 pos, Vector3 forward)
+    private void CenterHookTarget(Vector3 pos, Quaternion rot)
     {
         //Ray ray2 = new Ray(player.transforms.playerCamera.transform.position, forward);
         //Debug.DrawRay(player.transforms.playerCamera.transform.position, forward * 1000, Color.blue);
 
+        Vector3 forward = rot * Vector3.forward;
         Ray ray = new Ray(pos, forward);
 
         if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
@@ -258,8 +258,4 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     // Token: 0x0400018B RID: 395
     private string targetTag;
-
-    private Vector3 m_Pos;
-
-    private Vector3 m_Forward;
 }

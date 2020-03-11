@@ -1,8 +1,9 @@
+using Gamekit3D;
 using System;
 using UnityEngine;
 
 // Token: 0x0200003F RID: 63
-public class PlayerSoundController : MonoBehaviour
+public class PlayerSoundController : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x06000261 RID: 609 RVA: 0x00016538 File Offset: 0x00014738
     private void Start()
@@ -48,12 +49,12 @@ public class PlayerSoundController : MonoBehaviour
     // Token: 0x06000262 RID: 610 RVA: 0x00016784 File Offset: 0x00014984
     private void Update()
     {
-        this.cancelCableLoop = (this.player.ReeledState != 0 || this.player.IsGrounded);
+        this.cancelCableLoop = (this.player.ReeledState != 0 || state.IsGrounded);
         this.gasSmallEmitting = this.player.particles.gasCore.isPlaying;
         this.SpeedReelAndGasSettings();
         if (this.player.IsEitherHooked && this.srcGas.clip != this.gasBurst)
         {
-            if (this.player.JumpReelKeyDown)
+            if (state.IsJumpReelKey)
             {
                 if (!this.cancelCableLoop)
                 {
@@ -86,7 +87,7 @@ public class PlayerSoundController : MonoBehaviour
             this.srcCableLoop.Stop();
             if (!(this.srcGas.clip == this.gasBurst) || !this.srcGas.isPlaying)
             {
-                if ((this.gasSmallEmitting || (this.player.BurstTankLevel > 0f && Input.GetAxisRaw(this.player.axisName.verticalBurst) != 0f)) && !this.player.IsGrounded)
+                if ((this.gasSmallEmitting || (this.player.BurstTankLevel > 0f && Input.GetAxisRaw(this.player.axisName.verticalBurst) != 0f)) && !state.IsGrounded)
                 {
                     this.srcGas.volume = this.volume.gasSmall;
                     this.srcGas.clip = this.gasLoop;

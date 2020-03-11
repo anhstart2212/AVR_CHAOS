@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 // Token: 0x0200003C RID: 60
-public class PlayerParticleEffects :MonoBehaviour
+public class PlayerParticleEffects : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x0600024B RID: 587 RVA: 0x00015360 File Offset: 0x00013560
     private void Start()
@@ -136,7 +136,7 @@ public class PlayerParticleEffects :MonoBehaviour
     // Token: 0x0600024F RID: 591 RVA: 0x00015600 File Offset: 0x00013800
     private void SlideFX()
     {
-        if (this.player.Animator.GetBool("IsSlideAnim") && this.player.IsGrounded)
+        if (this.player.Animator.GetBool("IsSlideAnim") && state.IsGrounded)
         {
             switch (this.player.SlideState)
             {
@@ -154,7 +154,7 @@ public class PlayerParticleEffects :MonoBehaviour
                     break;
             }
         }
-        else if (!this.player.IsGrounded && this.player.Animator.GetFloat("HookLowPass") >= 0.95f && this.player.VelocityMagnitudeXZ > 35f)
+        else if (!state.IsGrounded && this.player.Animator.GetFloat("HookLowPass") >= 0.95f && this.player.VelocityMagnitudeXZ > 35f)
         {
             if (this.player.Animator.GetFloat("CrossHook") <= -0.2f)
             {
@@ -227,7 +227,7 @@ public class PlayerParticleEffects :MonoBehaviour
     // Token: 0x06000251 RID: 593 RVA: 0x0001586C File Offset: 0x00013A6C
     private void SpeedLine()
     {
-        if (this.player.IsGrounded)
+        if (state.IsGrounded)
         {
             this.speedLine.enableEmission = false;
             return;

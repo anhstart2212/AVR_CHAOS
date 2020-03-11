@@ -1,3 +1,4 @@
+using Gamekit3D;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -18,13 +19,13 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600022E RID: 558 RVA: 0x00013988 File Offset: 0x00011B88
     private void Update()
     {
-        if (!this.player.IsGrounded)
+        if (!state.IsGrounded)
         {
             this.velDirBeforeLand = this.player.VelocityDirectionXZ;
         }
 
         // Chaos Added
-        if (!this.player.IsGrounded && !this.player.IsEitherHooked && !this.player.BurstForceIsRunning)
+        if (!state.IsGrounded && !this.player.IsEitherHooked && !this.player.BurstForceIsRunning)
         {
             this.rb.AddForce(-Vector3.up * this.player.speed.groundGravity, ForceMode.Acceleration);
         }
@@ -38,7 +39,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
             return;
         }
 
-        if (this.player.IsGrounded && !this.groundMovementIsRunning)
+        if (state.IsGrounded && !this.groundMovementIsRunning)
         {
             base.StartCoroutine(this.GroundMovement());
             this.airMovementIsRunning = false;
@@ -79,22 +80,6 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    //public void PlayerMove(Player player, float movementX, float movementY)
-    //{
-    //    this.player = player;
-    //    this.player.MovementX = movementX;
-    //    this.player.MovementY = movementY;
-    //}
-
-    //public void PlayerHook(Player player, bool fireLeftHook, bool fireRightHook, bool jumpReelKey, bool centerHook)
-    //{
-    //    this.player = player;
-    //    this.player.FireLeftHook = fireLeftHook;
-    //    this.player.FireRightHook = fireRightHook;
-    //    this.player.JumpReelKeyDown = jumpReelKey;
-    //    //this.player.CenterHookKeyDown = centerHook;
-    //}
-
     // Token: 0x06000231 RID: 561 RVA: 0x00013AD4 File Offset: 0x00011CD4
     private IEnumerator GroundMovement()
     {
@@ -120,7 +105,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         while (this.groundMovementIsRunning)
         {
             Vector3 runDirection = (!this.player.IsSliding && !this.player.Animator.GetBool("IsSlideAnim")) ? base.transform.forward : this.velDirBeforeLand;
-            if (!this.player.IsGrounded)
+            if (!state.IsGrounded)
             {
                 this.groundMovementIsRunning = false;
             }
@@ -183,8 +168,8 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         //float num = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
         //float num2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-        float num = this.player.MovementY;
-        float num2 = this.player.MovementX;
+        float num = state.MovementYKey;
+        float num2 = state.MovementXKey;
 
         int num3 = 0;
         if (num != 0f)
@@ -433,36 +418,36 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 if ((!this.player.IsAnimating || this.player.IsSliding) && Time.timeScale != 0f)
                 {
                     // Chaos Added
-                    if (state.IsCenterHook)
+                    if (state.IsFireCenterHookKey)
                     {
                         yield return new WaitForSeconds(0.05f);
                     }
                     // Chaos Added
 
-                    if (this.player.IsLeftTargetSet && state.IsLeftHook && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsLeftTargetSet && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true);
                     }
-                    if (this.player.IsRightTargetSet && state.IsRightHook && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsRightTargetSet && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false);
                     }
-                    if (!state.IsLeftHook && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (!state.IsFireLeftHookKey && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(true);
                     }
-                    if (!state.IsRightHook && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (!state.IsFireRightHookKey && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(false);
                     }
 
                     // Chaos Added
-                    if (!this.player.IsLeftTargetSet && state.IsLeftHook && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsLeftTargetSet && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true, true);
 
                     }
-                    if (!this.player.IsRightTargetSet && state.IsRightHook && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsRightTargetSet && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false, true);
                     }
@@ -485,7 +470,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
             }
             else
             {
-                if (this.player.JumpReelKeyDown && (this.player.IsLeftImpulse || this.player.IsRightImpulse))
+                if (state.IsJumpReelKey && (this.player.IsLeftImpulse || this.player.IsRightImpulse))
                 {
                     this.HookImpulse();
                 }
@@ -552,7 +537,15 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         Transform transform = null;
         Vector3 vector = Vector3.zero;
         //GameObject titanObject;
-        
+
+        Vector3 pos;
+        Quaternion rot;
+        IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();
+
+        // this calculate the looking angle for this specific entity
+        CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
+
+        Vector3 hookTargetNull = pos + rot * Vector3.forward * 100;
 
         if (isLeftHook && !isNull)
         {
@@ -574,14 +567,14 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             player.IsLeftHookTargetNull = isNull;
             transform = this.player.transforms.hookOriginLeft;
-            vector = this.player.transforms.hookTargetNull.position;
+            vector = hookTargetNull;
             this.player.LeftAnchorPosition = vector;
         }
         if (!isLeftHook && isNull)
         {
             player.IsRightHookTargetNull = isNull;
             transform = this.player.transforms.hookOriginRight;
-            vector = this.player.transforms.hookTargetNull.position;
+            vector = hookTargetNull;
             this.player.RightAnchorPosition = vector;
         }
 
@@ -677,7 +670,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             float d = this.SetReelSpeeds(false);
             float d2 = this.SetReelSpeeds(true);
-            if (this.player.JumpReelKeyDown && flag)
+            if (state.IsJumpReelKey && flag)
             {
                 float velocityMagnitude = this.player.VelocityMagnitude;
                 float angleVelocityAndHook = Vector3.Angle(this.player.VelocityDirection, this.player.HookDirection);
@@ -699,7 +692,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 this.rb.AddForce(-Vector3.up * d2, ForceMode.Acceleration);
             }
         }
-        if (!this.player.IsGrounded)
+        if (!state.IsGrounded)
         {
             this.CableLengthAdjustment(isLeft, vector, component, maxLength);
         }
@@ -725,7 +718,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000244 RID: 580 RVA: 0x00014720 File Offset: 0x00012920
     private float SetReelSpeeds(bool isReelGrav)
     {
-        if (isReelGrav && !this.player.JumpReelKeyDown)
+        if (isReelGrav && !state.IsJumpReelKey)
         {
             return this.player.speed.reelGravBrake;
         }

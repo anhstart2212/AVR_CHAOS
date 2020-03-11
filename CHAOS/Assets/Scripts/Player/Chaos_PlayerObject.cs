@@ -103,8 +103,10 @@ partial class Chaos_PlayerObject
 
     Vector3 RandomPosition()
     {
-        float x = Random.Range(-5f, 5f);
-        float z = Random.Range(-5f, 5f);
-        return new Vector3(x, 2f, z);
+        float x = Random.Range(20f, 25f);
+        float y = 2f;
+        float z = Random.Range(20f, 25f);
+       
+        return new Vector3(x, y, z);
     }
 }

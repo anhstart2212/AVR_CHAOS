@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 // Token: 0x02000040 RID: 64
-public class WallContactInteractions : MonoBehaviour
+public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
 {
     // Token: 0x0600026D RID: 621 RVA: 0x00017051 File Offset: 0x00015251
     private void Start()
@@ -65,7 +65,7 @@ public class WallContactInteractions : MonoBehaviour
             bool againstWall = Physics.Raycast(new Ray(this.FindRayOrigins(), base.transform.forward), 1f, Common.layerObstacle);
             if (this.player.IsDoubleHooked)
             {
-                if (this.player.IsStationary && !this.player.IsGroundTakeOff && !this.player.IsGrounded && againstWall)
+                if (this.player.IsStationary && !this.player.IsGroundTakeOff && !state.IsGrounded && againstWall)
                 {
                     if (delayCount == 10)
                     {
@@ -104,7 +104,7 @@ public class WallContactInteractions : MonoBehaviour
                 this.hookedOnWallIsRunning = false;
                 this.reeledState = 0;
             }
-            if (this.player.JumpReelKeyDown && brakingLastFrame)
+            if (state.IsJumpReelKey && brakingLastFrame)
             {
                 this.reeledState = 0;
             }
@@ -114,7 +114,7 @@ public class WallContactInteractions : MonoBehaviour
                 this.hookedOnWallIsRunning = false;
             }
             //brakingLastFrame = Input.GetButton(this.player.axisName.jumpReel);
-            brakingLastFrame = player.JumpReelKeyDown;
+            brakingLastFrame = state.IsJumpReelKey;
             yield return null;
         }
         yield break;
@@ -178,7 +178,7 @@ public class WallContactInteractions : MonoBehaviour
             {
                 break;
             }
-            if (/*Input.GetButtonDown(this.player.axisName.jumpReel)*/ player.JumpReelKeyDown)
+            if (/*Input.GetButtonDown(this.player.axisName.jumpReel)*/ state.IsJumpReelKey)
             {
                 this.StopJump();
                 this.StartJump(16);
@@ -212,7 +212,7 @@ public class WallContactInteractions : MonoBehaviour
         {
             return PlayerAnimation.WALL_STOP;
         }
-        if (this.player.IsGrounded || this.player.ReeledState != 0)
+        if (state.IsGrounded || this.player.ReeledState != 0)
         {
             return PlayerAnimation.WALL_NONE;
         }
@@ -254,7 +254,7 @@ public class WallContactInteractions : MonoBehaviour
         }
         PlayerAnimation.SetWallMovementParametersWithLerp(this.player.Animator, num2, newSide, ratio);
         this.OverrideRotation(vector, num2);
-        if (!this.player.IsEitherHooked || !this.player.JumpReelKeyDown)
+        if (!this.player.IsEitherHooked || !state.IsJumpReelKey)
         {
             this.ScaleVelocity();
             this.LockPositionToWall(wallHitRay);
@@ -285,7 +285,7 @@ public class WallContactInteractions : MonoBehaviour
         {
             this.jumpStarted = true;
         }
-        if (this.jumpStarted && (flag || /*Input.GetButtonDown(this.player.axisName.jumpReel)*/ player.JumpReelKeyDown))
+        if (this.jumpStarted && (flag || /*Input.GetButtonDown(this.player.axisName.jumpReel)*/ state.IsJumpReelKey))
         {
             this.jumpStarted = false;
             return true;

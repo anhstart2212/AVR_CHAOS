@@ -36,7 +36,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         Vector3 direction = Vector3.zero;
         
-        if (!this.player.IsGrounded)
+        if (!state.IsGrounded)
         {
             if (this.player.ReeledState == 0)
             {
@@ -44,7 +44,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
                 {
                     if (this.player.IsEitherHooked)
                     {
-                        if (this.player.JumpReelKeyDown)
+                        if (state.IsJumpReelKey)
                         {
                             if (!this.player.IsStationary)
                             {
@@ -89,54 +89,66 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
                 num = 2;
                 direction = this.HookDirection();
             }
-
-            this.RotatePlayer(num, direction);
         }
         else
         {
             num = -1;
         }
-    }
 
-    public void PlayerRotation(float movementX, float movementY, float mouseX)
-    {
         if (num == -1)
         {
-            //int num2 = 0;
-            ////float axisRaw = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
-            ////float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-            //float axisRaw = this.player.MovementY;
-            //float axisRaw2 = this.player.MovementX;
-            //if (axisRaw2 < 0f)
-            //{
-            //    num2++;
-            //}
-            //else if (axisRaw2 > 0f)
-            //{
-            //    num2 += 2;
-            //}
-            //if (axisRaw < 0f)
-            //{
-            //    num2 += 4;
-            //}
-            //else if (axisRaw > 0f)
-            //{
-            //    num2 += 8;
-            //}
-            //num = 2;
+            m_Movement.Set(state.MovementXKey, state.MovementYKey);
 
-            //direction = this.DetermineMoveDirection(num2);
-
-            m_Movement.Set(movementX, movementY);
-
-            SetTargetRotation(mouseX);
+            SetTargetRotation(state.MouseXKey);
 
             if (IsMoveInput)
             {
                 UpdateOrientation();
             }
         }
+
+        this.RotatePlayer(num, direction);
     }
+
+    //public void PlayerRotation(float movementX, float movementY, float mouseX)
+    //{
+    //    if (num == -1)
+    //    {
+    //        //int num2 = 0;
+    //        ////float axisRaw = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+    //        ////float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+    //        //float axisRaw = this.player.MovementY;
+    //        //float axisRaw2 = this.player.MovementX;
+    //        //if (axisRaw2 < 0f)
+    //        //{
+    //        //    num2++;
+    //        //}
+    //        //else if (axisRaw2 > 0f)
+    //        //{
+    //        //    num2 += 2;
+    //        //}
+    //        //if (axisRaw < 0f)
+    //        //{
+    //        //    num2 += 4;
+    //        //}
+    //        //else if (axisRaw > 0f)
+    //        //{
+    //        //    num2 += 8;
+    //        //}
+    //        //num = 2;
+
+    //        //direction = this.DetermineMoveDirection(num2);
+
+    //        m_Movement.Set(state.MovementX, state.MovementY);
+
+    //        SetTargetRotation(state.MouseX);
+
+    //        if (IsMoveInput)
+    //        {
+    //            UpdateOrientation();
+    //        }
+    //    }
+    //}
 
     public Vector2 MoveInput
     {
@@ -195,8 +207,8 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
 
         Vector3 localInput = new Vector3(MoveInput.x, 0f, MoveInput.y);
-        float groundedTurnSpeed = Mathf.Lerp(800, 500, 0.2f);
-        float actualTurnSpeed = this.player.IsGrounded ? groundedTurnSpeed : Vector3.Angle(transform.forward, localInput) * 5 * groundedTurnSpeed;
+        float groundedTurnSpeed = Mathf.Lerp(600, 800, 0.2f);
+        float actualTurnSpeed = state.IsGrounded ? groundedTurnSpeed : Vector3.Angle(transform.forward, localInput) * 5 * groundedTurnSpeed;
         m_TargetRotation = Quaternion.RotateTowards(transform.rotation, m_TargetRotation, actualTurnSpeed * Time.deltaTime);
 
         transform.rotation = m_TargetRotation;
@@ -272,7 +284,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
                 num *= 5f;
                 break;
             default:
-                if (this.player.IsGrounded)
+                if (state.IsGrounded)
                 {
                     num *= 20f;
                 }

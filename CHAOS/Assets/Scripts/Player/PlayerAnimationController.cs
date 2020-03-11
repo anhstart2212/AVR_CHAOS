@@ -16,11 +16,6 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001F2 RID: 498 RVA: 0x0000F6C4 File Offset: 0x0000D8C4
     private void Update()
     {
-        //if (this.anim.GetBool("IsHooked") && this.player.IsAnimating)
-        //{
-        //    this.ToggleAnimatingState("end");
-        //}
-
         if (this.anim.GetBool("IsHooked") && this.player.IsAnimating)
         {
             this.ToggleAnimatingState("end");
@@ -30,7 +25,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001F3 RID: 499 RVA: 0x0000F6F8 File Offset: 0x0000D8F8
     private void LateUpdate()
     {
-        if (!this.player.IsGrounded)
+        if (!state.IsGrounded)
         {
             this.landingVelocity = this.rb.velocity;
             this.anim.SetFloat("ImpactVertVelocity", this.landingVelocity.y);
@@ -39,7 +34,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
             Vector3 vector = new Vector3(this.landingVelocity.x, 0f, this.landingVelocity.z);
             animator.SetFloat(name, vector.magnitude);
         }
-        this.anim.SetBool("IsGrounded", this.player.IsGrounded);
+        this.anim.SetBool("IsGrounded", state.IsGrounded);
         this.anim.SetFloat("VertVelocity", this.player.VelocityYSigned);
         this.anim.SetFloat("HorzVelocity", this.player.VelocityMagnitudeXZ);
         if (this.player.IsAnimating && PlayerAnimation.InIdleRunOrAir(this.anim, true) && !this.anim.IsInTransition(0))
@@ -167,7 +162,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         //    this.anim.SetBool("IsSaluting", false);
         //}
 
-        if (this.anim.GetBool("IsSaluting") && (player.MovementX != 0f || player.MovementY != 0f))
+        if (this.anim.GetBool("IsSaluting") && (state.MovementXKey != 0f || state.MovementYKey != 0f))
         {
             this.anim.SetBool("IsSaluting", false);
         }
@@ -207,7 +202,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001FD RID: 509 RVA: 0x0000FCE4 File Offset: 0x0000DEE4
     private void SetAirborne()
     {
-        if (!this.player.IsGrounded)
+        if (!state.IsGrounded)
         {
             this.anim.SetFloat("AirborneAngle", Vector3.Angle(this.rb.velocity, Vector3.up));
             this.anim.SetFloat("VelocityAngle", Vector3.Angle(this.player.VelocityDirectionXZ, base.transform.forward));
@@ -248,7 +243,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
             this.anim.SetBool("IsHooked", true);
         }
         Vector3 lhs = Vector3.zero;
-        if (this.player.JumpReelKeyDown)
+        if (state.IsJumpReelKey)
         {
             this.anim.SetFloat("ReelingIn", Mathf.Lerp(this.anim.GetFloat("ReelingIn"), 1f, 0.15f));
         }
@@ -305,7 +300,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         {
             this.anim.SetBool("IsHooked", false);
         }
-        if (this.player.IsEitherHooked && !this.player.JumpReelKeyDown && height <= 2.5f && !this.player.IsGrounded)
+        if (this.player.IsEitherHooked && !state.IsJumpReelKey && height <= 2.5f && !state.IsGrounded)
         {
             this.player.RigidBody.velocity = this.player.RigidBody.velocity * 0.99f;
         }
