@@ -122,9 +122,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         this.SetVelocityLastFrame();
     }
 
-
-
-    void PollKeys()
+    public void PollKeys()
     {
         if (cameraSettings != null)
         {
@@ -143,93 +141,12 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
 
-    public override void Attached()
-    {
-        // This couples the Transform property of the State with the GameObject Transform
-        state.SetTransforms(state.Transform, transform);
-        state.SetAnimator(GetComponent<Animator>());
-
-        // setting layerweights 
-        state.Animator.SetLayerWeight(0, 1);
-        state.Animator.SetLayerWeight(1, 1);
-
-        state.OnPlayerHook += OnPlayerHook;
-    }
-
-    public override void SimulateController()
-    {
-        PollKeys();
-
-        DrawOwnerHookTarget();
-
-        IChaosPlayerCommandInput input = ChaosPlayerCommand.Create();
-
-        input.MouseX = m_MouseXaxis;
-        input.MouseY = m_MouseYaxis;
-        input.MovementX = movementX;
-        input.MovementY = movementY;
-        input.Jump = jumpKeyDown;
-        input.CenterHook = centerHookKeyDown;
-        input.FireLeftHook = fireLeftHook;
-        input.FireRightHook = fireRightHook;
-        input.JumpReel = jumpReelKeyDown;
-
-
-        input.CamPos = cameraSettings.CinemachineBrain.position;
-        input.CamRot = transforms.playerCamera.rotation;
-
-        entity.QueueInput(input);
-    }
-
-    public override void ExecuteCommand(Command command, bool resetState)
-    {
-        ChaosPlayerCommand cmd = (ChaosPlayerCommand)command;
-
-        if (resetState)
-        {
-            // we got a correction from the server, reset (this only runs on the client)
-            SetState(cmd.Result.Position, cmd.Result.Rotation);
-        }
-        else
-        {
-            // apply movement(this runs on both server and client)
-            State result = Apply(cmd.Input.MovementX, cmd.Input.MovementY, cmd.Input.MouseX, cmd.Input.Jump, cmd.Input.FireLeftHook, cmd.Input.FireRightHook, cmd.Input.JumpReel);
-
-            // copy the state to the commands result (this gets sent back to the client)
-            cmd.Result.Position = result.position;
-            cmd.Result.Rotation = result.rotation;
-
-            state.CamPos = cmd.Input.CamPos;
-            state.CamRot = cmd.Input.CamRot;
-
-            if (cmd.IsFirstExecution)
-            {
-                // animation run
-                AnimateRun(cmd);
-
-                //FindHookTarget();
-
-                state.IsCenterHook = cmd.Input.CenterHook;
-                state.IsLeftHook = cmd.Input.FireLeftHook;
-                state.IsRightHook = cmd.Input.FireRightHook;
-                state.IsJump = IsJumping;
-
-                if (cmd.Input.CenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
-                {
-                    PlayerHook();
-                }
-
-                AnimateHook();
-            }
-        }
-    }
-
-    void AnimateRun(ChaosPlayerCommand cmd)
+    public void AnimateRun(ChaosPlayerCommand cmd)
     {
         AnimationScript.SetRunning(cmd);
     }
 
-    void AnimateHook()
+    public void AnimateHook()
     {
         //AnimationScript.SetHooks(entity);
     }
@@ -242,33 +159,22 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     //    }
     //}
 
-    void PlayerHook()
+    public void PlayerHook()
     {
         state.PlayerHook();
     }
 
-    void OnPlayerHook()
+    public void OnPlayerHook()
     {
         MovementScript.StartHookActions(entity);
     }
 
-    void DrawOwnerHookTarget()
+    public void DrawOwnerHookTarget()
     {
         hudScript.DrawOwnerHookTarget(true);
     }
 
-    public void SetState(Vector3 position, Quaternion rotation)
-    {
-        // assign new state
-        m_State.position = position;
-        m_State.rotation = rotation;
-
-        // assign local transform
-        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
-        transform.rotation = m_State.rotation;
-    }
-
-    private State Apply(float movementX, float movementY, float mouseX, bool jumpKey, bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    public State Apply(float movementX, float movementY, float mouseX, bool jumpKey, bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
     {
         PlayerMoveInput(movementX, movementY);
 
@@ -1996,32 +1902,32 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     private bool isRightHookTargetNull;
 
     // Token: 0x0400018C RID: 396
-    private bool jumpReelKeyDown;
+    public bool jumpReelKeyDown;
 
-    private bool jumpKeyDown;
+    public bool jumpKeyDown;
 
     private bool attackKeyDown;
 
     // Token: 0x0400018D RID: 397
-    private bool centerHookKeyDown;
+    public bool centerHookKeyDown;
 
     // Token: 0x0400018E RID: 398
-    private bool fireLeftHook;
+    public bool fireLeftHook;
 
     // Token: 0x0400018F RID: 399
-    private bool fireRightHook;
+    public bool fireRightHook;
 
     // Token: 0x04000190 RID: 400
-    private float movementX;
+    public float movementX;
 
     // Token: 0x04000191 RID: 401
-    private float movementY;
+    public float movementY;
 
     //Token: 0x04000192 RID: 402
-    private float mouseAxisX;
+    public float mouseAxisX;
 
     //Token: 0x04000193 RID: 403
-    private float mouseAxisY;
+    public float mouseAxisY;
 
     private bool fastSpeed;
 
@@ -2280,13 +2186,13 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x040001E8 RID: 488
     private bool[] rayHits = new bool[5];
 
-    private CameraSettings cameraSettings;
+    public CameraSettings cameraSettings;
 
     private State m_State;
 
-    private float m_MouseXaxis;
+    public float m_MouseXaxis;
 
-    private float m_MouseYaxis;
+    public float m_MouseYaxis;
 
     private LauncherControl[] m_LauncherControls;
 }
