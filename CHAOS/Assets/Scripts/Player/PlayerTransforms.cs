@@ -25,6 +25,4 @@ public class PlayerTransforms
 
     // Token: 0x04000590 RID: 1424
     public Transform rotator;
-
-    public Transform hookTargetNull;
 }
