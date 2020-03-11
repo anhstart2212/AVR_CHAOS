@@ -677,7 +677,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 float d3 = this.acceleration.GetAcceleration(velocityMagnitude, angleVelocityAndHook);
 
                 // Chaos Added
-                if (this.player.FastSpeed)
+                if (state.FastSpeedKey)
                 {
                     this.rb.AddForce(this.player.HookedSteerDirection() * d * d3 * this.player.speed.fastSpeed, ForceMode.Acceleration);
                 }

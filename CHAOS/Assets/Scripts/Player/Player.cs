@@ -134,6 +134,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_FireLeftHook = Input.GetButton(axisName.fireLeftHook);
         m_FireRightHook = Input.GetButton(axisName.fireRightHook);
         m_JumpReelKeyDown = (Input.GetButton(axisName.jumpReel));
+        m_FastSpeed = (Input.GetButton(this.axisName.fastSpeed));
 
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
@@ -211,7 +212,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         if (this.IsEitherHooked && this.m_GroundTakeOff)
         {
-            if (this.m_Animator.GetFloat("Height") > 2f || !this.JumpReelKeyDown)
+            if (this.m_Animator.GetFloat("Height") > 2f || !state.IsJumpReelKey)
             {
                 base.Invoke("ResetGroundTakeOff", 0.25f);
             }
@@ -302,7 +303,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             this.m_Jumping = true;
         }
-        else if (this.JumpReelKeyDown && this.m_IsGrounded && this.IsEitherHooked)
+        else if (state.IsJumpReelKey && this.m_IsGrounded && this.IsEitherHooked)
         {
             this.m_GroundTakeOff = true;
         }
@@ -770,7 +771,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             return;
         }
-        if (this.IsEitherHooked && this.JumpReelKeyDown)
+        if (this.IsEitherHooked && state.IsJumpReelKey)
         {
             Vector3 onNormal = this.HookedSteerDirection();
             float num = Vector3.Angle(new Vector3(this.m_RigidBody.velocity.x, 0f, this.m_RigidBody.velocity.z), new Vector3(onNormal.x, 0f, onNormal.z));

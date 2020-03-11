@@ -66,6 +66,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         input.FireLeftHook = player.FireLeftHook;
         input.FireRightHook = player.FireRightHook;
         input.JumpReel = player.JumpReelKeyDown;
+        input.FastSpeed = player.FastSpeed;
 
         if (CameraSettings.instance != null)
         {
@@ -116,6 +117,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                 state.IsFireRightHookKey = cmd.Input.FireRightHook;
                 state.IsJumpReelKey = cmd.Input.JumpReel;
                 state.IsJumpKey = cmd.Input.Jump;
+                state.FastSpeedKey = cmd.Input.FastSpeed;
                 state.IsJump = player.IsJumping;
                 state.IsGrounded = player.IsGrounded;
 
