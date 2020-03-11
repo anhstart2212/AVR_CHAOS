@@ -205,9 +205,8 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     void UpdateOrientation()
     {
-
         Vector3 localInput = new Vector3(MoveInput.x, 0f, MoveInput.y);
-        float groundedTurnSpeed = Mathf.Lerp(600, 800, 0.2f);
+        float groundedTurnSpeed = Mathf.Lerp(player.speed.turnSpeed, 800, 0.2f);
         float actualTurnSpeed = state.IsGrounded ? groundedTurnSpeed : Vector3.Angle(transform.forward, localInput) * 5 * groundedTurnSpeed;
         m_TargetRotation = Quaternion.RotateTowards(transform.rotation, m_TargetRotation, actualTurnSpeed * Time.deltaTime);
 

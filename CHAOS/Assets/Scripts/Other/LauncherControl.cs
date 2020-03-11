@@ -181,7 +181,7 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
             Ray ray = new Ray(pos, direction);
             //Chaos Added
 
-            Debug.DrawRay(pos, direction * 100, Color.red);
+            //Debug.DrawRay(pos, direction * 100, Color.red);
 
             if (!Physics.Raycast(ray, this.player.MaxHookDistance, Common.layerNoHook))
             {
