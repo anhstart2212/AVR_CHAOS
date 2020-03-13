@@ -146,7 +146,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001FB RID: 507 RVA: 0x0000FB78 File Offset: 0x0000DD78
     private void SetSalute()
     {
-        if (Input.GetButtonDown(this.player.axisName.salute) && Mathf.Round(this.rb.velocity.magnitude * 1000f) / 1000f == 0f)
+        if (Input.GetButtonDown(InputAxisNames.salute) && Mathf.Round(this.rb.velocity.magnitude * 1000f) / 1000f == 0f)
         {
             if (this.anim.GetBool("IsSaluting"))
             {
@@ -349,7 +349,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         {
             this.anim.ResetTrigger("Reload");
         }
-        if (Input.GetButtonDown(this.player.axisName.reload) && PlayerAnimation.InIdleRunOrAir(this.anim, false) && !this.anim.GetBool("Reload"))
+        if (Input.GetButtonDown(InputAxisNames.reload) && PlayerAnimation.InIdleRunOrAir(this.anim, false) && !this.anim.GetBool("Reload"))
         {
             this.anim.SetTrigger("Reload");
         }

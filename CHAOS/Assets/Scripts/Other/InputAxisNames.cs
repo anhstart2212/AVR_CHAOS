@@ -5,36 +5,36 @@ using System;
 public class InputAxisNames
 {
     // Token: 0x04000555 RID: 1365
-    public string moveLeftRight;
+    public static string moveLeftRight = "Move Horizontal";
 
     // Token: 0x04000556 RID: 1366
-    public string moveFrontBack;
+    public static string moveFrontBack = "Move Vertical";
 
     // Token: 0x04000557 RID: 1367
-    public string fireLeftHook;
+    public static string fireLeftHook = "Left Hook";
 
     // Token: 0x04000558 RID: 1368
-    public string fireRightHook;
+    public static string fireRightHook = "Right Hook";
 
     // Token: 0x04000559 RID: 1369
-    public string salute;
+    public static string salute = "Salute";
 
     // Token: 0x0400055A RID: 1370
-    public string reload;
+    public static string reload = "";
 
     // Token: 0x0400055B RID: 1371
-    public string attack;
+    public static string attack = "Attack";
 
     // Token: 0x0400055C RID: 1372
-    public string centerHook;
+    public static string centerHook = "Center Hook";
 
     // Token: 0x0400055D RID: 1373
-    public string jumpReel;
+    public static string jumpReel = "Jump Reel";
 
-    public string jump;
+    public static string jump = "Jump";
 
     // Token: 0x0400055E RID: 1374
-    public string verticalBurst;
+    public static string verticalBurst = "Vertical Burst";
 
     // Token: 0x0400055F RID: 1375
     //public string mouseX;
@@ -43,7 +43,7 @@ public class InputAxisNames
     //public string mouseY;
 
     // Token: 0x04000561 RID: 1377
-    public string titanLock;
+    public static string titanLock = "";
 
-    public string fastSpeed;
+    public static string fastSpeed = "Fast Speed";
 }

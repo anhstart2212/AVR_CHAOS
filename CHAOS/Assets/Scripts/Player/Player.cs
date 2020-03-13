@@ -127,14 +127,14 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
             m_MouseYaxis = CameraSettings.instance.Current.m_YAxis.Value;
         }
 
-        m_MovementX = Input.GetAxis(axisName.moveLeftRight);
-        m_MovementY = Input.GetAxis(axisName.moveFrontBack);
-        m_JumpKeyDown = Input.GetButtonDown(axisName.jump);
-        m_CenterHookKeyDown = (Input.GetButton(axisName.centerHook));
-        m_FireLeftHook = Input.GetButton(axisName.fireLeftHook);
-        m_FireRightHook = Input.GetButton(axisName.fireRightHook);
-        m_JumpReelKeyDown = (Input.GetButton(axisName.jumpReel));
-        m_FastSpeed = (Input.GetButton(this.axisName.fastSpeed));
+        m_MovementX = Input.GetAxis(InputAxisNames.moveLeftRight);
+        m_MovementY = Input.GetAxis(InputAxisNames.moveFrontBack);
+        m_JumpKeyDown = Input.GetButtonDown(InputAxisNames.jump);
+        m_CenterHookKeyDown = (Input.GetButton(InputAxisNames.centerHook));
+        m_FireLeftHook = Input.GetButton(InputAxisNames.fireLeftHook);
+        m_FireRightHook = Input.GetButton(InputAxisNames.fireRightHook);
+        m_JumpReelKeyDown = (Input.GetButton(InputAxisNames.jumpReel));
+        m_FastSpeed = (Input.GetButton(InputAxisNames.fastSpeed));
 
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }

@@ -54,7 +54,7 @@ public class PlayerBursts : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         float axisRaw = state.MovementXKey;
         float axisRaw2 = state.MovementYKey;
-        float axisRaw3 = Input.GetAxisRaw(this.player.axisName.verticalBurst);
+        float axisRaw3 = Input.GetAxisRaw(InputAxisNames.verticalBurst);
         if (axisRaw > 0f)
         {
             if (!this.adAxisDown)
@@ -614,7 +614,7 @@ public class PlayerBursts : Bolt.EntityBehaviour<IChaos_PlayerState>
         float loopModifier = 1f;
         float loopModChange = 1f / (float)force_frames;
         float preMag = this.rb.velocity.y;
-        while (Input.GetAxisRaw(this.player.axisName.verticalBurst) != 0f && this.player.BurstTankLevel > 0f)
+        while (Input.GetAxisRaw(InputAxisNames.verticalBurst) != 0f && this.player.BurstTankLevel > 0f)
         {
             this.ScaleVelocity(direction + this.player.VelocityDirection * 0.5f, 0.975f);
             float forceMod = this.GetBurstVertForceModifier();

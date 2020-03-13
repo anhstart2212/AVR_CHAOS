@@ -87,7 +87,7 @@ public class PlayerSoundController : Bolt.EntityBehaviour<IChaos_PlayerState>
             this.srcCableLoop.Stop();
             if (!(this.srcGas.clip == this.gasBurst) || !this.srcGas.isPlaying)
             {
-                if ((this.gasSmallEmitting || (this.player.BurstTankLevel > 0f && Input.GetAxisRaw(this.player.axisName.verticalBurst) != 0f)) && !state.IsGrounded)
+                if ((this.gasSmallEmitting || (this.player.BurstTankLevel > 0f && Input.GetAxisRaw(InputAxisNames.verticalBurst) != 0f)) && !state.IsGrounded)
                 {
                     this.srcGas.volume = this.volume.gasSmall;
                     this.srcGas.clip = this.gasLoop;
