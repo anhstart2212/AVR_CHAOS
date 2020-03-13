@@ -80,6 +80,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
+    Vector3 inputDirection;
     // Token: 0x06000231 RID: 561 RVA: 0x00013AD4 File Offset: 0x00011CD4
     private IEnumerator GroundMovement()
     {
@@ -120,11 +121,26 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 // Chaos Added
 
                 this.DetermineMoveState();
+
                 if (this.player.IsSlopedTerrain)
                 {
                     runDirection = this.SlopedRunDirection(runDirection);
                 }
-                this.rb.velocity = runDirection.normalized * this.speed;
+
+                inputDirection = new Vector3(Input.GetAxisRaw(InputAxisNames.moveLeftRight), 0f, Input.GetAxisRaw(InputAxisNames.moveFrontBack));
+
+                // Detect when receive no input, then make a full stop to prevent sliding
+                if(inputDirection == Vector3.zero)
+                {
+                    rb.velocity = rb.velocity / 1.5f;
+                    rb.angularVelocity = rb.angularVelocity / 1.5f;
+                }
+                else
+                {
+                    // If there is input, apply velocity
+                    this.rb.velocity = runDirection.normalized * this.speed;
+                }
+               
                 yield return Common.yieldFixedUpdate;
             }
         }

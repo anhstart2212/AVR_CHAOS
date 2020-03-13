@@ -99,8 +99,6 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             m_Movement.Set(state.MovementXKey, state.MovementYKey);
 
-            SetTargetRotation(state.MouseXKey);
-
             if (IsMoveInput)
             {
                 UpdateOrientation();
@@ -109,46 +107,6 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         this.RotatePlayer(num, direction);
     }
-
-    //public void PlayerRotation(float movementX, float movementY, float mouseX)
-    //{
-    //    if (num == -1)
-    //    {
-    //        //int num2 = 0;
-    //        ////float axisRaw = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
-    //        ////float axisRaw2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-    //        //float axisRaw = this.player.MovementY;
-    //        //float axisRaw2 = this.player.MovementX;
-    //        //if (axisRaw2 < 0f)
-    //        //{
-    //        //    num2++;
-    //        //}
-    //        //else if (axisRaw2 > 0f)
-    //        //{
-    //        //    num2 += 2;
-    //        //}
-    //        //if (axisRaw < 0f)
-    //        //{
-    //        //    num2 += 4;
-    //        //}
-    //        //else if (axisRaw > 0f)
-    //        //{
-    //        //    num2 += 8;
-    //        //}
-    //        //num = 2;
-
-    //        //direction = this.DetermineMoveDirection(num2);
-
-    //        m_Movement.Set(state.MovementX, state.MovementY);
-
-    //        SetTargetRotation(state.MouseX);
-
-    //        if (IsMoveInput)
-    //        {
-    //            UpdateOrientation();
-    //        }
-    //    }
-    //}
 
     public Vector2 MoveInput
     {
@@ -165,52 +123,19 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         get { return !Mathf.Approximately(MoveInput.sqrMagnitude, 0f); }
     }
 
-    public Quaternion m_TargetRotation;
-
-    void SetTargetRotation(float mouseX)
-    {
-        // Create three variables, move input local to the player, flattened forward direction of the camera and a local target rotation.
-        Vector2 moveInput = MoveInput;
-        Vector3 localMovementDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
-
-
-        Vector3 forward = Quaternion.Euler(0f, mouseX, 0f) * Vector3.forward;
-        forward.y = 0f;
-        forward.Normalize();
-
-        Quaternion targetRotation;
-
-        // If the local movement direction is the opposite of forward then the target rotation should be towards the camera.
-        if (Mathf.Approximately(Vector3.Dot(localMovementDirection, Vector3.forward), -1.0f))
-        {
-            targetRotation = Quaternion.LookRotation(-forward);
-        }
-        else
-        {
-            // Otherwise the rotation should be the offset of the input from the camera's forward.
-            Quaternion cameraToInputOffset = Quaternion.FromToRotation(Vector3.forward, localMovementDirection);
-            targetRotation = Quaternion.LookRotation(cameraToInputOffset * forward);
-        }
-
-        //// The desired forward direction of Ellen.
-        //Vector3 resultingForward = targetRotation * Vector3.forward;
-
-        //// Find the difference between the current rotation of the player and the desired rotation of the player in radians.
-        //float angleCurrent = Mathf.Atan2(transform.forward.x, transform.forward.z) * Mathf.Rad2Deg;
-        //float targetAngle = Mathf.Atan2(resultingForward.x, resultingForward.z) * Mathf.Rad2Deg;
-
-        //m_AngleDiff = Mathf.DeltaAngle(angleCurrent, targetAngle);
-        m_TargetRotation = targetRotation;
-    }
-
+    // Caches for performance
+    Vector3 inputDirection;
+    Quaternion quaternion;
+    /// <summary>
+    /// Turn the player according to  input axes
+    /// </summary>
     void UpdateOrientation()
     {
-        Vector3 localInput = new Vector3(MoveInput.x, 0f, MoveInput.y);
-        float groundedTurnSpeed = Mathf.Lerp(player.speed.turnSpeed, 800, 0.2f);
-        float actualTurnSpeed = state.IsGrounded ? groundedTurnSpeed : Vector3.Angle(transform.forward, localInput) * 5 * groundedTurnSpeed;
-        m_TargetRotation = Quaternion.RotateTowards(transform.rotation, m_TargetRotation, actualTurnSpeed * Time.deltaTime);
+        inputDirection = new Vector3(Input.GetAxis(InputAxisNames.moveLeftRight), 0f, Input.GetAxis(InputAxisNames.moveFrontBack));
 
-        transform.rotation = m_TargetRotation;
+        quaternion = ((!(inputDirection != Vector3.zero)) ? base.transform.rotation : Quaternion.Euler(0f, Mathf.Atan2(inputDirection.x, inputDirection.z) * 57.29578f + player.transforms.playerCamera.eulerAngles.y, 0f));
+
+        transform.rotation = quaternion;
     }
 
     // Token: 0x06000256 RID: 598 RVA: 0x00015F8D File Offset: 0x0001418D
