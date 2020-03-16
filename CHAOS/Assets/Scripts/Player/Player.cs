@@ -167,9 +167,10 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_HudScript.DrawOwnerHookTarget(true);
     }
 
-    public State Apply(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    public State Apply(float movementX, float movementY)
     {
-        //PlayerMoveInput(movementX, movementY);
+        // Fix smooth position
+        PlayerMoveInput(movementX, movementY);
 
         //PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
 
@@ -184,6 +185,12 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         // done
         return m_State;
+    }
+
+    void PlayerMoveInput(float movementX, float movementY)
+    {
+        MovementX = movementX;
+        MovementY = movementY;
     }
 
     public void SetState(Vector3 position, Quaternion rotation)
@@ -603,7 +610,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     public Vector3 HookedSteerDirection()
     {
         Vector3 a = Vector3.zero;
-        float num = this.MovementX;
+        //float num = this.MovementX;
+        float num = state.MovementXKey;
         if (num > 0f)
         {
             a = base.transform.right;

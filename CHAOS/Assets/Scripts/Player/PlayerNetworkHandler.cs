@@ -97,7 +97,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         else
         {
             // apply movement(this runs on both server and client)
-            State result = player.Apply(cmd.Input.FireLeftHook, cmd.Input.FireRightHook, cmd.Input.JumpReel);
+            State result = player.Apply(cmd.Input.MovementX, cmd.Input.MovementY);
 
             // copy the state to the commands result (this gets sent back to the client)
             cmd.Result.Position = result.position;
