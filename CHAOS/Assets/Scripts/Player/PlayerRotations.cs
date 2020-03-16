@@ -131,9 +131,9 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
     /// </summary>
     void UpdateOrientation()
     {
-        inputDirection = new Vector3(Input.GetAxis(InputAxisNames.moveLeftRight), 0f, Input.GetAxis(InputAxisNames.moveFrontBack));
+        inputDirection = new Vector3(state.MovementXKey, 0f, state.MovementYKey);
 
-        quaternion = ((!(inputDirection != Vector3.zero)) ? base.transform.rotation : Quaternion.Euler(0f, Mathf.Atan2(inputDirection.x, inputDirection.z) * 57.29578f + player.transforms.playerCamera.eulerAngles.y, 0f));
+        quaternion = ((!(inputDirection != Vector3.zero)) ? base.transform.rotation : Quaternion.Euler(0f, Mathf.Atan2(inputDirection.x, inputDirection.z) * 57.29578f + state.CamRot.eulerAngles.y, 0f));
 
         transform.rotation = quaternion;
     }

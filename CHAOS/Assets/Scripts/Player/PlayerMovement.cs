@@ -127,7 +127,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                     runDirection = this.SlopedRunDirection(runDirection);
                 }
 
-                inputDirection = new Vector3(Input.GetAxisRaw(InputAxisNames.moveLeftRight), 0f, Input.GetAxisRaw(InputAxisNames.moveFrontBack));
+                inputDirection = new Vector3(state.MovementXKey, 0f, state.MovementYKey);
 
                 // Detect when receive no input, then make a full stop to prevent sliding
                 if(inputDirection == Vector3.zero)

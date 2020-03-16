@@ -111,20 +111,17 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                 // animation run
                 player.AnimateRun(cmd);
 
-                if (entity.IsOwner)
-                {
-                    state.MovementXKey = cmd.Input.MovementX;
-                    state.MovementYKey = cmd.Input.MovementY;
-                    state.MouseXKey = cmd.Input.MouseX;
-                    state.IsFireCenterHookKey = cmd.Input.FireCenterHook;
-                    state.IsFireLeftHookKey = cmd.Input.FireLeftHook;
-                    state.IsFireRightHookKey = cmd.Input.FireRightHook;
-                    state.IsJumpReelKey = cmd.Input.JumpReel;
-                    state.IsJumpKey = cmd.Input.Jump;
-                    state.FastSpeedKey = cmd.Input.FastSpeed;
-                    state.IsJump = player.IsJumping;
-                    state.IsGrounded = player.IsGrounded;
-                }
+                state.MovementXKey = cmd.Input.MovementX;
+                state.MovementYKey = cmd.Input.MovementY;
+                state.MouseXKey = cmd.Input.MouseX;
+                state.IsFireCenterHookKey = cmd.Input.FireCenterHook;
+                state.IsFireLeftHookKey = cmd.Input.FireLeftHook;
+                state.IsFireRightHookKey = cmd.Input.FireRightHook;
+                state.IsJumpReelKey = cmd.Input.JumpReel;
+                state.IsJumpKey = cmd.Input.Jump;
+                state.FastSpeedKey = cmd.Input.FastSpeed;
+                state.IsJump = player.IsJumping;
+                state.IsGrounded = player.IsGrounded;
 
                 if (cmd.Input.FireCenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
                 {
