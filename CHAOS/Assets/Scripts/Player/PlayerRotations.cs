@@ -135,7 +135,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         quaternion = ((!(inputDirection != Vector3.zero)) ? base.transform.rotation : Quaternion.Euler(0f, Mathf.Atan2(inputDirection.x, inputDirection.z) * 57.29578f + state.CamRot.eulerAngles.y, 0f));
 
-        transform.rotation = quaternion;
+        transform.rotation = Quaternion.Slerp(transform.rotation, quaternion, player.speed.turnSpeed * BoltNetwork.FrameDeltaTime);
     }
 
     // Token: 0x06000256 RID: 598 RVA: 0x00015F8D File Offset: 0x0001418D

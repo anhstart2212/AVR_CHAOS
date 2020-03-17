@@ -129,7 +129,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         m_MovementX = Input.GetAxis(InputAxisNames.moveLeftRight);
         m_MovementY = Input.GetAxis(InputAxisNames.moveFrontBack);
-        m_JumpKeyDown = Input.GetButtonDown(InputAxisNames.jump);
+        m_JumpKeyDown = Input.GetButton(InputAxisNames.jump);
         m_CenterHookKeyDown = (Input.GetButton(InputAxisNames.centerHook));
         m_FireLeftHook = Input.GetButton(InputAxisNames.fireLeftHook);
         m_FireRightHook = Input.GetButton(InputAxisNames.fireRightHook);
@@ -200,8 +200,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_State.rotation = rotation;
 
         // assign local transform
-        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
-        transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 2f * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * BoltNetwork.FrameDeltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 3f * BoltNetwork.FrameDeltaTime);
     }
 
 

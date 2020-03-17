@@ -80,8 +80,6 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    Vector3 inputDirection;
-    // Token: 0x06000231 RID: 561 RVA: 0x00013AD4 File Offset: 0x00011CD4
     private IEnumerator GroundMovement()
     {
         this.groundMovementIsRunning = true;
@@ -128,7 +126,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 }
 
                 // Fix smooth position (state.MovementXKey -> player.MovementX)
-                inputDirection = new Vector3(player.MovementX, 0f, player.MovementY);
+                Vector3 inputDirection = new Vector3(player.MovementX, 0f, player.MovementY);
 
                 // Detect when receive no input, then make a full stop to prevent sliding
                 if(inputDirection == Vector3.zero)
