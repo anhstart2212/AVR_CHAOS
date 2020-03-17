@@ -21,6 +21,18 @@ namespace Bolt.AdvancedTutorial
             }
 		}
 
+        void FixedUpdate()
+        {
+            foreach (Chaos_PlayerObject p in Chaos_PlayerObject.AllPlayers)
+            {
+                // if we have an entity, it's dead but our spawn frame has passed
+                if (p.entity && p.state.Dead && p.state.RespawnFrame <= BoltNetwork.ServerFrame)
+                {
+                    p.Spawn();
+                }
+            }
+        }
+
         public override void Connected(BoltConnection connection)
         {
             Chaos_PlayerObject.CreateClientPlayer(connection);
@@ -33,7 +45,7 @@ namespace Bolt.AdvancedTutorial
 
         public override void SceneLoadRemoteDone(BoltConnection connection)
 		{
-            Chaos_PlayerObject.GetChaosPlayer(connection).Spawn();
+            connection.GetChaosPlayer().Spawn();
         }
 
 		

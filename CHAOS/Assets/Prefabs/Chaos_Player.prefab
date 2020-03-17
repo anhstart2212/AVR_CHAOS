@@ -3136,7 +3136,7 @@ Transform:
   m_GameObject: {fileID: 1596217168966922}
   m_LocalRotation: {x: -0.05602266, y: 0.7631294, z: 0.066765204, w: 0.64034164}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children:
   - {fileID: 4270481664853988}
   - {fileID: 4574038950604586}
@@ -4857,7 +4857,7 @@ MonoBehaviour:
     runJump: 45
     wallSideJump: 50
     wallUpJump: 25
-    turnSpeed: 600
+    turnSpeed: 15
     look: 20
     gasFree: 40
     reelDouble: 4.15
@@ -4869,7 +4869,7 @@ MonoBehaviour:
     horzBurst: 70
     cameraForwardSingle: 10
     cameraForwardDouble: 15
-    groundGravity: 9.8
+    groundGravity: 9.81
     fastSpeed: 3
   limit:
     maxHorizontal: 60
@@ -4902,6 +4902,9 @@ MonoBehaviour:
     gasFast: {fileID: 198043302649730770}
     gasBurst: {fileID: 198074957772921390}
     deathVFX: {fileID: 0}
+  m_Weapons:
+  - {fileID: 114471131437695008}
+  - {fileID: 114887657756209454}
 --- !u!114 &114630607990808298
 MonoBehaviour:
   m_ObjectHideFlags: 1

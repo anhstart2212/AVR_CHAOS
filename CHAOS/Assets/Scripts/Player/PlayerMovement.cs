@@ -111,11 +111,11 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
             else
             {
                 // Chaos Added
-                if (m_PlayerCombat != null && m_PlayerCombat.InCombo)
-                {
-                    this.rb.velocity = Vector3.zero;
-                }
-                yield return new WaitUntil(() => m_PlayerCombat.InCombo == false);
+                //if (m_PlayerCombat != null && m_PlayerCombat.InCombo)
+                //{
+                //    this.rb.velocity = Vector3.zero;
+                //}
+                //yield return new WaitUntil(() => m_PlayerCombat.InCombo == false);
                 // Chaos Added
 
                 this.DetermineMoveState();

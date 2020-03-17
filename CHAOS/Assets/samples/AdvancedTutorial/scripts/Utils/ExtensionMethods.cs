@@ -13,5 +13,15 @@ namespace Bolt.AdvancedTutorial
 
 			return (Player)connection.UserData;
 		}
-	}
+
+        public static Chaos_PlayerObject GetChaosPlayer(this BoltConnection connection)
+        {
+            if (connection == null)
+            {
+                return Chaos_PlayerObject.ServerPlayer;
+            }
+
+            return (Chaos_PlayerObject)connection.UserData;
+        }
+    }
 }

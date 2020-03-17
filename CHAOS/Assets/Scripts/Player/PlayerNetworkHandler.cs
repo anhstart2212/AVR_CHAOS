@@ -35,11 +35,17 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
             state.SetAnimator(animator);
 
             // setting layerweights 
-            state.Animator.SetLayerWeight(0, 1);
-            state.Animator.SetLayerWeight(1, 1);
+            //state.Animator.SetLayerWeight(0, 1);
+            //state.Animator.SetLayerWeight(1, 1);
 
             state.OnPlayerHook += player.OnPlayerHook;
-        }else
+
+            state.AddCallback("WeaponId", player.WeaponChanged);
+            state.OnFire += player.OnFire;
+            // setup weapon
+            player.WeaponChanged();
+        }
+        else
         {
             Debug.LogError("Exception! Null Player Or Animator");
         }
@@ -67,6 +73,8 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         input.FireRightHook = player.FireRightHook;
         input.JumpReel = player.JumpReelKeyDown;
         input.FastSpeed = player.FastSpeed;
+        input.WeaponId = player.WeaponId;
+        input.Fire = player.Fire;
 
         if (CameraSettings.instance != null)
         {
@@ -85,7 +93,10 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     /// <param name="resetState"></param>
     public override void ExecuteCommand(Command command, bool resetState)
     {
-        
+        if (state.Dead)
+        {
+            return;
+        }
 
         ChaosPlayerCommand cmd = (ChaosPlayerCommand)command;
 
@@ -122,10 +133,17 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                 state.FastSpeedKey = cmd.Input.FastSpeed;
                 state.IsJump = player.IsJumping;
                 state.IsGrounded = player.IsGrounded;
+                state.WeaponId = cmd.Input.WeaponId;
 
                 if (cmd.Input.FireCenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
                 {
                     player.PlayerHook();
+                }
+
+                // deal with weapons
+                if (cmd.Input.Fire)
+                {
+                    player.FireWeapon(cmd);
                 }
             }
         }

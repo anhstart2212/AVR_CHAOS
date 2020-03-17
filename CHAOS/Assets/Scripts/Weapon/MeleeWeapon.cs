@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Bolt.AdvancedTutorial;
 
-public class MeleeWeapon : MonoBehaviour {
+public class MeleeWeapon : Chaos_WeaponBase
+{
 
     public int damage = 1;
 

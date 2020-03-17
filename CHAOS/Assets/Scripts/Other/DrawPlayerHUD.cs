@@ -83,7 +83,7 @@ public class DrawPlayerHUD : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600011C RID: 284 RVA: 0x0000BD34 File Offset: 0x00009F34
     public void OnGUI()
     {
-        if (!m_IsDraw)
+        if (!m_IsDraw || state.Dead)
         {
             return;
         }

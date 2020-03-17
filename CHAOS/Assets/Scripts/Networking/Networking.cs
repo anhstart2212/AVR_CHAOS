@@ -58,8 +58,8 @@ public class Networking : Bolt.GlobalEventListener
     {
         BoltConsole.Write("SceneLoadLocalDone", Color.red);
 
-        var a = BoltNetwork.Instantiate(BoltPrefabs.Character, new NetworkToken(), new Vector3(0,2,3), Quaternion.identity);
-        a.TakeControl();
+        //var a = BoltNetwork.Instantiate(BoltPrefabs.Character, new NetworkToken(), new Vector3(0,2,3), Quaternion.identity);
+        //a.TakeControl();
 
         CameraSettings.Instantiate();
     }

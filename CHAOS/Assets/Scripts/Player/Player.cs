@@ -136,6 +136,17 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_JumpReelKeyDown = (Input.GetButton(InputAxisNames.jumpReel));
         m_FastSpeed = (Input.GetButton(InputAxisNames.fastSpeed));
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            m_WeaponId = 0;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            m_WeaponId = 1;
+        }
+
+        m_Fire = Input.GetMouseButton(0);
+
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
 
@@ -202,6 +213,56 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         // assign local transform
         transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * BoltNetwork.FrameDeltaTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 3f * BoltNetwork.FrameDeltaTime);
+    }
+
+    public void WeaponChanged()
+    {
+        // setup weapon
+        for (int i = 0; i < m_Weapons.Length; ++i)
+        {
+            m_Weapons[i].gameObject.SetActive(false);
+        }
+
+        m_Weapons[state.WeaponId].gameObject.SetActive(true);
+    }
+
+    public void FireWeapon(ChaosPlayerCommand cmd)
+    {
+        if (ActiveWeapon.fireFrame + ActiveWeapon.refireRate <= BoltNetwork.ServerFrame)
+        {
+            ActiveWeapon.fireFrame = BoltNetwork.ServerFrame;
+
+            state.Fire();
+
+            // if we are the owner and the active weapon is a hitscan weapon, do logic
+            if (entity.IsOwner)
+            {
+                ActiveWeapon.OnOwner(cmd, entity);
+            }
+        }
+    }
+
+    public void OnFire()
+    {
+        ActiveWeapon.Fx(entity);
+    }
+
+    public void ApplyDamage(byte damage)
+    {
+        if (!state.Dead)
+        {
+            state.Health -= damage;
+
+            if (state.Health > 100 || state.Health < 0)
+            {
+                state.Health = 0;
+            }
+
+            if (state.Health == 0)
+            {
+                entity.Controller.GetChaosPlayer().Kill();
+            }
+        }
     }
 
 
@@ -1787,18 +1848,22 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    // Token: 0x17000065 RID: 101
-    // (get) Token: 0x060001C4 RID: 452 RVA: 0x0000E12B File Offset: 0x0000C32B
-    //public CameraControl CamScript
-    //{
-    //    get
-    //    {
-    //        return this.camScript;
-    //    }
-    //}
+    public int WeaponId
+    {
+        get
+        {
+            return m_WeaponId;
+        }
+    }
 
-    // Token: 0x17000066 RID: 102
-    // (get) Token: 0x060001C5 RID: 453 RVA: 0x0000E133 File Offset: 0x0000C333
+    public bool Fire
+    {
+        get
+        {
+            return m_Fire;
+        }
+    }
+
     public PlayerGasManagement GasScript
     {
         get
@@ -2116,4 +2181,19 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     private float m_MouseXaxis;
 
     private float m_MouseYaxis;
+
+    [SerializeField]
+    Chaos_WeaponBase[] m_Weapons;
+
+    public Chaos_WeaponBase ActiveWeapon
+    {
+        get
+        {
+            return m_Weapons[state.WeaponId];
+        }
+    }
+
+    private int m_WeaponId;
+
+    private bool m_Fire;
 }

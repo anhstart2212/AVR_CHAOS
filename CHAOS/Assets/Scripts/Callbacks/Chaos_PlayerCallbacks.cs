@@ -11,7 +11,7 @@ namespace Bolt.AdvancedTutorial
 		public override void SceneLoadLocalDone(string scene)
 		{
             // ui
-            GameUI.Instantiate();
+            Chaos_GameUI.Instantiate();
 
             // camera
             CameraSettings.Instantiate();
