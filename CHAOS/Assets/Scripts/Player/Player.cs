@@ -129,7 +129,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         m_MovementX = Input.GetAxis(InputAxisNames.moveLeftRight);
         m_MovementY = Input.GetAxis(InputAxisNames.moveFrontBack);
-        m_JumpKeyDown = Input.GetButtonDown(InputAxisNames.jump);
+        m_JumpKeyDown = Input.GetButton(InputAxisNames.jump);
         m_CenterHookKeyDown = (Input.GetButton(InputAxisNames.centerHook));
         m_FireLeftHook = Input.GetButton(InputAxisNames.fireLeftHook);
         m_FireRightHook = Input.GetButton(InputAxisNames.fireRightHook);
@@ -167,9 +167,10 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_HudScript.DrawOwnerHookTarget(true);
     }
 
-    public State Apply(bool fireLeftHook, bool fireRightHook, bool jumpReelKey)
+    public State Apply(float movementX, float movementY)
     {
-        //PlayerMoveInput(movementX, movementY);
+        // Fix smooth position
+        PlayerMoveInput(movementX, movementY);
 
         //PlayerHookInput(fireLeftHook, fireRightHook, jumpReelKey);
 
@@ -186,6 +187,12 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         return m_State;
     }
 
+    void PlayerMoveInput(float movementX, float movementY)
+    {
+        MovementX = movementX;
+        MovementY = movementY;
+    }
+
     public void SetState(Vector3 position, Quaternion rotation)
     {
         // assign new state
@@ -193,8 +200,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         m_State.rotation = rotation;
 
         // assign local transform
-        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * Time.deltaTime);
-        transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 2f * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * BoltNetwork.FrameDeltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 3f * BoltNetwork.FrameDeltaTime);
     }
 
 
@@ -603,7 +610,8 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     public Vector3 HookedSteerDirection()
     {
         Vector3 a = Vector3.zero;
-        float num = this.MovementX;
+        //float num = this.MovementX;
+        float num = state.MovementXKey;
         if (num > 0f)
         {
             a = base.transform.right;
