@@ -1,119 +1,123 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCombat : MonoBehaviour
+public class PlayerCombat : MonoBehaviour, IActionCaller
 {
-    public MeleeWeapon meleeWeapon;
-    public float attackDuration = 0.03f;
-    public bool canAttack;
+    public CombatData combatData;
 
-    private AnimatorStateInfo m_CurrentStateInfo;    // Information about the base layer of the animator cached.
-    private AnimatorStateInfo m_NextStateInfo;
-    private AnimatorStateInfo m_PreviousCurrentStateInfo;    // Information about the base layer of the animator from last frame.
-    private AnimatorStateInfo m_PreviousNextStateInfo;
-    private Coroutine m_AttackWaitCoroutine;
-    private bool m_Attack;
-    private Player m_Player;
-    private Animator m_Animator;
-    private bool m_InCombo;
+    public ActionData nextAction;
 
+    public bool actionPending;
 
+    public ActionData[] FalconPunchCombo;
 
+    private KeyCombo falconPunch;
 
-    
+    private List<ActionData> queue = new List <ActionData>();
 
+    public float timeBetweenCombo = 1;
 
-    public bool InCombo
+    public float timeBetweenComboTimecount;
+
+    public ComboList moveList;
+
+    void Awake()
     {
-        get
-        {
-            return m_InCombo;
-        }
+        falconPunch = new KeyCombo(FalconPunchCombo);
     }
 
-    // Use this for initialization
-    void Start()
-    {
-        m_Player = GetComponent<Player>();
-        m_Animator = m_Player.Animator;
-        meleeWeapon = GetComponentInChildren<MeleeWeapon>();
-        meleeWeapon.SetOwner(gameObject);
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        Combat();
-        CacheAnimatorState();
-        EquipMeleeWeapon(IsWeaponEquiped());
-    }
-
-    private void Combat()
-    {
-        if (m_Animator == null || m_Player == null)
+        if(Input.GetButtonDown(InputAxisNames.attack))
         {
-            return;
+            this.QueueAction(combatData.BasicAttack);
         }
 
-        m_Animator.SetFloat(PlayerAnimation.PARAMS.hashCombatStateTime, Mathf.Repeat(m_Animator.GetCurrentAnimatorStateInfo(0).normalizedTime, 1f));
-        m_Animator.ResetTrigger(PlayerAnimation.PARAMS.hashMeleeAttack);
-
-        if (m_Player.AttackKeyDown)
+        if (Input.GetButtonDown(InputAxisNames.heavyAttack))
         {
-            if (m_AttackWaitCoroutine != null)
-                StopCoroutine(m_AttackWaitCoroutine);
-
-            m_AttackWaitCoroutine = StartCoroutine(AttackWait());
+            this.QueueAction(combatData.HeavyAttack);
         }
 
-        if (m_Attack && canAttack)
+        if (Input.GetButtonDown(InputAxisNames.parry))
         {
-            PlayerAnimation.SetAttackState(m_Player.Animator);
+            this.QueueAction(combatData.Parry);
+        }
+
+        if(timeBetweenComboTimecount >= 0)
+        {
+            timeBetweenComboTimecount -= Time.deltaTime;
+
+            if(timeBetweenComboTimecount <= 0)
+            {
+                queue.Clear();
+            }
         }
 
     }
 
-    IEnumerator AttackWait()
+    private void QueueAction(ActionData actionData)
     {
-        m_Attack = true;
-        yield return new WaitForSeconds(attackDuration);
-        m_Attack = false;
+        if (actionData.interruptable)
+        {
+            this.UseAction(actionData);
+        }
+        else
+        {
+            if(actionPending)
+            {
+                nextAction = actionData;
+            }
+            else
+            {
+                this.UseAction(actionData);
+            }
+        }
     }
 
-    bool IsWeaponEquiped()
+    // Token: 0x06000021 RID: 33 RVA: 0x00006585 File Offset: 0x00004985
+    protected void UseAction(ActionData actionData)
     {
-        bool equipped = m_NextStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo1 || m_CurrentStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo1;
-        equipped |= m_NextStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo2 || m_CurrentStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo2;
-        equipped |= m_NextStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo3 || m_CurrentStateInfo.shortNameHash == PlayerAnimation.PARAMS.hashPlayerCombo3;
+        AddCombo(actionData);
 
-        return equipped;
+        if(CheckCombo())
+        {
+            print("Done Combo!...clearing old action datas");
+            queue.Clear();
+        }
+        else
+        {
+            actionPending = true;
+
+            timeBetweenComboTimecount = timeBetweenCombo;
+
+            StartCoroutine(actionData.Excecute(this, transform));
+        }
     }
 
-    void CacheAnimatorState()
+    public void Callback(ActionData finishedData)
     {
-        m_PreviousCurrentStateInfo = m_CurrentStateInfo;
-        m_PreviousNextStateInfo = m_NextStateInfo;
+        actionPending = false;
 
-        m_CurrentStateInfo = m_Animator.GetCurrentAnimatorStateInfo(0);
-        m_NextStateInfo = m_Animator.GetNextAnimatorStateInfo(0);
+        if(nextAction != null)
+        {
+            this.UseAction(nextAction);
+            nextAction = null;
+        }
     }
 
-    void EquipMeleeWeapon(bool equip)
+    bool CheckCombo()
     {
-        m_InCombo = equip;
+        if(moveList.Check(queue))
+        {
+            queue.Clear();
+            return true;
+        }
+        return false;
     }
 
-    // This is called by an animation event when swings staff.
-    public void MeleeAttackStart(int throwing = 0)
+    void AddCombo(ActionData action)
     {
-        meleeWeapon.BeginAttack(throwing != 0);
-        //m_InAttack = true;
-    }
-
-    // This is called by an animation event when finishes swinging staff.
-    public void MeleeAttackEnd()
-    {
-        meleeWeapon.EndAttack();
-        //m_InAttack = false;
+        queue.Add(action);
     }
 }

@@ -36,6 +36,11 @@ public class InputAxisNames
     // Token: 0x0400055E RID: 1374
     public static string verticalBurst = "Vertical Burst";
 
+    // Token: 0x0400055B RID: 1371
+    public static string heavyAttack = "Heavy Attack";
+
+    public static string parry = "Parry";
+
     // Token: 0x0400055F RID: 1375
     //public string mouseX;
 
