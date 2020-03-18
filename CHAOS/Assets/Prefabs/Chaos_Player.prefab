@@ -208,7 +208,6 @@ GameObject:
   - component: {fileID: 114687775198559298}
   - component: {fileID: 114247104174143304}
   - component: {fileID: 114894489476488628}
-  - component: {fileID: 114529056228805508}
   - component: {fileID: 114681628147749856}
   - component: {fileID: 114059939868762764}
   - component: {fileID: 114105610914925422}
@@ -4779,27 +4778,12 @@ MonoBehaviour:
   damagePerBullet: 25
   refireRate: 5
   fireFrame: 0
-  damage: 1
-  hitParticlePrefab: {fileID: 198200190501009950, guid: a44256b39be96464182c3b750c0f2443,
-    type: 2}
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 16384
-  attackPoints:
-  - radius: 0.35
-    offset: {x: 0, y: 0, z: 0}
-    attackRoot: {fileID: 4156394454966102}
---- !u!114 &114529056228805508
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1116045452685704}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9d1f089bca63de4c8f65247d0a124e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  nextAction: {fileID: 0}
+  actionPending: 0
+  timeBetweenCombo: 1
+  timeBetweenComboTimecount: 0
+  moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
 --- !u!114 &114598839821928022
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4986,9 +4970,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68f137d05cf641249a41dbc4444bc81a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  meleeWeapon: {fileID: 0}
-  attackDuration: 0.03
-  canAttack: 1
+  combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  nextAction: {fileID: 0}
+  actionPending: 0
+  FalconPunchCombo: []
+  timeBetweenCombo: 1
+  timeBetweenComboTimecount: 0
+  moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
 --- !u!114 &114682355756843380
 MonoBehaviour:
   m_ObjectHideFlags: 1
