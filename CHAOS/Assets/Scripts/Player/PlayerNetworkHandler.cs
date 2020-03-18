@@ -42,8 +42,13 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
 
             state.AddCallback("WeaponId", player.WeaponChanged);
             state.OnFire += player.OnFire;
-            // setup weapon
+            // setup rifle weapon
             player.WeaponChanged();
+
+            // setup melee weapon
+            state.OnBasicAttack += player.OnBasicAttack;
+            state.OnHeavyAttack += player.OnHeavyAttack;
+            state.OnParry += player.OnParry;
         }
         else
         {
@@ -75,6 +80,9 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         input.FastSpeed = player.FastSpeed;
         input.WeaponId = player.WeaponId;
         input.Fire = player.Fire;
+        input.BasicAttack = player.BasicAttackKey;
+        input.HeavyAttack = player.HeavyAttackKey;
+        input.Parry = player.ParryKey;
 
         if (CameraSettings.instance != null)
         {
@@ -140,10 +148,16 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                     player.PlayerHook();
                 }
 
-                // deal with weapons
+                // deal with Rifle weapons
                 if (cmd.Input.Fire)
                 {
                     player.FireWeapon(cmd);
+                }
+
+                // deal with melee weapons
+                if (cmd.Input.BasicAttack || cmd.Input.HeavyAttack || cmd.Input.Parry)
+                {
+                    player.AttackWeapon(cmd);
                 }
             }
         }

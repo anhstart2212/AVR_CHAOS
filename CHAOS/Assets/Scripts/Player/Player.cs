@@ -145,7 +145,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
             m_WeaponId = 1;
         }
 
-        m_Fire = Input.GetMouseButton(0);
+        m_Fire = Input.GetButton(InputAxisNames.attack);
+
+        m_BasicAttackKey = Input.GetButtonDown(InputAxisNames.attack);
+        m_HeavyAttackKey = Input.GetButtonDown(InputAxisNames.heavyAttack);
+        m_ParryKey = Input.GetButtonDown(InputAxisNames.parry);
 
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
@@ -228,17 +232,50 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     public void FireWeapon(ChaosPlayerCommand cmd)
     {
-        if (ActiveWeapon.fireFrame + ActiveWeapon.refireRate <= BoltNetwork.ServerFrame)
+        if (ActiveWeapon is Chaos_WeaponRifle)
         {
-            ActiveWeapon.fireFrame = BoltNetwork.ServerFrame;
+            if (cmd.Input.Fire)
+            {
+                if (ActiveWeapon.fireFrame + ActiveWeapon.refireRate <= BoltNetwork.ServerFrame)
+                {
+                    ActiveWeapon.fireFrame = BoltNetwork.ServerFrame;
 
-            state.Fire();
+                    state.Fire();
+
+                    // if we are the owner and the active weapon is a hitscan weapon, do logic
+                    if (entity.IsOwner)
+                    {
+                        ActiveWeapon.OnOwner(cmd, entity);
+                    }
+                }
+            }
+        }
+    }
+
+    public void AttackWeapon(ChaosPlayerCommand cmd)
+    {
+        if (ActiveWeapon is MeleeWeapon)
+        {
+            if (cmd.Input.BasicAttack)
+            {
+                state.BasicAttack();
+            }
+
+            if (cmd.Input.HeavyAttack)
+            {
+                state.HeavyAttack();
+            }
+
+            if (cmd.Input.Parry)
+            {
+                state.Parry();
+            }
 
             // if we are the owner and the active weapon is a hitscan weapon, do logic
-            if (entity.IsOwner)
-            {
-                ActiveWeapon.OnOwner(cmd, entity);
-            }
+            //if (entity.IsOwner)
+            //{
+            //    ActiveWeapon.OnOwner(cmd, entity);
+            //}
         }
     }
 
@@ -246,6 +283,22 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         ActiveWeapon.Fx(entity);
     }
+
+    public void OnBasicAttack()
+    {
+        ActiveWeapon.BasicAttack();
+    }
+
+    public void OnHeavyAttack()
+    {
+        ActiveWeapon.HeavyAttack();
+    }
+
+    public void OnParry()
+    {
+        ActiveWeapon.Parry();
+    }
+    
 
     public void ApplyDamage(byte damage)
     {
@@ -1911,6 +1964,30 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
+    public bool BasicAttackKey
+    {
+        get
+        {
+            return m_BasicAttackKey;
+        }
+    }
+
+    public bool HeavyAttackKey
+    {
+        get
+        {
+            return m_HeavyAttackKey;
+        }
+    }
+
+    public bool ParryKey
+    {
+        get
+        {
+            return m_ParryKey;
+        }
+    }
+
     private bool m_IsLeftHookTargetNull;
 
     private bool m_IsRightHookTargetNull;
@@ -2196,4 +2273,10 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     private int m_WeaponId;
 
     private bool m_Fire;
+
+    private bool m_BasicAttackKey;
+
+    private bool m_HeavyAttackKey;
+
+    private bool m_ParryKey;
 }

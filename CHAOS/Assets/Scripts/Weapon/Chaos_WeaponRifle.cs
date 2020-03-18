@@ -40,6 +40,7 @@ public class Chaos_WeaponRifle : Chaos_WeaponBase
 
     public override void Fx(BoltEntity entity)
     {
+        Debug.Log("333333333333333");
         Vector3 pos;
         Quaternion rot;
         IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();

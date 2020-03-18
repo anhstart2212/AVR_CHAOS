@@ -42,5 +42,20 @@ namespace Bolt.AdvancedTutorial
 		{
 
 		}
-	}
+
+        public virtual void BasicAttack()
+        {
+
+        }
+
+        public virtual void HeavyAttack()
+        {
+
+        }
+
+        public virtual void Parry()
+        {
+
+        }
+    }
 }
