@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Bolt.AdvancedTutorial
-{
+
 	public class Chaos_WeaponBase : MonoBehaviour
 	{
 		[SerializeField]
@@ -58,4 +57,4 @@ namespace Bolt.AdvancedTutorial
 
         }
     }
-}
+

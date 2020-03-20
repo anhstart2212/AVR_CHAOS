@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Parry", menuName = "Generic/Parry")]
 public class Parry : ActionData
 {
-    public override IEnumerator Excecute(IActionCaller caller, Transform t = null)
+    public override IEnumerator Excecute(Transform t = null, int comboCount = 0)
     {
         Debug.Log("Parry");
 
@@ -16,11 +16,6 @@ public class Parry : ActionData
         go.transform.localPosition = new Vector3(1.33f, -4.87f, -2.91f);
 
         yield return new WaitForSeconds(.1f);
-
-        if (caller != null)
-        {
-            caller.Callback(this);
-        }
 
         if (go != null)
         {

@@ -9,9 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb55057e71d42ed48bdcc81a01c57aa8, type: 3}
-  m_Name: BasicAttack
+  m_Name: Unarmed3Hit
   m_EditorClassIdentifier: 
   SubActions: []
   staminaCost: 0
   interruptable: 0
-  fxPrefab: {fileID: 1283591652711670, guid: 6e83879da637b304b9818703b7adeb00, type: 2}
+  fxPrefab: {fileID: 0}
+  animator: {fileID: 0}
+  triggerName: 3HitCombo

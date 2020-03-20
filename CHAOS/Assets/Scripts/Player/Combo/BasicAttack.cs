@@ -5,22 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BasicAttack", menuName = "Generic/Basic Attack")]
 public class BasicAttack : ActionData
 {
-    public override IEnumerator Excecute(IActionCaller caller, Transform t = null)
-    {
-        GameObject go = Instantiate(fxPrefab,t.position,t.rotation);
+    //public override IEnumerator Excecute(Transform t = null, int comboCount = 0)
+    //{
+    //    Init();
 
-        go.transform.SetParent(t);
+    //    animator.SetBool("IsInCombat",true);
 
-        yield return new WaitForSeconds(.5f);
+    //    Debug.Log("comboCount  " + comboCount + SubActions[comboCount].triggerName);
 
-        if(caller != null)
-        {
-            caller.Callback(this);
-        }
+    //    animator.SetTrigger(SubActions[comboCount].triggerName);
 
-        if(go != null)
-        {
-            Destroy(go);
-        }
-    }
+    //    yield return new WaitForSeconds(.5f);
+    //}
 }

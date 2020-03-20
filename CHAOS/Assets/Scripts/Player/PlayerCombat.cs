@@ -91,7 +91,7 @@ public class PlayerCombat : MonoBehaviour, IActionCaller
 
             timeBetweenComboTimecount = timeBetweenCombo;
 
-            StartCoroutine(actionData.Excecute(this, transform));
+            StartCoroutine(actionData.Excecute(transform));
         }
     }
 

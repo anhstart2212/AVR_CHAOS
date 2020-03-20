@@ -15,3 +15,5 @@ MonoBehaviour:
   staminaCost: 0
   interruptable: 0
   fxPrefab: {fileID: 1425882269866226, guid: fa745b006b2a6c9419f165566537fe4d, type: 2}
+  animator: {fileID: 0}
+  triggerName: HeavyAttack

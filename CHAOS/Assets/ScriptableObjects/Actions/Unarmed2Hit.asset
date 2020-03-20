@@ -8,8 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cdfb3882252c334abe48fe5511cc65a, type: 3}
-  m_Name: ComboList
+  m_Script: {fileID: 11500000, guid: bb55057e71d42ed48bdcc81a01c57aa8, type: 3}
+  m_Name: Unarmed2Hit
   m_EditorClassIdentifier: 
-  combos:
-  - {fileID: 11400000, guid: 9084ffb506eb7674c8eb2c752d0e256c, type: 2}
+  SubActions: []
+  staminaCost: 0
+  interruptable: 0
+  fxPrefab: {fileID: 0}
+  animator: {fileID: 0}
+  triggerName: 2HitCombo

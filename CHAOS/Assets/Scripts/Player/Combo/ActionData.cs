@@ -17,9 +17,23 @@ public abstract class ActionData : ScriptableObject
     // can this action interrupt other actions?
     public GameObject fxPrefab;
 
-    public virtual IEnumerator Excecute(IActionCaller caller,Transform t = null)
+    // can this action interrupt other actions?
+    public Animator animator;
+
+    public string triggerName;
+
+    public virtual IEnumerator Excecute(Transform t = null, int comboCount = 0)
     {
         yield return null;
+    }
+
+    protected void Init()
+    {
+        if(!animator)
+        {
+            GameObject go = GameObject.FindGameObjectWithTag("Player");
+            animator = go.GetComponent<Animator>();
+        }
     }
 
 }

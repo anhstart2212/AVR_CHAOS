@@ -10,7 +10,7 @@ public class ComboList : ScriptableObject
     {
         foreach(Combo combo in combos)
         {
-            if(combo.Check(b))
+            if(combo.Check(0))
             {
                 return combo;
             }
