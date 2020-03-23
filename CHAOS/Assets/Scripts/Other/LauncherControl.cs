@@ -28,7 +28,7 @@ public class LauncherControl : Bolt.EntityBehaviour<IChaos_PlayerState>
         CameraSettings.instance.CalculateDummyCameraTransform(state, out pos, out rot);
 
         //this.player.TitanAimLock = Input.GetButton(this.player.axisName.titanLock);
-        if (state.IsFireCenterHookKey)
+        if (entity.isActiveAndEnabled && state.IsFireCenterHookKey)
         {
             CenterHookTarget(pos, rot);
         }

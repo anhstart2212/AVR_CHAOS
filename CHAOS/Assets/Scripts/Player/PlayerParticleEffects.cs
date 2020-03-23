@@ -136,7 +136,7 @@ public class PlayerParticleEffects : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600024F RID: 591 RVA: 0x00015600 File Offset: 0x00013800
     private void SlideFX()
     {
-        if (this.player.Animator.GetBool("IsSlideAnim") && state.IsGrounded)
+        if (this.player.Animator.GetBool("IsSlideAnim") && entity.isActiveAndEnabled && state.IsGrounded)
         {
             switch (this.player.SlideState)
             {
@@ -154,7 +154,7 @@ public class PlayerParticleEffects : Bolt.EntityBehaviour<IChaos_PlayerState>
                     break;
             }
         }
-        else if (!state.IsGrounded && this.player.Animator.GetFloat("HookLowPass") >= 0.95f && this.player.VelocityMagnitudeXZ > 35f)
+        else if (entity.isActiveAndEnabled && !state.IsGrounded && this.player.Animator.GetFloat("HookLowPass") >= 0.95f && this.player.VelocityMagnitudeXZ > 35f)
         {
             if (this.player.Animator.GetFloat("CrossHook") <= -0.2f)
             {
@@ -227,7 +227,7 @@ public class PlayerParticleEffects : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000251 RID: 593 RVA: 0x0001586C File Offset: 0x00013A6C
     private void SpeedLine()
     {
-        if (state.IsGrounded)
+        if (entity.isActiveAndEnabled && state.IsGrounded)
         {
             this.speedLine.enableEmission = false;
             return;

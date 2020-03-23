@@ -22,6 +22,9 @@ public class Chaos_WeaponRifle : Chaos_WeaponBase
             // display debug
             //Debug.DrawRay(pos, rot * Vector3.forward * 100, Color.blue);
 
+            // update rotation
+            //player.transform.rotation = Quaternion.Slerp(player.transform.rotation, rot, player.speed.turnSpeed * 3 * BoltNetwork.FrameDeltaTime);
+
             using (var hits = BoltNetwork.RaycastAll(new Ray(pos, rot * Vector3.forward), cmd.ServerFrame))
             {
                 for (int i = 0; i < hits.count; ++i)
@@ -40,7 +43,6 @@ public class Chaos_WeaponRifle : Chaos_WeaponBase
 
     public override void Fx(BoltEntity entity)
     {
-        Debug.Log("333333333333333");
         Vector3 pos;
         Quaternion rot;
         IChaos_PlayerState state = entity.GetState<IChaos_PlayerState>();

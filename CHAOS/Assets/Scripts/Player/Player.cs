@@ -154,9 +154,32 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         //titanAimLock = Input.GetButton(axisName.titanLock);
     }
 
-    public void AnimateRun(ChaosPlayerCommand cmd)
+    public void AnimatePlayer(ChaosPlayerCommand cmd)
     {
+        // run
         AnimationScript.SetRunning(cmd);
+
+        // Rifle
+        if (ActiveWeapon is Chaos_WeaponRifle)
+        {
+            state.IsRifleIdle = true;
+
+            if (cmd.Input.Fire)
+            {
+                state.IsFire = true;
+            }
+            else
+            {
+                state.IsFire = false;
+            }
+        }
+        // Melee
+        else if (ActiveWeapon is MeleeWeapon)
+        {
+            state.IsRifleIdle = false;
+        }
+
+
     }
 
     //void FindHookTarget()
@@ -333,14 +356,14 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         if (this.IsEitherHooked && this.m_GroundTakeOff)
         {
-            if (this.m_Animator.GetFloat("Height") > 2f || !state.IsJumpReelKey)
+            if (this.m_Animator.GetFloat("Height") > 2f || (entity.isActiveAndEnabled && !state.IsJumpReelKey))
             {
                 base.Invoke("ResetGroundTakeOff", 0.25f);
             }
             this.SetControlGroundState(false, false);
             flag = true;
         }
-        if (this.IsEitherHooked && state.IsJumpReelKey && this.m_Animator.GetFloat("HookLowPass") > 0f)
+        if (this.IsEitherHooked && entity.isActiveAndEnabled && state.IsJumpReelKey && this.m_Animator.GetFloat("HookLowPass") > 0f)
         {
             this.SetControlGroundState(false, false);
             flag = true;
@@ -420,11 +443,11 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000132 RID: 306 RVA: 0x0000CEC4 File Offset: 0x0000B0C4
     private void CheckIfJumping()
     {
-        if (state.IsJumpKey && this.m_IsGrounded && !this.m_Jumping && !this.IsEitherHooked)
+        if (entity.isActiveAndEnabled && state.IsJumpKey && this.m_IsGrounded && !this.m_Jumping && !this.IsEitherHooked)
         {
             this.m_Jumping = true;
         }
-        else if (state.IsJumpReelKey && this.m_IsGrounded && this.IsEitherHooked)
+        else if (entity.isActiveAndEnabled && state.IsJumpReelKey && this.m_IsGrounded && this.IsEitherHooked)
         {
             this.m_GroundTakeOff = true;
         }
@@ -544,7 +567,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         else if (this.IsEitherHooked && this.m_WalledState == 0)
         {
-            if (!state.IsJumpReelKey)
+            if (entity.isActiveAndEnabled && !state.IsJumpReelKey)
             {
                 this.m_PhysicsState = 3;
             }
@@ -893,7 +916,7 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             return;
         }
-        if (this.IsEitherHooked && state.IsJumpReelKey)
+        if (this.IsEitherHooked && entity.isActiveAndEnabled && state.IsJumpReelKey)
         {
             Vector3 onNormal = this.HookedSteerDirection();
             float num = Vector3.Angle(new Vector3(this.m_RigidBody.velocity.x, 0f, this.m_RigidBody.velocity.z), new Vector3(onNormal.x, 0f, onNormal.z));

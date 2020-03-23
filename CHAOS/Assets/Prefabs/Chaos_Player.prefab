@@ -3734,7 +3734,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1873221929236870}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.118, y: 0, z: -0}
+  m_LocalPosition: {x: 0.127, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4890628576922116}
@@ -4924,7 +4924,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1464242901574752}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.127, y: -0, z: -0}
+  m_LocalPosition: {x: -0.127, y: -0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4890628576922116}
@@ -5079,7 +5079,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1116045452685704}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6.7, z: 0}
+  m_LocalPosition: {x: 0, y: 6.6, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4960256790494132}
@@ -5712,15 +5712,15 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1596217168966922}
-  m_LocalRotation: {x: 0.20132688, y: 0.08004918, z: 0.09472041, w: 0.9716417}
-  m_LocalPosition: {x: -0.7260529, y: -0.6832442, z: -0.4554516}
-  m_LocalScale: {x: 0.60000044, y: 0.6000001, z: 0.60000044}
+  m_LocalRotation: {x: 0.04983388, y: 0.42152405, z: 0.8153085, w: 0.39383513}
+  m_LocalPosition: {x: -0.012, y: -0.041, z: 0.214}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_Children:
   - {fileID: 4270481664853988}
   - {fileID: 4574038950604586}
   m_Father: {fileID: 4446789915941816}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -10, y: 100, z: 0}
+  m_LocalEulerAnglesHint: {x: -40.398003, y: 32.866, z: 116.048004}
 --- !u!20 &20096518691345828
 Camera:
   m_ObjectHideFlags: 1
@@ -7796,8 +7796,8 @@ MonoBehaviour:
     turnSpeed: 15
     look: 20
     gasFree: 40
-    reelDouble: 4.15
-    reelSingle: 3.7
+    reelDouble: 3.15
+    reelSingle: 2.7
     reelGravDouble: 4
     reelGravSingle: 6
     reelGravBrake: 15

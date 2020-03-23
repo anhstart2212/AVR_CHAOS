@@ -26,11 +26,23 @@ namespace Bolt.AdvancedTutorial
             foreach (Chaos_PlayerObject p in Chaos_PlayerObject.AllPlayers)
             {
                 // if we have an entity, it's dead but our spawn frame has passed
-                if (p.entity && p.state.Dead && p.state.RespawnFrame <= BoltNetwork.ServerFrame)
+                if (p.entity && p.State.Dead && p.State.RespawnFrame <= BoltNetwork.ServerFrame)
                 {
                     p.Spawn();
                 }
             }
+        }
+
+        public override void Disconnected(BoltConnection connection)
+        {
+            BoltConsole.Write("Disconnected", Color.red);
+            base.Disconnected(connection);
+        }
+
+        public override void ConnectFailed(UdpEndPoint endpoint, IProtocolToken token)
+        {
+            BoltConsole.Write("ConnectFailed", Color.red);
+            base.ConnectFailed(endpoint, token);
         }
 
         public override void Connected(BoltConnection connection)
@@ -48,6 +60,12 @@ namespace Bolt.AdvancedTutorial
             connection.GetChaosPlayer().Spawn();
         }
 
-		
-	}
+        public override void SceneLoadLocalBegin(string scene)
+        {
+            foreach (Chaos_PlayerObject p in Chaos_PlayerObject.AllPlayers)
+            {
+                p.entity = null;
+            }
+        }
+    }
 }

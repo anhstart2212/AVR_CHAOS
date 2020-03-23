@@ -19,13 +19,13 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x0600022E RID: 558 RVA: 0x00013988 File Offset: 0x00011B88
     private void Update()
     {
-        if (!state.IsGrounded)
+        if (entity.isActiveAndEnabled && !state.IsGrounded)
         {
             this.velDirBeforeLand = this.player.VelocityDirectionXZ;
         }
 
         // Chaos Added
-        if (!state.IsGrounded && !this.player.IsEitherHooked && !this.player.BurstForceIsRunning)
+        if (entity.isActiveAndEnabled && !state.IsGrounded && !this.player.IsEitherHooked && !this.player.BurstForceIsRunning)
         {
             this.rb.AddForce(-Vector3.up * this.player.speed.groundGravity, ForceMode.Acceleration);
         }
@@ -39,7 +39,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
             return;
         }
 
-        if (state.IsGrounded && !this.groundMovementIsRunning)
+        if (entity.isActiveAndEnabled && state.IsGrounded && !this.groundMovementIsRunning)
         {
             base.StartCoroutine(this.GroundMovement());
             this.airMovementIsRunning = false;
@@ -104,7 +104,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         while (this.groundMovementIsRunning)
         {
             Vector3 runDirection = (!this.player.IsSliding && !this.player.Animator.GetBool("IsSlideAnim")) ? base.transform.forward : this.velDirBeforeLand;
-            if (!state.IsGrounded)
+            if (entity.isActiveAndEnabled && !state.IsGrounded)
             {
                 this.groundMovementIsRunning = false;
             }
@@ -181,46 +181,49 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000233 RID: 563 RVA: 0x00013BC0 File Offset: 0x00011DC0
     private void DetermineMoveState()
     {
-        //float num = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
-        //float num2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
-        float num = state.MovementYKey;
-        float num2 = state.MovementXKey;
+        if (entity.isActiveAndEnabled)
+        {
+            //float num = Input.GetAxisRaw(this.player.axisName.moveFrontBack);
+            //float num2 = Input.GetAxisRaw(this.player.axisName.moveLeftRight);
+            float num = state.MovementYKey;
+            float num2 = state.MovementXKey;
 
-        int num3 = 0;
-        if (num != 0f)
-        {
-            num = 1f;
-        }
-        if (num2 != 0f)
-        {
-            num2 = 1f;
-        }
-        if (num == 0f && num2 > 0f)
-        {
-            num = num2;
-        }
-        if (num > 0f)
-        {
-            num3 = 1;
-        }
-        if (this.player.IsAnimating)
-        {
-            num3 = 0;
-        }
-        if (this.player.IsSliding)
-        {
-            num3 = 1;
-        }
-        if (num3 != 0)
-        {
-            if (num3 == 1)
+            int num3 = 0;
+            if (num != 0f)
             {
-                this.SpeedLerp(this.player.speed.run);
+                num = 1f;
             }
-        }
-        else
-        {
-            this.SpeedLerp(0f);
+            if (num2 != 0f)
+            {
+                num2 = 1f;
+            }
+            if (num == 0f && num2 > 0f)
+            {
+                num = num2;
+            }
+            if (num > 0f)
+            {
+                num3 = 1;
+            }
+            if (this.player.IsAnimating)
+            {
+                num3 = 0;
+            }
+            if (this.player.IsSliding)
+            {
+                num3 = 1;
+            }
+            if (num3 != 0)
+            {
+                if (num3 == 1)
+                {
+                    this.SpeedLerp(this.player.speed.run);
+                }
+            }
+            else
+            {
+                this.SpeedLerp(0f);
+            }
         }
     }
 
@@ -433,36 +436,36 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 if ((!this.player.IsAnimating || this.player.IsSliding) && Time.timeScale != 0f)
                 {
                     // Chaos Added
-                    if (state.IsFireCenterHookKey)
+                    if (entity.isActiveAndEnabled && state.IsFireCenterHookKey)
                     {
                         yield return new WaitForSeconds(0.05f);
                     }
                     // Chaos Added
 
-                    if (this.player.IsLeftTargetSet && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsLeftTargetSet && entity.isActiveAndEnabled && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true);
                     }
-                    if (this.player.IsRightTargetSet && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (this.player.IsRightTargetSet && entity.isActiveAndEnabled && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false);
                     }
-                    if (!state.IsFireLeftHookKey && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (entity.isActiveAndEnabled && !state.IsFireLeftHookKey && this.player.CurrentLeftHook != null && this.player.CurrentLeftHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(true);
                     }
-                    if (!state.IsFireRightHookKey && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
+                    if (entity.isActiveAndEnabled && !state.IsFireRightHookKey && this.player.CurrentRightHook != null && this.player.CurrentRightHook.GetComponent<DrawHookCable>().reachedTarget)
                     {
                         this.RetractHook(false);
                     }
 
                     // Chaos Added
-                    if (!this.player.IsLeftTargetSet && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsLeftTargetSet && entity.isActiveAndEnabled && state.IsFireLeftHookKey && this.player.CurrentLeftHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(true, true);
 
                     }
-                    if (!this.player.IsRightTargetSet && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
+                    if (!this.player.IsRightTargetSet && entity.isActiveAndEnabled && state.IsFireRightHookKey && this.player.CurrentRightHook == null && !this.player.BurstForceIsRunning)
                     {
                         this.FireHook(false, true);
                     }
@@ -485,7 +488,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
             }
             else
             {
-                if (state.IsJumpReelKey && (this.player.IsLeftImpulse || this.player.IsRightImpulse))
+                if (entity.isActiveAndEnabled && state.IsJumpReelKey && (this.player.IsLeftImpulse || this.player.IsRightImpulse))
                 {
                     this.HookImpulse();
                 }
@@ -685,14 +688,14 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             float d = this.SetReelSpeeds(false);
             float d2 = this.SetReelSpeeds(true);
-            if (state.IsJumpReelKey && flag)
+            if (entity.isActiveAndEnabled && state.IsJumpReelKey && flag)
             {
                 float velocityMagnitude = this.player.VelocityMagnitude;
                 float angleVelocityAndHook = Vector3.Angle(this.player.VelocityDirection, this.player.HookDirection);
                 float d3 = this.acceleration.GetAcceleration(velocityMagnitude, angleVelocityAndHook);
 
                 // Chaos Added
-                if (state.FastSpeedKey)
+                if (entity.isActiveAndEnabled && state.FastSpeedKey)
                 {
                     this.rb.AddForce(this.player.HookedSteerDirection() * d * d3 * this.player.speed.fastSpeed, ForceMode.Acceleration);
                 }
@@ -707,7 +710,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 this.rb.AddForce(-Vector3.up * d2, ForceMode.Acceleration);
             }
         }
-        if (!state.IsGrounded)
+        if (entity.isActiveAndEnabled && !state.IsGrounded)
         {
             this.CableLengthAdjustment(isLeft, vector, component, maxLength);
         }
@@ -733,7 +736,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000244 RID: 580 RVA: 0x00014720 File Offset: 0x00012920
     private float SetReelSpeeds(bool isReelGrav)
     {
-        if (isReelGrav && !state.IsJumpReelKey)
+        if (isReelGrav && entity.isActiveAndEnabled && !state.IsJumpReelKey)
         {
             return this.player.speed.reelGravBrake;
         }

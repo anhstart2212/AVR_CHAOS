@@ -25,7 +25,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001F3 RID: 499 RVA: 0x0000F6F8 File Offset: 0x0000D8F8
     private void LateUpdate()
     {
-        if (!state.IsGrounded)
+        if (entity.isActiveAndEnabled && !state.IsGrounded)
         {
             this.landingVelocity = this.rb.velocity;
             this.anim.SetFloat("ImpactVertVelocity", this.landingVelocity.y);
@@ -136,7 +136,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001FA RID: 506 RVA: 0x0000FB42 File Offset: 0x0000DD42
     private void SetJumped()
     {
-        if (state.IsJump)
+        if (entity.isActiveAndEnabled && state.IsJump)
         {
             this.anim.SetBool("IsJumping", true);
             base.Invoke("JumpComplete", 0.1f);
@@ -202,7 +202,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     // Token: 0x060001FD RID: 509 RVA: 0x0000FCE4 File Offset: 0x0000DEE4
     private void SetAirborne()
     {
-        if (!state.IsGrounded)
+        if (entity.isActiveAndEnabled && !state.IsGrounded)
         {
             this.anim.SetFloat("AirborneAngle", Vector3.Angle(this.rb.velocity, Vector3.up));
             this.anim.SetFloat("VelocityAngle", Vector3.Angle(this.player.VelocityDirectionXZ, base.transform.forward));
@@ -243,7 +243,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
             this.anim.SetBool("IsHooked", true);
         }
         Vector3 lhs = Vector3.zero;
-        if (state.IsJumpReelKey)
+        if (entity.isActiveAndEnabled && state.IsJumpReelKey)
         {
             this.anim.SetFloat("ReelingIn", Mathf.Lerp(this.anim.GetFloat("ReelingIn"), 1f, 0.15f));
         }
@@ -300,7 +300,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         {
             this.anim.SetBool("IsHooked", false);
         }
-        if (this.player.IsEitherHooked && !state.IsJumpReelKey && height <= 2.5f && !state.IsGrounded)
+        if (entity.isActiveAndEnabled && this.player.IsEitherHooked && !state.IsJumpReelKey && height <= 2.5f && !state.IsGrounded)
         {
             this.player.RigidBody.velocity = this.player.RigidBody.velocity * 0.99f;
         }

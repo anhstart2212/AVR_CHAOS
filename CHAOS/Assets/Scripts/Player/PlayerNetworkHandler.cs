@@ -128,7 +128,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
             if(cmd.IsFirstExecution)
             {
                 // animation run
-                player.AnimateRun(cmd);
+                player.AnimatePlayer(cmd);
 
                 state.MovementXKey = cmd.Input.MovementX;
                 state.MovementYKey = cmd.Input.MovementY;

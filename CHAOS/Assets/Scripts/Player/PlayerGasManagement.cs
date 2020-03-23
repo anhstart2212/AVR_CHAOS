@@ -50,7 +50,7 @@ public class PlayerGasManagement : Bolt.EntityBehaviour<IChaos_PlayerState>
     // Token: 0x06000223 RID: 547 RVA: 0x000132B0 File Offset: 0x000114B0
     private void CheckForGasEffect()
     {
-        if (state.IsGrounded || this.player.ReeledState != 0)
+        if ((entity.isActiveAndEnabled && state.IsGrounded) || this.player.ReeledState != 0)
         {
             this.GasTrailOnOff(false, false, this.player.BurstForceIsRunning);
         }
@@ -68,7 +68,7 @@ public class PlayerGasManagement : Bolt.EntityBehaviour<IChaos_PlayerState>
             this.GasCoreLifeAdjust(true);
             this.GasTrailOnOff(true, false, this.player.BurstForceIsRunning);
         }
-        else if (this.player.IsMoving && state.IsJumpReelKey)
+        else if (entity.isActiveAndEnabled && this.player.IsMoving && state.IsJumpReelKey)
         {
             // Chaos added
 
@@ -153,7 +153,7 @@ public class PlayerGasManagement : Bolt.EntityBehaviour<IChaos_PlayerState>
     private void GasConsumptionControl()
     {
         bool flag;
-        if (this.player.PhysicsState == 2 && state.IsJumpReelKey)
+        if (this.player.PhysicsState == 2 && entity.isActiveAndEnabled && state.IsJumpReelKey)
         {
             flag = true;
             this.currentContinuousGasCost = this.player.gas.costAirMove;

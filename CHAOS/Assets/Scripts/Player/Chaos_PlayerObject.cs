@@ -16,7 +16,7 @@ public partial class Chaos_PlayerObject : IDisposable
         get { return connection == null; }
     }
 
-    public IChaos_PlayerState state
+    public IChaos_PlayerState State
     {
         get { return entity.GetState<IChaos_PlayerState>(); }
     }
@@ -54,8 +54,8 @@ public partial class Chaos_PlayerObject : IDisposable
     {
         if (entity)
         {
-            state.Dead = true;
-            state.RespawnFrame = BoltNetwork.ServerFrame + (5 * BoltNetwork.FramesPerSecond);
+            State.Dead = true;
+            State.RespawnFrame = BoltNetwork.ServerFrame + (5 * BoltNetwork.FramesPerSecond);
         }
     }
 }
@@ -146,8 +146,8 @@ partial class Chaos_PlayerObject
 
         if (entity)
         {
-            state.Dead = false;
-            state.Health = 100;
+            State.Dead = false;
+            State.Health = 100;
 
             // teleport entity to a random spawn position
             entity.transform.position = RandomPosition();

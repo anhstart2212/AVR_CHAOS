@@ -36,7 +36,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         Vector3 direction = Vector3.zero;
         
-        if (!state.IsGrounded)
+        if (entity.isActiveAndEnabled && !state.IsGrounded)
         {
             if (this.player.ReeledState == 0)
             {
@@ -44,7 +44,7 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
                 {
                     if (this.player.IsEitherHooked)
                     {
-                        if (state.IsJumpReelKey)
+                        if (entity.isActiveAndEnabled && state.IsJumpReelKey)
                         {
                             if (!this.player.IsStationary)
                             {

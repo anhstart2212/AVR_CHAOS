@@ -65,7 +65,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
             bool againstWall = Physics.Raycast(new Ray(this.FindRayOrigins(), base.transform.forward), 1f, Common.layerObstacle);
             if (this.player.IsDoubleHooked)
             {
-                if (this.player.IsStationary && !this.player.IsGroundTakeOff && !state.IsGrounded && againstWall)
+                if (this.player.IsStationary && !this.player.IsGroundTakeOff && entity.isActiveAndEnabled && !state.IsGrounded && againstWall)
                 {
                     if (delayCount == 10)
                     {
@@ -104,7 +104,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
                 this.hookedOnWallIsRunning = false;
                 this.reeledState = 0;
             }
-            if (state.IsJumpReelKey && brakingLastFrame)
+            if (entity.isActiveAndEnabled && state.IsJumpReelKey && brakingLastFrame)
             {
                 this.reeledState = 0;
             }
@@ -178,7 +178,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
             {
                 break;
             }
-            if (/*Input.GetButtonDown(this.player.axisName.jumpReel)*/ state.IsJumpReelKey)
+            if (/*Input.GetButtonDown(this.player.axisName.jumpReel)*/ entity.isActiveAndEnabled && state.IsJumpReelKey)
             {
                 this.StopJump();
                 this.StartJump(16);
@@ -212,7 +212,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             return PlayerAnimation.WALL_STOP;
         }
-        if (state.IsGrounded || this.player.ReeledState != 0)
+        if (entity.isActiveAndEnabled && state.IsGrounded || this.player.ReeledState != 0)
         {
             return PlayerAnimation.WALL_NONE;
         }
@@ -254,7 +254,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         PlayerAnimation.SetWallMovementParametersWithLerp(this.player.Animator, num2, newSide, ratio);
         this.OverrideRotation(vector, num2);
-        if (!this.player.IsEitherHooked || !state.IsJumpReelKey)
+        if (!this.player.IsEitherHooked || (entity.isActiveAndEnabled && !state.IsJumpReelKey))
         {
             this.ScaleVelocity();
             this.LockPositionToWall(wallHitRay);
@@ -285,7 +285,7 @@ public class WallContactInteractions : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             this.jumpStarted = true;
         }
-        if (this.jumpStarted && (flag || /*Input.GetButtonDown(this.player.axisName.jumpReel)*/ state.IsJumpReelKey))
+        if (this.jumpStarted && (flag || /*Input.GetButtonDown(this.player.axisName.jumpReel)*/ (entity.isActiveAndEnabled && state.IsJumpReelKey)))
         {
             this.jumpStarted = false;
             return true;
