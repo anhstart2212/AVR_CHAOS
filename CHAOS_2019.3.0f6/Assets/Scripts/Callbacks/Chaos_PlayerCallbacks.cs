@@ -5,7 +5,7 @@ using Gamekit3D;
 
 namespace Bolt.AdvancedTutorial
 {
-	[BoltGlobalBehaviour("Test")]
+	[BoltGlobalBehaviour("CityScene")]
 	public class Chaos_PlayerCallbacks : Bolt.GlobalEventListener
 	{
 		public override void SceneLoadLocalDone(string scene)

@@ -44,7 +44,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         this.SetHeight();
         this.SetGrabbed();
         this.SetJumped();
-        this.SetSalute();
+        //this.SetSalute();
         //this.SetRunning();
         this.SetAirborne();
         this.SetSlide();
@@ -57,6 +57,8 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         {
             base.Invoke("ResetImpactVelocity", 1f);
         }
+
+        SetIsStrafing();
     }
 
     // Token: 0x060001F4 RID: 500 RVA: 0x0000F875 File Offset: 0x0000DA75
@@ -73,38 +75,38 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     }
 
     // Token: 0x060001F6 RID: 502 RVA: 0x0000F8B4 File Offset: 0x0000DAB4
-    private void DropBlades(string time)
-    {
-        if (time == "start")
-        {
-            this.player.SoundScript.SwordSound("eject");
-            if (this.reloadSuccessful)
-            {
-                foreach (GameObject gameObject in new GameObject[]
-                {
-                    UnityEngine.Object.Instantiate<GameObject>(this.blades[0], this.blades[0].transform.position, this.blades[0].transform.rotation),
-                    UnityEngine.Object.Instantiate<GameObject>(this.blades[1], this.blades[1].transform.position, this.blades[1].transform.rotation)
-                })
-                {
-                    gameObject.GetComponent<Rigidbody>().isKinematic = false;
-                    gameObject.GetComponent<Rigidbody>().velocity = this.rb.velocity;
-                    gameObject.GetComponent<BoxCollider>().enabled = true;
-                    //gameObject.AddComponent<DestroyByTime>();
-                    //gameObject.GetComponent<DestroyByTime>().lifeTime = 5f;
-                }
-            }
-            this.blades[0].SetActive(false);
-            this.blades[1].SetActive(false);
-            this.reloadSuccessful = false;
-        }
-        else
-        {
-            this.player.SoundScript.SwordSound("draw");
-            this.blades[0].SetActive(true);
-            this.blades[1].SetActive(true);
-            this.reloadSuccessful = true;
-        }
-    }
+    //private void DropBlades(string time)
+    //{
+    //    if (time == "start")
+    //    {
+    //        this.player.SoundScript.SwordSound("eject");
+    //        if (this.reloadSuccessful)
+    //        {
+    //            foreach (GameObject gameObject in new GameObject[]
+    //            {
+    //                UnityEngine.Object.Instantiate<GameObject>(this.blades[0], this.blades[0].transform.position, this.blades[0].transform.rotation),
+    //                UnityEngine.Object.Instantiate<GameObject>(this.blades[1], this.blades[1].transform.position, this.blades[1].transform.rotation)
+    //            })
+    //            {
+    //                gameObject.GetComponent<Rigidbody>().isKinematic = false;
+    //                gameObject.GetComponent<Rigidbody>().velocity = this.rb.velocity;
+    //                gameObject.GetComponent<BoxCollider>().enabled = true;
+    //                //gameObject.AddComponent<DestroyByTime>();
+    //                //gameObject.GetComponent<DestroyByTime>().lifeTime = 5f;
+    //            }
+    //        }
+    //        this.blades[0].SetActive(false);
+    //        this.blades[1].SetActive(false);
+    //        this.reloadSuccessful = false;
+    //    }
+    //    else
+    //    {
+    //        this.player.SoundScript.SwordSound("draw");
+    //        this.blades[0].SetActive(true);
+    //        this.blades[1].SetActive(true);
+    //        this.reloadSuccessful = true;
+    //    }
+    //}
 
     // Token: 0x060001F7 RID: 503 RVA: 0x0000FA1F File Offset: 0x0000DC1F
     public void ToggleAnimatingState(string time)
@@ -196,6 +198,17 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         else
         {
             state.IsRunning = false;
+        }
+    }
+
+    public void SetIsStrafing()
+    {
+        anim.SetBool(AnimatorParameters.IsStrafing, state.IsStrafing);
+
+        if (state.IsStrafing)
+        {
+            anim.SetFloat(AnimatorParameters.InputHorizontal, state.MovementXKey);
+            anim.SetFloat(AnimatorParameters.InputVertical, state.MovementYKey);
         }
     }
 
@@ -304,7 +317,7 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
         {
             this.player.RigidBody.velocity = this.player.RigidBody.velocity * 0.99f;
         }
-        if (Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.hookAnimation) || Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.gasBurst) || Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.attackRelease) || Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.attackPrime))
+        if (Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.hookAnimation) || Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.gasBurst))
         {
             this.anim.SetBool("IsHookAnim", true);
         }
@@ -398,10 +411,10 @@ public class PlayerAnimationController : Bolt.EntityBehaviour<IChaos_PlayerState
     private Rigidbody rb;
 
     // Token: 0x04000223 RID: 547
-    public GameObject[] blades = new GameObject[2];
+    //public GameObject[] blades = new GameObject[2];
 
     // Token: 0x04000224 RID: 548
-    public GameObject bladeFallSFX;
+    //public GameObject bladeFallSFX;
 
     // Token: 0x04000225 RID: 549
     private Vector3 landingVelocity;

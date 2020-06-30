@@ -8,7 +8,7 @@ using Gamekit3D;
 
 namespace Bolt.AdvancedTutorial
 {
-	[BoltGlobalBehaviour(BoltNetworkModes.Server, "Test")]
+	[BoltGlobalBehaviour(BoltNetworkModes.Server, "CityScene")]
 	public class Chaos_ServerCallbacks : Bolt.GlobalEventListener
 	{
 		public static bool ListenServer = true;

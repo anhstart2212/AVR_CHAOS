@@ -11,6 +11,8 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         this.player = base.GetComponent<Player>();
         //this.cam = this.player.transforms.playerCamera;
         this.rotator = this.player.transforms.rotator;
+
+        m_Animator = this.GetComponent<Animator>();
     }
 
     // Token: 0x06000255 RID: 597 RVA: 0x00015D40 File Offset: 0x00013F40
@@ -99,13 +101,28 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         {
             m_Movement.Set(state.MovementXKey, state.MovementYKey);
 
-            if (IsMoveInput)
+            if (IsMoveInput && !state.IsStrafing)
             {
                 UpdateOrientation();
             }
         }
 
         this.RotatePlayer(num, direction);
+
+        if (state.IsFire && state.IsShooter && state.IsCanAction)
+        {
+            RotateToDirection(state.CamRot, player.speed.turnAimSpeed);
+            UpdateHeadrotation();
+        }
+        else
+        {
+            m_UpperBodyRotation = Quaternion.identity;
+        }
+
+        if (JrDevAssets.GAC.ArePlaying(player.gameObject))
+        {
+            RotateToDirection(state.CamRot, player.speed.turnComboSpeed);
+        }
     }
 
     public Vector2 MoveInput
@@ -123,6 +140,33 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         get { return !Mathf.Approximately(MoveInput.sqrMagnitude, 0f); }
     }
 
+    void UpdateHeadrotation()
+    {
+        if (m_Animator == null)
+            return;
+
+        // update upper body rotation to host
+        m_UpperBodyRotation = Quaternion.identity;
+        float headCameraRotation = state.CamRot.eulerAngles.x;
+        switch (axis)
+        {
+            case BlendAxis.X:
+                m_UpperBodyRotation.eulerAngles = new Vector3(speed * headCameraRotation, m_UpperBodyRotation.eulerAngles.y, m_UpperBodyRotation.eulerAngles.z);
+                break;
+            case BlendAxis.Y:
+                m_UpperBodyRotation.eulerAngles = new Vector3(m_UpperBodyRotation.eulerAngles.x, speed * headCameraRotation, m_UpperBodyRotation.eulerAngles.z);
+                break;
+            case BlendAxis.Z:
+                m_UpperBodyRotation.eulerAngles = new Vector3(m_UpperBodyRotation.eulerAngles.x, m_UpperBodyRotation.eulerAngles.y, speed * headCameraRotation);
+                break;
+        }
+    }
+
+    private void OnAnimatorIK(int layerIndex)
+    {
+        m_Animator.SetBoneLocalRotation(UpperChest, m_UpperBodyRotation);
+    }
+
     // Caches for performance
     Vector3 inputDirection;
     Quaternion quaternion;
@@ -138,14 +182,12 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
         transform.rotation = Quaternion.Slerp(transform.rotation, quaternion, player.speed.turnSpeed * BoltNetwork.FrameDeltaTime);
     }
 
-    // Token: 0x06000256 RID: 598 RVA: 0x00015F8D File Offset: 0x0001418D
-    public void Enable()
+    public void RotateToDirection(Quaternion direction, float rotationSpeed)
     {
-    }
-
-    // Token: 0x06000257 RID: 599 RVA: 0x00015F8F File Offset: 0x0001418F
-    public void Disable()
-    {
+        direction.x = 0f;
+        //Vector3 desiredForward = Vector3.RotateTowards(transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f);
+        //Quaternion newRotation = Quaternion.LookRotation(desiredForward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, direction, rotationSpeed * BoltNetwork.FrameDeltaTime);
     }
 
     // Token: 0x06000258 RID: 600 RVA: 0x00015F94 File Offset: 0x00014194
@@ -342,4 +384,12 @@ public class PlayerRotations : Bolt.EntityBehaviour<IChaos_PlayerState>
     private Transform rotator;
 
     private int num;
+
+    private Animator m_Animator;
+
+    public HumanBodyBones UpperChest = HumanBodyBones.UpperChest;
+
+    private Quaternion m_UpperBodyRotation;
+    public BlendAxis axis;
+    public float speed;
 }

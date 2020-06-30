@@ -2,6 +2,7 @@ using Gamekit3D;
 using System;
 using System.Collections;
 using UnityEngine;
+using JrDevAssets;
 
 // Token: 0x0200003A RID: 58
 public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
@@ -103,20 +104,23 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         while (this.groundMovementIsRunning)
         {
-            Vector3 runDirection = (!this.player.IsSliding && !this.player.Animator.GetBool("IsSlideAnim")) ? base.transform.forward : this.velDirBeforeLand;
+            Vector3 inputDirection = new Vector3(state.MovementXKey, 0f, state.MovementYKey);
+            Quaternion direction = ((!(inputDirection != Vector3.zero)) ? base.transform.rotation : Quaternion.Euler(0f, Mathf.Atan2(inputDirection.x, inputDirection.z) * 57.29578f + state.CamRot.eulerAngles.y, 0f));
+            Vector3 runDirection = (!this.player.IsSliding && !this.player.Animator.GetBool("IsSlideAnim")) ? direction * Vector3.forward : this.velDirBeforeLand;
+
             if (entity.isActiveAndEnabled && !state.IsGrounded)
             {
                 this.groundMovementIsRunning = false;
             }
             else
             {
-                // Chaos Added
-                //if (m_PlayerCombat != null && m_PlayerCombat.InCombo)
+                //Chaos Added
+                //if (player != null && player.InCombo)
                 //{
                 //    this.rb.velocity = Vector3.zero;
                 //}
-                //yield return new WaitUntil(() => m_PlayerCombat.InCombo == false);
-                // Chaos Added
+                //yield return new WaitUntil(() => player.InCombo == false);
+                //Chaos Added
 
                 this.DetermineMoveState();
 
@@ -126,7 +130,7 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 }
 
                 // Fix smooth position (state.MovementXKey -> player.MovementX)
-                Vector3 inputDirection = new Vector3(player.MovementX, 0f, player.MovementY);
+                //Vector3 inputDirection = new Vector3(player.MovementX, 0f, player.MovementY);
 
                 // Detect when receive no input, then make a full stop to prevent sliding
                 if(inputDirection == Vector3.zero)
@@ -136,8 +140,15 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
                 }
                 else
                 {
+                    //Chaos Added
+                    //if (GAC.ArePlaying(player.gameObject))
+                    //{
+                    //    speed = 0;
+                    //}
+                    //Chaos Added
+
                     // If there is input, apply velocity
-                    this.rb.velocity = runDirection.normalized * this.speed;
+                    this.rb.velocity = runDirection.normalized * (GAC.ArePlaying(player.gameObject) ? Mathf.Lerp(speed, 0f, 1f * Time.deltaTime) : state.MoveSpeed);
                 }
                
                 yield return Common.yieldFixedUpdate;
@@ -841,6 +852,14 @@ public class PlayerMovement : Bolt.EntityBehaviour<IChaos_PlayerState>
         get
         {
             return this.hookActionRunning;
+        }
+    }
+
+    public float MoveSpeed
+    {
+        get
+        {
+            return this.speed;
         }
     }
 }

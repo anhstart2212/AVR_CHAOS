@@ -158,9 +158,9 @@ partial class Chaos_PlayerObject
 
     Vector3 RandomPosition()
     {
-        float x = UE.Random.Range(20f, 30f);
-        float y = 10f;
-        float z = UE.Random.Range(20f, 30f);
+        float x = UE.Random.Range(-18.04f, -20f);
+        float y = 15f;
+        float z = UE.Random.Range(-13.32f, -15f);
        
         return new Vector3(x, y, z);
     }

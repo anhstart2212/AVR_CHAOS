@@ -4,6 +4,11 @@ using Gamekit3D;
 using Bolt.AdvancedTutorial;
 using Bolt;
 using System.Collections;
+using DarkTreeFPS;
+using UltimateSurvival.GUISystem;
+using UltimateSurvival;
+using JrDevAssets;
+using com.ootii.Messages;
 
 public struct State
 {
@@ -12,7 +17,7 @@ public struct State
 }
 
 // Token: 0x02000030 RID: 48
-public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
+public class Player : Bolt.EntityEventListener<IChaos_PlayerState>
 {
     // Token: 0x06000128 RID: 296 RVA: 0x0000C7CC File Offset: 0x0000A9CC
     private void Awake()
@@ -30,9 +35,10 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         this.m_SoundScript = base.GetComponent<PlayerSoundController>();
         this.m_FxScript = base.GetComponentInChildren<PlayerParticleEffects>();
         this.m_HudScript = base.GetComponent<DrawPlayerHUD>();
+        m_UnitZManager = GetComponentInChildren<UnitZManager>();
         //this.camScript = this.transforms.playerCamera.GetComponent<CameraControl>();
         ////this.gameScript = GameObject.FindWithTag("GameController").GetComponent<GameBase>();
-        
+
         if (CameraSettings.instance != null)
         {
             transforms.playerCamera = CameraSettings.instance.CinemachineBrain;
@@ -40,6 +46,25 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
         m_State = new State(); // State 
         m_State.position = transform.position;
+
+        //m_WeaponManager = GetComponentInChildren<WeaponManager>();
+        //m_InventoryManager = GetComponentInChildren<InventoryManager>();
+        //m_UseObjects = GetComponentInChildren<UseObjects>();
+        //m_PlayerStats = GetComponent<PlayerStats>();
+
+        m_OnlyArmsLayer = m_Animator.GetLayerIndex(AnimatorParameters.OnlyArmsLayer);
+        m_ComboLayer = m_Animator.GetLayerIndex(AnimatorParameters.ComboLayer);
+        m_FireLayer = m_Animator.GetLayerIndex(AnimatorParameters.FireLayer);
+        m_AimLayer = m_Animator.GetLayerIndex(AnimatorParameters.AimLayer);
+    }
+
+    private void Start()
+    {
+        if (entity.GetComponent<Player>().UnitZManager.PlayerManager != null && entity.GetComponent<Player>().UnitZManager.PlayerManager.PlayingCharacter != null)
+        {
+            // get fps controller from current player
+            m_FpsControl = entity.GetComponent<Player>().UnitZManager.PlayerManager.PlayingCharacter.GetComponent<FPSController>();
+        }
     }
 
     // Token: 0x0600012A RID: 298 RVA: 0x0000C8A4 File Offset: 0x0000AAA4
@@ -102,6 +127,21 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         this.ResetImpulse();
         this.ResetAnchors();
 
+        ShowInventory();
+
+        //if (!state.CurrentItemId.IsZero)
+        //{
+        //    StartCoroutine(CurrentNetworkItem(state.CurrentItemId));
+        //}
+
+        if (GAC.ArePlaying(gameObject))
+        {
+            m_Animator.applyRootMotion = true;
+        }
+        else
+        {
+            m_Animator.applyRootMotion = false;
+        }
     }
 
     // Token: 0x0600012D RID: 301 RVA: 0x0000CAA7 File Offset: 0x0000ACA7
@@ -123,63 +163,52 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         if (CameraSettings.instance != null)
         {
-            m_MouseXaxis = CameraSettings.instance.Current.m_XAxis.Value;
-            m_MouseYaxis = CameraSettings.instance.Current.m_YAxis.Value;
+            m_MouseXaxis = CameraSettings.instance.Current.m_XAxis.m_InputAxisValue;
+            m_MouseYaxis = CameraSettings.instance.Current.m_YAxis.m_InputAxisValue;
         }
 
+        m_InventoryKey = Input.GetButtonDown(InputAxisNames.Inventory);
         m_MovementX = Input.GetAxis(InputAxisNames.moveLeftRight);
         m_MovementY = Input.GetAxis(InputAxisNames.moveFrontBack);
         m_JumpKeyDown = Input.GetButton(InputAxisNames.jump);
-        m_CenterHookKeyDown = (Input.GetButton(InputAxisNames.centerHook));
-        m_FireLeftHook = Input.GetButton(InputAxisNames.fireLeftHook);
-        m_FireRightHook = Input.GetButton(InputAxisNames.fireRightHook);
-        m_JumpReelKeyDown = (Input.GetButton(InputAxisNames.jumpReel));
-        m_FastSpeed = (Input.GetButton(InputAxisNames.fastSpeed));
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (IsMouseLocked)
         {
-            m_WeaponId = 0;
+            m_CenterHookKeyDown = (Input.GetButton(InputAxisNames.centerHook));
+            m_FireLeftHook = Input.GetButton(InputAxisNames.fireLeftHook);
+            m_FireRightHook = Input.GetButton(InputAxisNames.fireRightHook);
+            m_JumpReelKeyDown = (Input.GetButton(InputAxisNames.jumpReel));
+            m_FastSpeed = (Input.GetButton(InputAxisNames.fastSpeed));
+            m_FireContinuouslyKey = Input.GetButton(InputAxisNames.leftMouse);
+            m_AimKey = Input.GetButtonDown(InputAxisNames.rightMouse);
         }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            m_WeaponId = 1;
-        }
-
-        m_Fire = Input.GetButton(InputAxisNames.attack);
-
-        m_BasicAttackKey = Input.GetButtonDown(InputAxisNames.attack);
-        m_HeavyAttackKey = Input.GetButtonDown(InputAxisNames.heavyAttack);
-        m_ParryKey = Input.GetButtonDown(InputAxisNames.parry);
 
         //titanAimLock = Input.GetButton(axisName.titanLock);
+        //m_PickupKey = Input.GetButtonDown(InputAxisNames.Pickup);
+        //m_DropWeaponKey = Input.GetButtonDown(InputAxisNames.DropWeapon);
     }
+
+    //IEnumerator CurrentNetworkItem(NetworkId itemId)
+    //{
+    //    BoltEntity boltEntity = BoltNetwork.FindEntity(itemId);
+    //    if (boltEntity)
+    //    {
+    //        //Debug.LogError(boltEntity.name + "  " + boltEntity.NetworkId);
+ 
+    //        if (boltEntity.IsOwner)
+    //        {
+    //            BoltNetwork.Destroy(boltEntity);
+    //        }
+
+    //        yield return new WaitForSeconds(0.2f);
+    //        CurrentItemId = new NetworkId();
+    //    }
+    //}
 
     public void AnimatePlayer(ChaosPlayerCommand cmd)
     {
         // run
         AnimationScript.SetRunning(cmd);
-
-        // Rifle
-        if (ActiveWeapon is Chaos_WeaponRifle)
-        {
-            state.IsRifleIdle = true;
-
-            if (cmd.Input.Fire)
-            {
-                state.IsFire = true;
-            }
-            else
-            {
-                state.IsFire = false;
-            }
-        }
-        // Melee
-        else if (ActiveWeapon is MeleeWeapon)
-        {
-            state.IsRifleIdle = false;
-        }
-
-
     }
 
     //void FindHookTarget()
@@ -200,9 +229,13 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         MovementScript.StartHookActions(entity);
     }
 
-    public void DrawOwnerHookTarget()
+    public void OwnerController()
     {
+        // Hook
         m_HudScript.DrawOwnerHookTarget(true);
+
+        // OwnerController
+        m_IsOwnerController = true;
     }
 
     public State Apply(float movementX, float movementY)
@@ -241,87 +274,48 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         transform.position = Vector3.Lerp(transform.position, m_State.position, 3f * BoltNetwork.FrameDeltaTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, m_State.rotation, 3f * BoltNetwork.FrameDeltaTime);
     }
-
-    public void WeaponChanged()
-    {
-        // setup weapon
-        for (int i = 0; i < m_Weapons.Length; ++i)
-        {
-            m_Weapons[i].gameObject.SetActive(false);
-        }
-
-        m_Weapons[state.WeaponId].gameObject.SetActive(true);
-    }
-
-    public void FireWeapon(ChaosPlayerCommand cmd)
-    {
-        if (ActiveWeapon is Chaos_WeaponRifle)
-        {
-            if (cmd.Input.Fire)
-            {
-                if (ActiveWeapon.fireFrame + ActiveWeapon.refireRate <= BoltNetwork.ServerFrame)
-                {
-                    ActiveWeapon.fireFrame = BoltNetwork.ServerFrame;
-
-                    state.Fire();
-
-                    // if we are the owner and the active weapon is a hitscan weapon, do logic
-                    if (entity.IsOwner)
-                    {
-                        ActiveWeapon.OnOwner(cmd, entity);
-                    }
-                }
-            }
-        }
-    }
-
-    public void AttackWeapon(ChaosPlayerCommand cmd)
-    {
-        if (ActiveWeapon is MeleeWeapon)
-        {
-            if (cmd.Input.BasicAttack)
-            {
-                state.BasicAttack();
-            }
-
-            if (cmd.Input.HeavyAttack)
-            {
-                state.HeavyAttack();
-            }
-
-            if (cmd.Input.Parry)
-            {
-                state.Parry();
-            }
-
-            // if we are the owner and the active weapon is a hitscan weapon, do logic
-            //if (entity.IsOwner)
-            //{
-            //    ActiveWeapon.OnOwner(cmd, entity);
-            //}
-        }
-    }
-
     public void OnFire()
     {
-        ActiveWeapon.Fx(entity);
+        //ActiveWeapon.Fx(entity);
+
+        //if (ActiveWeapon)
+        //{
+        //    ActiveWeapon.AnimateWeapon();
+        //}
+
+        if (m_FpsControl)
+        {
+            m_FpsControl.Fire();
+        }
     }
 
-    public void OnBasicAttack()
+    public void Fire(ChaosPlayerCommand cmd)
     {
-        ActiveWeapon.BasicAttack();
+        if (cmd.Input.IsFire && state.IsShooter && state.IsCanAction)
+        {
+            state.Fire();
+        }
     }
 
-    public void OnHeavyAttack()
+    public void Aim(ChaosPlayerCommand cmd)
     {
-        ActiveWeapon.HeavyAttack();
+        if (cmd.Input.IsAim && state.IsShooter && state.IsCanAction)
+        {
+            if (m_FpsControl)
+            {
+                m_FpsControl.Aim();
+            }
+        }
     }
 
-    public void OnParry()
+    public void ShowInventory()
     {
-        ActiveWeapon.Parry();
+        if (m_IsOwnerController && state.IsShowInventory)
+        {
+            // show inventory
+            UnitZManager.Hud.TogglePanelByName("Inventory");
+        }
     }
-    
 
     public void ApplyDamage(byte damage)
     {
@@ -795,7 +789,6 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         this.m_MoveScript.Disable();
         this.m_MoveScript.enabled = false;
-        this.m_RotScript.Disable();
         this.m_RotScript.enabled = false;
         this.m_BurstScript.Disable();
         this.m_BurstScript.enabled = false;
@@ -812,7 +805,6 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         this.m_MoveScript.Enable();
         this.m_MoveScript.enabled = true;
-        this.m_RotScript.Enable();
         this.m_RotScript.enabled = true;
         this.m_BurstScript.Enable();
         this.m_BurstScript.enabled = true;
@@ -1924,19 +1916,19 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    public int WeaponId
+    public bool FireContinuouslyKey
     {
         get
         {
-            return m_WeaponId;
+            return m_FireContinuouslyKey;
         }
     }
 
-    public bool Fire
+    public bool AimKey
     {
         get
         {
-            return m_Fire;
+            return m_AimKey;
         }
     }
 
@@ -1987,27 +1979,330 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
     }
 
-    public bool BasicAttackKey
+   
+
+    public bool InventoryKey
     {
         get
         {
-            return m_BasicAttackKey;
+            return m_InventoryKey;
         }
     }
 
-    public bool HeavyAttackKey
+    public bool IsOwnerController
     {
         get
         {
-            return m_HeavyAttackKey;
+            return m_IsOwnerController;
+        }
+        set
+        {
+            m_IsOwnerController = value;
         }
     }
 
-    public bool ParryKey
+    //public NetworkId CurrentItemId
+    //{
+    //    get
+    //    {
+    //        return m_CurrentItemId;
+    //    }
+    //    set
+    //    {
+    //        m_CurrentItemId = value;
+    //    }
+    //}
+
+    public bool IsCanAction
     {
         get
         {
-            return m_ParryKey;
+            return m_IsCanAction;
+        }
+        set
+        {
+            m_IsCanAction = value;
+        }
+    }
+
+    public NetworkId CurrentFPSId
+    {
+        get
+        {
+            return m_CurrentFPSId;
+        }
+        set
+        {
+            m_CurrentFPSId = value;
+        }
+    }
+
+    public NetworkId HandEquipId
+    {
+        get
+        {
+            return m_HandEquipId;
+        }
+        set
+        {
+            m_HandEquipId = value;
+        }
+    }
+
+    public NetworkId Gun1EquipId
+    {
+        get
+        {
+            return m_Gun1EquipId;
+        }
+        set
+        {
+            m_Gun1EquipId = value;
+        }
+    }
+
+    public NetworkId Gun2EquipId
+    {
+        get
+        {
+            return m_Gun2EquipId;
+        }
+        set
+        {
+            m_Gun2EquipId = value;
+        }
+    }
+
+    public NetworkId BackpackEquipId
+    {
+        get
+        {
+            return m_BackpackEquipId;
+        }
+        set
+        {
+            m_BackpackEquipId = value;
+        }
+    }
+
+    public NetworkId ArmorEquipId
+    {
+        get
+        {
+            return m_ArmorEquipId;
+        }
+        set
+        {
+            m_ArmorEquipId = value;
+        }
+    }
+
+    public NetworkId MeleeEquipId
+    {
+        get
+        {
+            return m_MeleeEquipId;
+        }
+        set
+        {
+            m_MeleeEquipId = value;
+        }
+    }
+
+    public int HandIndex
+    {
+        get
+        {
+            return m_HandIndex;
+        }
+        set
+        {
+            m_HandIndex = value;
+        }
+    }
+
+    public int Gun1Index
+    {
+        get
+        {
+            return m_Gun1Index;
+        }
+        set
+        {
+            m_Gun1Index = value;
+        }
+    }
+
+    public int Gun2Index
+    {
+        get
+        {
+            return m_Gun2Index;
+        }
+        set
+        {
+            m_Gun2Index = value;
+        }
+    }
+
+    public int BackpackIndex
+    {
+        get
+        {
+            return m_BackpackIndex;
+        }
+        set
+        {
+            m_BackpackIndex = value;
+        }
+    }
+
+    public int ArmorIndex
+    {
+        get
+        {
+            return m_ArmorIndex;
+        }
+        set
+        {
+            m_ArmorIndex = value;
+        }
+    }
+
+    public int MeleeIndex
+    {
+        get
+        {
+            return m_MeleeIndex;
+        }
+        set
+        {
+            m_MeleeIndex = value;
+        }
+    }
+
+    public bool Gun1InUse
+    {
+        get
+        {
+            return m_Gun1InUse;
+        }
+        set
+        {
+            m_Gun1InUse = value;
+        }
+    }
+
+    public bool Gun2InUse
+    {
+        get
+        {
+            return m_Gun2InUse;
+        }
+        set
+        {
+            m_Gun2InUse = value;
+        }
+    }
+
+    public bool MeleeInUse
+    {
+        get
+        {
+            return m_MeleeInUse;
+        }
+        set
+        {
+            m_MeleeInUse = value;
+        }
+    }
+
+    public bool IsShooter
+    {
+        get
+        {
+            return m_IsShooter;
+        }
+        set
+        {
+            m_IsShooter = value;
+        }
+    }
+
+    public bool IsStrafing
+    {
+        get
+        {
+            return m_IsStrafing;
+        }
+        set
+        {
+            m_IsStrafing = value;
+        }
+    }
+
+    public IChaos_PlayerState IChaosState
+    {
+        get
+        {
+            return entity.GetState<IChaos_PlayerState>();
+        }
+    }
+    
+
+    public UnitZManager UnitZManager
+    {
+        get
+        {
+            return m_UnitZManager;
+        }
+    }
+
+    public int OnlyArmsLayer
+    {
+        get
+        {
+            return m_OnlyArmsLayer;
+        }
+        set
+        {
+            m_OnlyArmsLayer = value;
+        }
+    }
+
+    public int ComboLayer
+    {
+        get
+        {
+            return m_ComboLayer;
+        }
+        set
+        {
+            m_ComboLayer = value;
+        }
+    }
+
+    public int FireLayer
+    {
+        get
+        {
+            return m_FireLayer;
+        }
+        set
+        {
+            m_FireLayer = value;
+        }
+    }
+
+    public int AimLayer
+    {
+        get
+        {
+            return m_AimLayer;
+        }
+        set
+        {
+            m_AimLayer = value;
         }
     }
 
@@ -2282,24 +2577,110 @@ public class Player : Bolt.EntityBehaviour<IChaos_PlayerState>
 
     private float m_MouseYaxis;
 
-    [SerializeField]
-    Chaos_WeaponBase[] m_Weapons;
+    //private WeaponManager m_WeaponManager;
 
-    public Chaos_WeaponBase ActiveWeapon
+    //private InventoryManager m_InventoryManager;
+
+    //private UseObjects m_UseObjects;
+
+    //private PlayerStats m_PlayerStats;
+
+    private bool m_FireContinuouslyKey;
+
+    private bool m_AimKey;
+
+    private bool m_InventoryKey;
+
+    [SerializeField]
+    private bool m_IsOwnerController;
+
+    //[SerializeField]
+    //private NetworkId m_CurrentItemId;
+
+    [SerializeField]
+    private NetworkId m_CurrentFPSId;
+
+    [SerializeField]
+    private NetworkId m_HandEquipId;
+
+    [SerializeField]
+    private NetworkId m_Gun1EquipId;
+
+    [SerializeField]
+    private NetworkId m_Gun2EquipId;
+
+    [SerializeField]
+    private NetworkId m_BackpackEquipId;
+
+    [SerializeField]
+    private NetworkId m_ArmorEquipId;
+
+    [SerializeField]
+    private NetworkId m_MeleeEquipId;
+
+    [SerializeField]
+    private int m_HandIndex;
+
+    [SerializeField]
+    private int m_Gun1Index;
+
+    [SerializeField]
+    private int m_Gun2Index;
+
+    [SerializeField]
+    private int m_BackpackIndex;
+
+    [SerializeField]
+    private int m_ArmorIndex;
+
+    [SerializeField]
+    private int m_MeleeIndex;
+
+    [SerializeField]
+    private bool m_Gun1InUse;
+
+    [SerializeField]
+    private bool m_Gun2InUse;
+
+    [SerializeField]
+    private bool m_MeleeInUse;
+
+    [SerializeField]
+    private FPSController m_FpsControl;
+
+    [SerializeField]
+    private UnitZManager m_UnitZManager;
+
+    [SerializeField]
+    private bool m_IsCanAction;
+
+    private bool isMouseLocked;
+
+    public bool IsMouseLocked
     {
         get
         {
-            return m_Weapons[state.WeaponId];
+            return isMouseLocked;
+        }
+        set
+        {
+            isMouseLocked = value;
+            Cursor.visible = !value;
+            if (isMouseLocked)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
     }
 
-    private int m_WeaponId;
-
-    private bool m_Fire;
-
-    private bool m_BasicAttackKey;
-
-    private bool m_HeavyAttackKey;
-
-    private bool m_ParryKey;
+    private bool m_IsShooter;
+    private bool m_IsStrafing;
+    private int m_OnlyArmsLayer;
+    private int m_ComboLayer;
+    private int m_FireLayer;
+    private int m_AimLayer;
 }

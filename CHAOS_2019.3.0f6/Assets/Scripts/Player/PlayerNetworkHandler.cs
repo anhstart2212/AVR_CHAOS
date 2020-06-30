@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
+public class PlayerNetworkHandler : Bolt.EntityEventListener<IChaos_PlayerState>
 {
     [SerializeField]
     [Tooltip("Player Component")]
@@ -14,6 +14,10 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     [Tooltip("Animator Component")]
     private Animator animator;
 
+    [SerializeField]
+    [Tooltip("PlayerMovement Component")]
+    private PlayerMovement playerMovement; //Reference to component PlayerMovement
+
     /// <summary>
     /// Initialize values
     /// </summary>
@@ -21,6 +25,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         player = this.GetComponent<Player>();
         animator = this.GetComponent<Animator>();
+        playerMovement = this.GetComponent<PlayerMovement>();
     }
 
     /// <summary>
@@ -28,7 +33,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     /// </summary>
     public override void Attached()
     {
-        if (player && animator)
+        if (player && animator && playerMovement)
         {
             // This couples the Transform property of the State with the GameObject Transform
             state.SetTransforms(state.Transform, player.transform);
@@ -40,15 +45,25 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
 
             state.OnPlayerHook += player.OnPlayerHook;
 
-            state.AddCallback("WeaponId", player.WeaponChanged);
-            state.OnFire += player.OnFire;
+            //state.AddCallback("WeaponId", player.WeaponChanged);
+            //state.OnFire += player.OnFire;
             // setup rifle weapon
-            player.WeaponChanged();
+            //player.WeaponChanged();
 
             // setup melee weapon
-            state.OnBasicAttack += player.OnBasicAttack;
-            state.OnHeavyAttack += player.OnHeavyAttack;
-            state.OnParry += player.OnParry;
+            //state.OnBasicAttack += player.OnBasicAttack;
+            //state.OnHeavyAttack += player.OnHeavyAttack;
+            //state.OnParry += player.OnParry;
+
+            //state.AddCallback("SlotIndex", player.SlotWeaponChanged);
+            // setup slot weapon
+            //player.SlotWeaponChanged();
+
+            // attack
+            state.OnFire += player.OnFire;
+
+            //state.AddCallback("IsBasicAttack", player.PlayCombo);
+            //state.AddCallback("IsHeavyAttack", player.PlayCombo);
         }
         else
         {
@@ -64,7 +79,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         player.PollKeys();
 
-        player.DrawOwnerHookTarget();
+        player.OwnerController();
 
         IChaosPlayerCommandInput input = ChaosPlayerCommand.Create();
 
@@ -77,18 +92,39 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
         input.FireLeftHook = player.FireLeftHook;
         input.FireRightHook = player.FireRightHook;
         input.JumpReel = player.JumpReelKeyDown;
-        input.FastSpeed = player.FastSpeed;
-        input.WeaponId = player.WeaponId;
-        input.Fire = player.Fire;
-        input.BasicAttack = player.BasicAttackKey;
-        input.HeavyAttack = player.HeavyAttackKey;
-        input.Parry = player.ParryKey;
+        input.IsFastSpeed = player.FastSpeed;
+        input.IsInventory = player.InventoryKey;
 
         if (CameraSettings.instance != null)
         {
             input.CamPos = CameraSettings.instance.CinemachineBrain.position;
             input.CamRot = CameraSettings.instance.CinemachineBrain.rotation;
         }
+
+        //input.CurrentItemId = player.CurrentItemId;
+        input.CurrentFPSId = player.CurrentFPSId;
+        input.IsCanAction = player.IsCanAction;
+        input.IsMouseLocked = player.IsMouseLocked;
+        input.HandEquipId = player.HandEquipId;
+        input.Gun1EquipId = player.Gun1EquipId;
+        input.Gun2EquipId = player.Gun2EquipId;
+        input.BackpackEquipId = player.BackpackEquipId;
+        input.ArmorEquipId = player.ArmorEquipId;
+        input.MeleeEquipId = player.MeleeEquipId;
+        input.HandIndex = player.HandIndex;
+        input.Gun1Index = player.Gun1Index;
+        input.Gun2Index = player.Gun2Index;
+        input.BackpackIndex = player.BackpackIndex;
+        input.ArmorIndex = player.ArmorIndex;
+        input.MeleeIndex = player.MeleeIndex;
+        input.Gun1InUse = player.Gun1InUse;
+        input.Gun2InUse = player.Gun2InUse;
+        input.MeleeInUse = player.MeleeInUse;
+        input.IsFire = player.FireContinuouslyKey;
+        input.IsAim = player.AimKey;
+        input.MoveSpeed = playerMovement.MoveSpeed;
+        input.IsShooter = player.IsShooter;
+        input.IsStrafing = player.IsStrafing;
 
         entity.QueueInput(input);
     }
@@ -122,10 +158,7 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
             cmd.Result.Position = result.position;
             cmd.Result.Rotation = result.rotation;
 
-            state.CamPos = cmd.Input.CamPos;
-            state.CamRot = cmd.Input.CamRot;
-
-            if(cmd.IsFirstExecution)
+            if (cmd.IsFirstExecution)
             {
                 // animation run
                 player.AnimatePlayer(cmd);
@@ -133,32 +166,51 @@ public class PlayerNetworkHandler : Bolt.EntityBehaviour<IChaos_PlayerState>
                 state.MovementXKey = cmd.Input.MovementX;
                 state.MovementYKey = cmd.Input.MovementY;
                 state.MouseXKey = cmd.Input.MouseX;
+                state.MouseYKey = cmd.Input.MouseY;
                 state.IsFireCenterHookKey = cmd.Input.FireCenterHook;
                 state.IsFireLeftHookKey = cmd.Input.FireLeftHook;
                 state.IsFireRightHookKey = cmd.Input.FireRightHook;
                 state.IsJumpReelKey = cmd.Input.JumpReel;
                 state.IsJumpKey = cmd.Input.Jump;
-                state.FastSpeedKey = cmd.Input.FastSpeed;
+                state.FastSpeedKey = cmd.Input.IsFastSpeed;
                 state.IsJump = player.IsJumping;
                 state.IsGrounded = player.IsGrounded;
-                state.WeaponId = cmd.Input.WeaponId;
+                state.CamPos = cmd.Input.CamPos;
+                state.CamRot = cmd.Input.CamRot;
+                //state.CurrentItemId = cmd.Input.CurrentItemId;
+                state.CurrentFPSId = cmd.Input.CurrentFPSId;
+                state.IsShowInventory = cmd.Input.IsInventory;
+                state.IsCanAction = cmd.Input.IsCanAction;
+                state.IsMouseLocked = cmd.Input.IsMouseLocked;
+                state.HandEquipId = cmd.Input.HandEquipId;
+                state.Gun1EquipId = cmd.Input.Gun1EquipId;
+                state.Gun2EquipId = cmd.Input.Gun2EquipId;
+                state.BackpackEquipId = cmd.Input.BackpackEquipId;
+                state.ArmorEquipId = cmd.Input.ArmorEquipId;
+                state.MeleeEquipId = cmd.Input.MeleeEquipId;
+                state.HandIndex = cmd.Input.HandIndex;
+                state.Gun1Index = cmd.Input.Gun1Index;
+                state.Gun2Index = cmd.Input.Gun2Index;
+                state.BackpackIndex = cmd.Input.BackpackIndex;
+                state.ArmorIndex = cmd.Input.ArmorIndex;
+                state.MeleeIndex = cmd.Input.MeleeIndex;
+                state.Gun1InUse = cmd.Input.Gun1InUse;
+                state.Gun2InUse = cmd.Input.Gun2InUse;
+                state.MeleeInUse = cmd.Input.MeleeInUse;
+                state.IsFire = cmd.Input.IsFire;
+                state.IsAim = cmd.Input.IsAim;
+                state.MoveSpeed = cmd.Input.MoveSpeed;
+                state.IsShooter = cmd.Input.IsShooter;
+                state.IsStrafing = cmd.Input.IsStrafing;
 
-                if (cmd.Input.FireCenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook)
+                if ((cmd.Input.FireCenterHook || cmd.Input.FireLeftHook || cmd.Input.FireRightHook))
                 {
                     player.PlayerHook();
                 }
 
-                // deal with Rifle weapons
-                if (cmd.Input.Fire)
-                {
-                    player.FireWeapon(cmd);
-                }
+                player.Fire(cmd);
 
-                // deal with melee weapons
-                if (cmd.Input.BasicAttack || cmd.Input.HeavyAttack || cmd.Input.Parry)
-                {
-                    player.AttackWeapon(cmd);
-                }
+                player.Aim(cmd);
             }
         }
     }

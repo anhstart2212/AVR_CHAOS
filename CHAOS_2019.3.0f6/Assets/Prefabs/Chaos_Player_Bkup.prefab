@@ -19045,7 +19045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 
   _serializerGuid: 1d62d4d2-ca0e-4c66-a15d-eeac8a467259
-  _prefabId: 14
+  _prefabId: 47
   _updateRate: 1
   _autoFreezeProxyFrames: 0
   _clientPredicted: 1
@@ -19079,6 +19079,7 @@ MonoBehaviour:
     wallSideJump: 50
     wallUpJump: 25
     turnSpeed: 15
+    turnAimSpeed: 0
     look: 20
     gasFree: 40
     reelDouble: 4.15
@@ -19123,9 +19124,19 @@ MonoBehaviour:
     gasFast: {fileID: 198043302649730770}
     gasBurst: {fileID: 198074957772921390}
     deathVFX: {fileID: 0}
-  m_Weapons:
-  - {fileID: 114664008601157740}
-  - {fileID: 114887657756209454}
+  m_IsOwnerController: 0
+  m_HandIndex: 0
+  m_Gun1Index: 0
+  m_Gun2Index: 0
+  m_BackpackIndex: 0
+  m_ArmorIndex: 0
+  m_MeleeIndex: 0
+  m_Gun1InUse: 0
+  m_Gun2InUse: 0
+  m_MeleeInUse: 0
+  m_FpsControl: {fileID: 0}
+  m_UnitZManager: {fileID: 0}
+  m_IsCanAction: 0
 --- !u!114 &114686578662805598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19151,6 +19162,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 383385e0cce75104ab5a0a7d39e4585b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UpperChest: 54
+  axis: 0
+  speed: -1
 --- !u!114 &114285654807304974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19434,6 +19448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   animator: {fileID: 0}
+  playerMovement: {fileID: 0}
 --- !u!114 &114105610914925422
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -29,30 +29,30 @@ public class PlayerCombat : MonoBehaviour, IActionCaller
 
     void Update()
     {
-        if(Input.GetButtonDown(InputAxisNames.attack))
-        {
-            this.QueueAction(combatData.BasicAttack);
-        }
+        //if(Input.GetButtonDown(InputAxisNames.attack))
+        //{
+        //    this.QueueAction(combatData.BasicAttack);
+        //}
 
-        if (Input.GetButtonDown(InputAxisNames.heavyAttack))
-        {
-            this.QueueAction(combatData.HeavyAttack);
-        }
+        //if (Input.GetButtonDown(InputAxisNames.heavyAttack))
+        //{
+        //    this.QueueAction(combatData.HeavyAttack);
+        //}
 
-        if (Input.GetButtonDown(InputAxisNames.parry))
-        {
-            this.QueueAction(combatData.Parry);
-        }
+        //if (Input.GetButtonDown(InputAxisNames.parry))
+        //{
+        //    this.QueueAction(combatData.Parry);
+        //}
 
-        if(timeBetweenComboTimecount >= 0)
-        {
-            timeBetweenComboTimecount -= Time.deltaTime;
+        //if(timeBetweenComboTimecount >= 0)
+        //{
+        //    timeBetweenComboTimecount -= Time.deltaTime;
 
-            if(timeBetweenComboTimecount <= 0)
-            {
-                queue.Clear();
-            }
-        }
+        //    if(timeBetweenComboTimecount <= 0)
+        //    {
+        //        queue.Clear();
+        //    }
+        //}
 
     }
 

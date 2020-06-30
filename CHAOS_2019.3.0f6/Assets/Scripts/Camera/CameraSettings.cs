@@ -55,6 +55,18 @@ namespace Gamekit3D
             get { return cinemachineBrain; }
         }
 
+        public float FovOffset
+        {
+            get { return fovOffset; }
+            set { fovOffset = value; }
+        }
+
+        public float DefaultFOV
+        {
+            get { return defaultFOV; }
+            set { defaultFOV = value; }
+        }
+
         void Reset()
         {
             Transform keyboardAndMouseCameraTransform = transform.Find("KeyboardAndMouseFreeLookRig");
@@ -97,11 +109,11 @@ namespace Gamekit3D
 
             if (Current != null && playerScript != null)
             {
-                Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
+                //Current.m_Lens.FieldOfView = this.NewCameraFoV(0.08f);
                 Current.m_Orbits[1].m_Radius = this.NewCameraDis(0.08f);
             }
 
-            UpdateCursorSettings();
+            //UpdateCursorSettings();
 
             //if (follow)
             //{
@@ -136,14 +148,10 @@ namespace Gamekit3D
 
         private float NewCameraFoV(float LERP)
         {
-            float run = this.playerScript.speed.run;
-            float num = this.playerScript.limit.maxHorizontal / 2f + run;
-            float num2 = Mathf.Clamp((this.playerScript.VelocityMagnitude - run) / num, 0f, 1f);
-            //float b = this.defaultFOV + 10f * num2;
-            float b = this.defaultFOV + fovOffset * num2;
+            float b = this.defaultFOV - fovOffset * 10f;
 
             // limit CameraFOV
-            if (b > cameraFOVLimit)
+            if (b < cameraFOVLimit)
             {
                 b = cameraFOVLimit;
             }

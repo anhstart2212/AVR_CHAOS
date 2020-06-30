@@ -34,7 +34,7 @@ public class Chaos_WeaponRifle : Chaos_WeaponBase
 
                     if ((serializer != null) && (serializer.state != state))
                     {
-                        serializer.ApplyDamage(player.ActiveWeapon.damagePerBullet);
+                        //serializer.ApplyDamage(player.ActiveWeapon.damagePerBullet);
                     }
                 }
             }

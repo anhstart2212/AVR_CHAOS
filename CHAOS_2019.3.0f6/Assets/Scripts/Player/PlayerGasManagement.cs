@@ -11,7 +11,7 @@ public class PlayerGasManagement : Bolt.EntityBehaviour<IChaos_PlayerState>
     {
         this.player = base.GetComponent<Player>();
         this.SetGas(this.player.gas.maxGasAmount);
-        this.InitGasCores();
+        //this.InitGasCores();
     }
 
     // Token: 0x06000220 RID: 544 RVA: 0x0001319C File Offset: 0x0001139C
@@ -60,12 +60,12 @@ public class PlayerGasManagement : Bolt.EntityBehaviour<IChaos_PlayerState>
         }
         else if (this.player.IsDoubleHooked)
         {
-            this.GasCoreLifeAdjust(true);
+            //this.GasCoreLifeAdjust(true);
             this.GasTrailOnOff(true, true, this.player.BurstForceIsRunning);
         }
         else if (this.player.IsEitherHooked)
         {
-            this.GasCoreLifeAdjust(true);
+            //this.GasCoreLifeAdjust(true);
             this.GasTrailOnOff(true, false, this.player.BurstForceIsRunning);
         }
         else if (entity.isActiveAndEnabled && this.player.IsMoving && state.IsJumpReelKey)

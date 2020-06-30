@@ -16,22 +16,10 @@ public static class PlayerAnimation
         return Common.CurrentStateName(anim, 0, "Idle") || Common.CurrentStateName(anim, 0, "Run") || Common.CurrentStateTag(anim, 0, PlayerAnimation.TAGS.airborne) || (Common.CurrentStateTag(anim, 0, PlayerAnimation.TAGS.hooked) && includeHookMove);
     }
 
-    // Token: 0x060001E5 RID: 485 RVA: 0x0000F2A8 File Offset: 0x0000D4A8
-    public static bool InAirOrHook(Animator anim, bool includeAttack)
-    {
-        return Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.airborne) || Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.hooked) || (Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.attackPrime) && includeAttack) || (Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.attackRelease) && includeAttack);
-    }
-
     // Token: 0x060001E6 RID: 486 RVA: 0x0000F31A File Offset: 0x0000D51A
     public static bool InGasBurst(Animator anim)
     {
         return Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.gasBurst);
-    }
-
-    // Token: 0x060001E7 RID: 487 RVA: 0x0000F32D File Offset: 0x0000D52D
-    public static bool InAttackAnimation(Animator anim)
-    {
-        return Common.CurrentOrNextStateTag(anim, 0, PlayerAnimation.TAGS.attackPrime) || Common.CurrentStateTag(anim, 0, PlayerAnimation.TAGS.attackRelease);
     }
 
     // Token: 0x060001E8 RID: 488 RVA: 0x0000F35C File Offset: 0x0000D55C
@@ -51,31 +39,24 @@ public static class PlayerAnimation
     // Token: 0x060001EA RID: 490 RVA: 0x0000F400 File Offset: 0x0000D600
     public static void SetAttackParametersWithLerp(Animator anim, float newSide, float newHeight, float newFacing, float newDistance)
     {
-        anim.SetFloat(PlayerAnimation.PARAMS.attackSide, Mathf.Lerp(anim.GetFloat(PlayerAnimation.PARAMS.attackSide), newSide, 0.5f));
-        anim.SetFloat(PlayerAnimation.PARAMS.attackHeight, Mathf.Lerp(anim.GetFloat(PlayerAnimation.PARAMS.attackHeight), newHeight, 0.15f));
-        anim.SetFloat(PlayerAnimation.PARAMS.attackFacing, Mathf.Lerp(anim.GetFloat(PlayerAnimation.PARAMS.attackFacing), newFacing, 0.2f));
-        anim.SetFloat(PlayerAnimation.PARAMS.attackDistance, Mathf.Lerp(anim.GetFloat(PlayerAnimation.PARAMS.attackDistance), newDistance, 0.15f));
+ 
     }
 
     // Token: 0x060001EB RID: 491 RVA: 0x0000F4BC File Offset: 0x0000D6BC
     public static void SetAttackParameters(Animator anim, float newSide, float newHeight, float newFacing, float newDistance)
     {
-        anim.SetFloat(PlayerAnimation.PARAMS.attackSide, newSide);
-        anim.SetFloat(PlayerAnimation.PARAMS.attackHeight, newHeight);
-        anim.SetFloat(PlayerAnimation.PARAMS.attackFacing, newFacing);
-        anim.SetFloat(PlayerAnimation.PARAMS.attackDistance, newDistance);
+
     }
 
     // Token: 0x060001EC RID: 492 RVA: 0x0000F50E File Offset: 0x0000D70E
     public static void SetAttackState(Animator anim, bool primed, bool released)
     {
-        anim.SetBool(PlayerAnimation.PARAMS.attackPrimed, primed);
-        anim.SetBool(PlayerAnimation.PARAMS.attackReleased, released);
+
     }
 
     public static void SetAttackState(Animator anim)
     {
-        anim.SetTrigger(PARAMS.hashMeleeAttack);
+
     }
 
     // Token: 0x04000204 RID: 516
@@ -99,12 +80,6 @@ public static class PlayerAnimation
     // Token: 0x02000034 RID: 52
     public class Tags
     {
-        // Token: 0x0400020A RID: 522
-        public readonly string attackRelease = "AttackRelease";
-
-        // Token: 0x0400020B RID: 523
-        public readonly string attackPrime = "AttackPrime";
-
         // Token: 0x0400020C RID: 524
         public readonly string grabEvade = "GrabEvade";
 
@@ -148,36 +123,9 @@ public static class PlayerAnimation
         // Token: 0x04000218 RID: 536
         public readonly string wallRunSpeed = "WallRunSpeed";
 
-        // Token: 0x04000219 RID: 537
-        public readonly string attackSide = "AttackSide";
-
-        // Token: 0x0400021A RID: 538
-        public readonly string attackHeight = "AttackHeight";
-
-        // Token: 0x0400021B RID: 539
-        public readonly string attackFacing = "AttackFacing";
-
-        // Token: 0x0400021C RID: 540
-        public readonly string attackDistance = "AttackDistance";
-
-        // Token: 0x0400021D RID: 541
-        public readonly string attackPrimed = "AttackPrimed";
-
-        // Token: 0x0400021E RID: 542
-        public readonly string attackReleased = "AttackReleased";
-
         // Token: 0x0400021F RID: 543
         public readonly string grabbedState = "GrabbedState";
 
-        public readonly int hashMeleeAttack = Animator.StringToHash("MeleeAttack");
-
-        public readonly int hashCombatStateTime = Animator.StringToHash("CombatStateTime");
-
-        public readonly int hashPlayerCombo1 = Animator.StringToHash("PlayerCombo1");
-
-        public readonly int hashPlayerCombo2 = Animator.StringToHash("PlayerCombo2");
-
-        public readonly int hashPlayerCombo3 = Animator.StringToHash("PlayerCombo3");
     }
 }
 

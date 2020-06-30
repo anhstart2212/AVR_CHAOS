@@ -269,17 +269,17 @@ public class PlayerParticleEffects : Bolt.EntityBehaviour<IChaos_PlayerState>
         float time = num3;
         this.rightTrail.time = time;
         trailRenderer.time = time;
-        bool flag = Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.attackPrime) || Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.gasBurst) || Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.grabbed) || this.player.IsAttacking;
-        if (flag)
-        {
-            //this.leftMWT.Emit = true;
-            //this.rightMWT.Emit = true;
-        }
-        else
-        {
-            //this.leftMWT.Emit = false;
-            //this.rightMWT.Emit = false;
-        }
+        //bool flag = Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.attackPrime) || Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.gasBurst) || Common.CurrentStateTag(this.player.Animator, 0, PlayerAnimation.TAGS.grabbed) || this.player.IsAttacking;
+        //if (flag)
+        //{
+        //    //this.leftMWT.Emit = true;
+        //    //this.rightMWT.Emit = true;
+        //}
+        //else
+        //{
+        //    //this.leftMWT.Emit = false;
+        //    //this.rightMWT.Emit = false;
+        //}
     }
 
     // Token: 0x0400026D RID: 621

@@ -23,7 +23,7 @@ public class InputAxisNames
     public static string reload = "";
 
     // Token: 0x0400055B RID: 1371
-    public static string attack = "Attack";
+    public static string leftMouse = "Left Mouse";
 
     // Token: 0x0400055C RID: 1372
     public static string centerHook = "Center Hook";
@@ -37,7 +37,7 @@ public class InputAxisNames
     public static string verticalBurst = "Vertical Burst";
 
     // Token: 0x0400055B RID: 1371
-    public static string heavyAttack = "Heavy Attack";
+    public static string rightMouse = "Right Mouse";
 
     public static string parry = "Parry";
 
@@ -51,4 +51,10 @@ public class InputAxisNames
     public static string titanLock = "";
 
     public static string fastSpeed = "Fast Speed";
+
+    public static string Inventory = "Inventory";
+
+    public static string pickup = "Pickup";
+
+    public static string dropWeapon = "DropWeapon";
 }

@@ -11,8 +11,6 @@ public class PlayerActions : MonoBehaviour
     {
         this.playerScript = base.GetComponent<Player>();
         this.anim = this.playerScript.Animator;
-        this.ResetAttack();
-        PlayerAnimation.SetAttackState(this.anim, this.attackPrimed, this.attackReleased);
         PlayerAnimation.SetAttackParameters(this.anim, -1f, -1f, 1f, 0f);
         this.SetDamageEffect();
     }
@@ -20,7 +18,6 @@ public class PlayerActions : MonoBehaviour
     // Token: 0x060001CA RID: 458 RVA: 0x0000E234 File Offset: 0x0000C434
     private void Update()
     {
-        this.anim.SetBool("IsAttackAnim", PlayerAnimation.InAttackAnimation(this.anim));
         this.Attack();
     }
 
@@ -28,7 +25,6 @@ public class PlayerActions : MonoBehaviour
     public void Disable()
     {
         this.ResetAttack();
-        PlayerAnimation.SetAttackState(this.anim, this.attackPrimed, this.attackReleased);
         PlayerAnimation.SetAttackParameters(this.anim, -1f, -1f, 1f, 0f);
     }
 
@@ -247,43 +243,6 @@ public class PlayerActions : MonoBehaviour
     // Token: 0x060001DA RID: 474 RVA: 0x0000E4F4 File Offset: 0x0000C6F4
     private void Attack()
     {
-        if (this.attackReleased)
-        {
-            base.Invoke("ResetAttack", Time.fixedDeltaTime);
-        }
-        bool flag = false;
-        if (this.playerScript.Height > 1.25f && !Common.CurrentOrNextStateTag(this.anim, 0, "AttackRelease"))
-        {
-            if (playerScript.AttackKeyDown && !this.attackPrimed)
-            {
-                flag = (this.attackPrimed = true);
-            }
-        }
-        else
-        {
-            this.attackPrimed = false;
-        }
-        if (this.attackPrimed)
-        {
-            bool flag2 = this.FindTitanTarget();
-            if (this.CancelAttack(flag, !flag2))
-            {
-                this.attackPrimed = false;
-            }
-            else if (flag2 && playerScript.AttackKeyDown && !flag)
-            {
-                this.attackReleased = true;
-                this.attackPrimed = false;
-                this.framesSinceActivated = 0;
-                if (Common.CurrentStateTag(this.anim, 0, PlayerAnimation.TAGS.attackPrime))
-                {
-                    this.playerScript.SoundScript.SwordSound("miss");
-                }
-            }
-        }
-        PlayerAnimation.SetAttackState(this.anim, this.attackPrimed, this.attackReleased);
-        this.playerScript.IsAttacking = Common.CurrentOrNextStateTag(this.anim, 0, PlayerAnimation.TAGS.attackRelease);
-        this.playerScript.IsAttackReadied = (!this.playerScript.IsAttacking && Common.CurrentOrNextStateTag(this.anim, 0, PlayerAnimation.TAGS.attackPrime));
         if (this.playerScript.IsAttacking)
         {
             if (this.framesSinceActivated == 0)
@@ -403,8 +362,7 @@ public class PlayerActions : MonoBehaviour
     // Token: 0x060001DE RID: 478 RVA: 0x0000E996 File Offset: 0x0000CB96
     private void ResetAttack()
     {
-        this.attackReleased = false;
-        this.attackPrimed = false;
+
     }
 
     // Token: 0x060001DF RID: 479 RVA: 0x0000E9A8 File Offset: 0x0000CBA8
@@ -507,12 +465,6 @@ public class PlayerActions : MonoBehaviour
 
     // Token: 0x040001FB RID: 507
     private bool damageEffectActive;
-
-    // Token: 0x040001FC RID: 508
-    private bool attackReleased;
-
-    // Token: 0x040001FD RID: 509
-    private bool attackPrimed;
 
     // Token: 0x040001FE RID: 510
     private int framesSinceActivated = -1;
