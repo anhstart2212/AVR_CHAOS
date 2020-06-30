@@ -4780,11 +4780,16 @@ MonoBehaviour:
   refireRate: 5
   fireFrame: 0
   combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  lastAction: {fileID: 0}
+  currentAction: {fileID: 0}
   nextAction: {fileID: 0}
   actionPending: 0
+  isInCombo: 0
+  comboFinished: 0
   timeBetweenCombo: 1
   timeBetweenComboTimecount: 0
   moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
+  chainCount: 0
 --- !u!114 &114598839821928022
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4956,11 +4961,16 @@ MonoBehaviour:
   refireRate: 5
   fireFrame: 0
   combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  lastAction: {fileID: 0}
+  currentAction: {fileID: 0}
   nextAction: {fileID: 0}
   actionPending: 0
+  isInCombo: 0
+  comboFinished: 0
   timeBetweenCombo: 1
   timeBetweenComboTimecount: 0
   moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
+  chainCount: 0
 --- !u!114 &114668607960966020
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5126,7 +5136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sceneGuid: 
   _serializerGuid: 1d62d4d2-ca0e-4c66-a15d-eeac8a467259
-  _prefabId: 1
+  _prefabId: 2
   _updateRate: 1
   _autoFreezeProxyFrames: 0
   _clientPredicted: 1

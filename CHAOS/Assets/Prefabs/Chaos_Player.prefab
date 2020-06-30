@@ -7646,11 +7646,16 @@ MonoBehaviour:
   refireRate: 5
   fireFrame: 0
   combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  lastAction: {fileID: 0}
+  currentAction: {fileID: 0}
   nextAction: {fileID: 0}
   actionPending: 0
+  isInCombo: 0
+  comboFinished: 0
   timeBetweenCombo: 1
   timeBetweenComboTimecount: 0
   moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
+  chainCount: 0
 --- !u!114 &114449979950271768
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7709,11 +7714,16 @@ MonoBehaviour:
   refireRate: 5
   fireFrame: 0
   combatData: {fileID: 11400000, guid: dcc2b3e83ed75ff419e54b48057649d0, type: 2}
+  lastAction: {fileID: 0}
+  currentAction: {fileID: 0}
   nextAction: {fileID: 0}
   actionPending: 0
+  isInCombo: 0
+  comboFinished: 0
   timeBetweenCombo: 1
   timeBetweenComboTimecount: 0
   moveList: {fileID: 11400000, guid: dcf52cc05f965cd4e8a16175604d0b00, type: 2}
+  chainCount: 0
 --- !u!114 &114491828222449250
 MonoBehaviour:
   m_ObjectHideFlags: 1
